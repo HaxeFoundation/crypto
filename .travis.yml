@@ -1,0 +1,92 @@
+language: haxe
+
+# TravisCI by default run on linux.
+# Let's enable both linux and mac builds because why not?
+os:
+  - linux
+  - osx
+
+# Let's use Ubuntu Trusty instead of Precise, which reached its EOL on April 28, 2017.
+dist: trusty
+
+# Test with Haxe 3.4.7 and Haxe development.
+haxe:
+  - "3.4.7"
+  - development
+
+neko: "2.2.0"
+
+matrix:
+  # Allow Haxe development to fail.
+  allow_failures:
+    - haxe: development
+
+addons:
+  # This is the preferred way to install apt packages.
+  # However, it only allow some but not all packages.
+  # Alternatively, we can use `sudo apt-get install ...` in the `install:` section.
+  # http://docs.travis-ci.com/user/apt/#Adding-APT-Packages
+  apt:
+    packages:
+      # C++ (for rebuilding hxcpp)
+      - gcc-multilib
+      - g++-multilib
+      # Python
+      - python3
+      # C#
+      - mono-devel
+      - mono-mcs
+      # Flash
+      - libglib2.0
+      - libfreetype6
+      # Lua
+      - cmake3
+      - lua5.1
+      - luarocks
+      - libpcre3-dev
+      - libssl-dev
+
+install:
+  # os-specific config
+  - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
+      export DISPLAY=:99.0;
+      export AUDIODEV=null;
+      phpenv global 7.0;
+    elif [ "${TRAVIS_OS_NAME}" = "osx" ]; then
+      brew update;
+      brew install mono;
+      brew install phantomjs;
+      brew upgrade python;
+      brew install php;
+    fi
+  # Haxe Lua dependencies
+  - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
+      sudo luarocks install luasec OPENSSL_LIBDIR=/usr/lib/x86_64-linux-gnu;
+      sudo luarocks install lrexlib-pcre PCRE_LIBDIR=/usr/lib/x86_64-linux-gnu;
+      sudo luarocks install luabitop;
+    elif [ "${TRAVIS_OS_NAME}" = "osx" ]; then
+      brew install lua luarocks pcre python;
+      sudo luarocks install lrexlib-pcre;
+      sudo luarocks install luasocket;
+    fi
+  - sudo luarocks install luv
+  - sudo luarocks install environ
+  - sudo luarocks install luautf8
+  # Download and setup a standalone flash player debugger
+  - haxe flash/install.hxml
+  # Install haxelibs
+  - if [ "${TRAVIS_HAXE_VERSION}" = "development" ]; then
+      haxelib git hxcpp https://github.com/HaxeFoundation/hxcpp.git;
+      pushd $(haxelib path hxcpp | head -1);
+        pushd tools/hxcpp; haxe compile.hxml; popd;
+        pushd project; neko build.n; popd;
+      popd;
+    else
+      haxelib install hxcpp;
+    fi
+  - haxelib install hxjava
+  - haxelib install hxcs
+  - haxelib list
+
+script:
+  - haxe tests/compile.hxml
