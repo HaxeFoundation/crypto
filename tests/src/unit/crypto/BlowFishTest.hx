@@ -1,3 +1,5 @@
+package unit.crypto;
+
 import haxe.Timer;
 import haxe.io.Bytes;
 import haxe.crypto.BlowFish;
