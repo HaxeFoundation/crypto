@@ -1,12 +1,13 @@
 package unit.crypto;
 
+import unit.Test;
 import haxe.Timer;
 import haxe.io.Bytes;
 import haxe.crypto.TripleDes;
 import haxe.crypto.mode.Mode;
 import haxe.crypto.padding.*;
 
-class TripleDesTest
+class TripleDesTest extends Test
 {
     var keys = [
              "800000000000000000000000000000000000000000000000", "400000000000000000000000000000000000000000000000",
