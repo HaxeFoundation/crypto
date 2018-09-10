@@ -1,9 +1,10 @@
 package unit.crypto;
 
+import unit.Test;
 import haxe.io.Bytes;
 import haxe.crypto.mode.*;
 
-class ModeTest 
+class ModeTest extends Test
 {
      var plainText = [
         "6BC1BEE22E409F96E93D7E117393172A", "AE2D8A571E03AC9C9EB76FAC45AF8E51", "30C81C46A35CE411E5FBC1191A0A52EF", "F69F2445DF4F9B17AD2B417BE66C3710",
