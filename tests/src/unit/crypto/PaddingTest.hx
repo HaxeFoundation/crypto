@@ -1,9 +1,10 @@
 package unit.crypto;
 
+import unit.Test;
 import haxe.io.Bytes;
 import haxe.crypto.padding.*;
 
-class PaddingTest
+class PaddingTest extends Test
 {
     var plainText = [
         "0000000000000000", "11111111111111", "222222222222", "3333333333",
