@@ -1,12 +1,13 @@
 package unit.crypto;
 
+import unit.Test;
 import haxe.Timer;
 import haxe.io.Bytes;
 import haxe.crypto.BlowFish;
 import haxe.crypto.mode.Mode;
 import haxe.crypto.padding.*;
 
-class BlowFishTest
+class BlowFishTest extends Test
 {
     var keys = [
             "0000000000000000", "FFFFFFFFFFFFFFFF", "3000000000000000", "1111111111111111",
