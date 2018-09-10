@@ -1,12 +1,13 @@
 package unit.crypto;
 
+import unit.Test;
 import haxe.Timer;
 import haxe.io.Bytes;
 import haxe.crypto.AES;
 import haxe.crypto.mode.Mode;
 import haxe.crypto.padding.*;
 
-class AesTest
+class AesTest extends Test
 {
     var keys = [
             "2B7E151628AED2A6ABF7158809CF4F3C", "2B7E151628AED2A6ABF7158809CF4F3C", "2B7E151628AED2A6ABF7158809CF4F3C", "2B7E151628AED2A6ABF7158809CF4F3C",
