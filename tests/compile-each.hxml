@@ -1,0 +1,6 @@
+-D source-header=''
+--debug
+-p src
+--dce full
+-D analyzer-optimize
+-D analyzer-user-var-fusion
