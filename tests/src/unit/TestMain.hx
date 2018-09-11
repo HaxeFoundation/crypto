@@ -57,7 +57,10 @@ class TestMain {
 			new BlowFishTest(),
 			new ModeTest(),
 			new PaddingTest(),
-			new TripleDesTest()
+			new TripleDesTest(),
+			new Sha224Test(),
+			new Sha256Test(),
+			new HmacTest()
 		];
 
 		TestIssues.addIssueClasses("src/unit/issues", "unit.issues");
