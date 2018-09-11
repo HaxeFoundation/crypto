@@ -40,4 +40,5 @@ install:
 build: off
 
 test_script:
-  - haxe tests/compile.hxml
+  - cd tests
+  - haxe compile.hxml

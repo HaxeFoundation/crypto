@@ -65,6 +65,7 @@ class AesTest extends Test
 
     public function new() 
     {
+		super();
         trace("Aes starts...");
         test_ecb();
         test_cbc();

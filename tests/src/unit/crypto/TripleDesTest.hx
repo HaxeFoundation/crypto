@@ -826,6 +826,7 @@ class TripleDesTest extends Test
 
     public function new() 
     {
+		super();
         trace("TripleDes starts...");
         test_ecb();
     }

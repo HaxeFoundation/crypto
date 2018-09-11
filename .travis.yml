@@ -11,7 +11,7 @@ dist: trusty
 
 # Test with Haxe 3.4.7 and Haxe development.
 haxe:
-  - "3.4.7"
+# - "3.4.7"
   - development
 
 neko: "2.2.0"
@@ -89,4 +89,5 @@ install:
   - haxelib list
 
 script:
-  - haxe tests/compile.hxml
+  - cd tests
+  - haxe compile.hxml

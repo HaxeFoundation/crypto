@@ -58,6 +58,7 @@ class ModeTest extends Test
 
     public function new()
     {
+		super();
         test_encrypt();
         test_decrypt();
     }

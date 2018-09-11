@@ -54,6 +54,7 @@ class PaddingTest extends Test
 
     public function new()
     {
+		super();
         test_pad();
         test_unpad();
     }

@@ -1,4 +1,6 @@
-# unittest helpers
+# unit test helpers
+-cp src
+-cp ../src
 # targets
 
 compile-flash9.hxml

@@ -8,7 +8,7 @@ class CBC
     {
 	var vector = iv.sub(0,iv.length);
 	var i : Int = 0;
-.	var len : Int = src.length;
+	var len : Int = src.length;
 	while (i < len)
 	{
 		for (j in 0...blockSize)

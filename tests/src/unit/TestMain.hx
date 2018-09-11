@@ -2,6 +2,7 @@ package unit;
 
 import unit.crypto.*;
 import haxe.ds.List;
+import unit.Test.*;
 
 @:access(unit.Test)
 @:expose("unit.TestMain")

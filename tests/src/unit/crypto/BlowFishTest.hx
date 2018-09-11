@@ -69,6 +69,7 @@ class BlowFishTest extends Test
 
     public function new() 
     {
+		super();
         trace("Blowfish starts...");
         test_ecb();
         test_ctr();

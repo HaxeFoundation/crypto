@@ -161,8 +161,8 @@ class BlowFish
 
     public function init(key:Bytes, ?iv:Bytes):Void
     {
-	this.iv = iv;
-        SetKey(key);
+		this.iv = iv;
+        setKey(key);
     }
 
     public function  getBlockSize():Int
@@ -174,7 +174,7 @@ class BlowFish
     { 
         var out:Bytes;
 	
-	switch(padding)  {
+		switch(padding)  {
            //CBC, ECB  and PCBC requires padding
            case Padding.NoPadding:
                 out = NoPadding.pad(data,BLOCK_SIZE); 
@@ -361,18 +361,18 @@ class BlowFish
 
     private function int32ToBytes(n:Int32, bs:Bytes, off:Int):Void
     {
-	bs.set( off , (n >> 24));
-	bs.set(++off, (n >> 16));
-	bs.set(++off, (n >>  8));
-	bs.set(++off, (n      ));
+		bs.set( off , (n >> 24));
+		bs.set(++off, (n >> 16));
+		bs.set(++off, (n >>  8));
+		bs.set(++off, (n      ));
     }
 
     private function bytesToInt32(bs:Bytes, off:Int):Int32
     {
-	var n:Int32 = ( bs.get(off) & 0xff ) << 24;
-	n |= ( bs.get(++off) & 0xff) << 16;
-	n |= ( bs.get(++off) & 0xff) << 8;
-	n |= bs.get(++off) & 0xff ;
-	return n;
+		var n:Int32 = ( bs.get(off) & 0xff ) << 24;
+		n |= ( bs.get(++off) & 0xff) << 16;
+		n |= ( bs.get(++off) & 0xff) << 8;
+		n |= bs.get(++off) & 0xff ;
+		return n;
     }
 }
