@@ -4,12 +4,12 @@ import unit.Test;
 import haxe.io.Bytes;
 import haxe.crypto.Hmac;
 
-class HmaxTest extends Test
+class HmacTest extends Test
 {
 
-	var hmacMd5;
-	var hmacSha1;
-	var hmacSha256;
+	var hmacMd5:Hmac;
+	var hmacSha1:Hmac;
+	var hmacSha256:Hmac;
 
     public function new()
     {
