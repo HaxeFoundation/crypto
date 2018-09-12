@@ -4,17 +4,26 @@ import sys.io.File.*;
 import haxe.*;
 import haxe.io.*;
 
+#if (haxe_ver < 4)
+import haxe.xml.Fast as Access;
+#else
+import haxe.xml.Access;
+#end
+
 class Install {
 	// https://www.adobe.com/support/flashplayer/downloads.html
-	static var fpDownload(default, never) = switch (systemName()) {
-		case "Linux":
-			"http://fpdownload.macromedia.com/pub/flashplayer/updaters/30/flash_player_sa_linux_debug.x86_64.tar.gz";
-		case "Mac":
-			"http://fpdownload.macromedia.com/pub/flashplayer/updaters/30/flashplayer_30_sa_debug.dmg";
-		case "Windows":
-			"http://fpdownload.macromedia.com/pub/flashplayer/updaters/30/flashplayer_30_sa_debug.exe";
-		case _:
-			throw "unsupported system";
+	static function getDownloadUrl() {
+		var majorVersion = getLatestFPVersion()[0];
+		return switch (systemName()) {
+			case "Linux":
+				'http://fpdownload.macromedia.com/pub/flashplayer/updaters/${majorVersion}/flash_player_sa_linux_debug.x86_64.tar.gz';
+			case "Mac":
+				'http://fpdownload.macromedia.com/pub/flashplayer/updaters/${majorVersion}/flashplayer_${majorVersion}_sa_debug.dmg';
+			case "Windows":
+				'http://fpdownload.macromedia.com/pub/flashplayer/updaters/${majorVersion}/flashplayer_${majorVersion}_sa_debug.exe';
+			case _:
+				throw "unsupported system";
+		}
 	}
 	// https://helpx.adobe.com/flash-player/kb/configure-debugger-version-flash-player.html
 	static var mmcfg(default, never) = switch (systemName()) {
@@ -38,9 +47,15 @@ class Install {
 		case _:
 			throw "unsupported system";
 	}
+	static function getLatestFPVersion():Array<Int> {
+		var appcast = Xml.parse(Http.requestUrl("http://fpdownload2.macromedia.com/get/flashplayer/update/current/xml/version_en_mac_pep.xml"));
+		var versionStr = new Access(appcast).node.XML.node.update.att.version;
+		return versionStr.split(",").map(Std.parseInt);
+	}
 	static function main() {
 		switch (systemName()) {
 			case "Linux":
+				var fpDownload = getDownloadUrl();
 				// Download and unzip flash player
 				if (command("wget", [fpDownload]) != 0)
 					throw "failed to download flash player";
@@ -51,6 +66,7 @@ class Install {
 				if (command("brew", ["cask", "install", "flash-player-debugger"]) != 0)
 					throw "failed to install flash-player-debugger";
 			case "Windows":
+				var fpDownload = getDownloadUrl();
 				// Download flash player
 				download(fpDownload, "flash\\flashplayer.exe");
 			case _:
