@@ -3,7 +3,7 @@ package unit.crypto;
 import unit.Test;
 import haxe.Timer;
 import haxe.io.Bytes;
-import haxe.crypto.AES;
+import haxe.crypto.Aes;
 import haxe.crypto.mode.Mode;
 import haxe.crypto.padding.*;
 
@@ -98,7 +98,7 @@ class AesTest extends Test
         trace("Starting "+cipherMode+" mode for "+keys.length+" keys");
         var time = Timer.stamp();
         
-        var aes : AES = new AES();
+        var aes : Aes = new Aes();
 
         for(i in 0...keys.length)
         {
