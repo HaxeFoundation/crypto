@@ -10,8 +10,10 @@ install:
   # Install the neko chocolatey package (https://chocolatey.org/packages/neko)
   - cinst neko --version 2.2.0 -y
   # Install the haxe chocolatey package (https://chocolatey.org/packages/haxe)
-  - cinst haxe --version 3.4.7 -y
+  - cinst haxe --prerelease --ignore-dependencies -s 'https://ci.appveyor.com/nuget/haxe' -y
   - RefreshEnv
+  - neko -version
+  - haxe -version
   # Setup haxelib
   - mkdir "%HAXELIB_ROOT%"
   - haxelib setup "%HAXELIB_ROOT%"
