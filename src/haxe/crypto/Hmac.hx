@@ -27,6 +27,7 @@ package haxe.crypto;
 enum HashMethod {
 	MD5;
 	SHA1;
+	SHA224;
 	SHA256;
 }
 
@@ -42,11 +43,12 @@ class Hmac {
 	public function new( hashMethod : HashMethod ) {
 		method = hashMethod;
 		blockSize = switch ( hashMethod ) {
-			case MD5, SHA1, SHA256: 64;
+			case MD5, SHA1, SHA224, SHA256: 64;
 		}
 		length = switch ( hashMethod ) {
 			case MD5: 16;
 			case SHA1: 20;
+			case SHA224: 28;
 			case SHA256: 32;
 		}
 	}
@@ -55,6 +57,7 @@ class Hmac {
 		return switch ( method ) {
 			case MD5: Md5.make(b);
 			case SHA1: Sha1.make(b);
+			case SHA224: Sha224.make(b);
 			case SHA256: Sha256.make(b);
 		}
 	}
