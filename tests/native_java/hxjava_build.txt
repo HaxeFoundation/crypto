@@ -1,0 +1,25 @@
+./
+begin modules
+M haxe.test.OverloadInterface1
+C haxe.test.OverloadInterface1
+M haxe.test.OverloadInterface2
+C haxe.test.OverloadInterface2
+M haxe.test.lowerCaseClass
+C haxe.test.lowerCaseClass
+M haxe.test.MyClass
+C haxe.test.MyClass
+M haxe.test.TEnum
+E haxe.test.TEnum
+M haxe.test.Base
+C haxe.test.Base
+M haxe.test.Generic1
+C haxe.test.Generic1
+M haxe.test.GenericHelper
+C haxe.test.GenericHelper
+M haxe.test.StaticAndInstanceClash
+C haxe.test.StaticAndInstanceClash
+M haxe.UpperCasePackage.SomeClass
+C haxe.UpperCasePackage.SomeClass
+M haxe.UpperCasePackage.lowercase
+C haxe.UpperCasePackage.lowercase
+end modules
