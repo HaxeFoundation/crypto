@@ -104,22 +104,22 @@ class ModeTest extends Test
             src = Bytes.ofHex(cbc_txt[i]);
             vector = Bytes.ofHex(iv[i]);
             CBC.decrypt(src,vector,BLOCK_SIZE,decryptBlock);
-            eq(plainText[i],src.toHex().toUpperCase(),Mode.CBC);
+            eq(plainText[i],src.toHex().toUpperCase());
             src = Bytes.ofHex(cfb_txt[i]);
             CFB.decrypt(src,vector,BLOCK_SIZE,decryptBlock);
-            eq(plainText[i],src.toHex().toUpperCase(),Mode.CFB);
+            eq(plainText[i],src.toHex().toUpperCase());
             src = Bytes.ofHex(ctr_txt[i]);
             CTR.decrypt(src,vector,BLOCK_SIZE,decryptBlock);
-            eq(plainText[i],src.toHex().toUpperCase(),Mode.CTR);
+            eq(plainText[i],src.toHex().toUpperCase());
             src = Bytes.ofHex(ecb_txt[i]);
             ECB.decrypt(src,BLOCK_SIZE,decryptBlock);
-            eq(plainText[i],src.toHex().toUpperCase(),Mode.ECB);
+            eq(plainText[i],src.toHex().toUpperCase());
             src = Bytes.ofHex(ofb_txt[i]);
             OFB.decrypt(src,vector,BLOCK_SIZE,decryptBlock);
-            eq(plainText[i],src.toHex().toUpperCase(),Mode.OFB);
+            eq(plainText[i],src.toHex().toUpperCase());
             src = Bytes.ofHex(pcbc_txt[i]);
             PCBC.decrypt(src,vector,BLOCK_SIZE,decryptBlock);
-            eq(plainText[i],src.toHex().toUpperCase(),Mode.PCBC);
+            eq(plainText[i],src.toHex().toUpperCase());
         }
     }
 }
