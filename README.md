@@ -80,7 +80,7 @@ Cross platform cryptographic functions for Haxe
    trace("Decrypted text: "+ data);
  ```
  
-  #### Hmac with MD5 / SHA224 / SHA256
+  #### Hmac with MD5 / SHA1 / SHA224 / SHA256
  ```haxe
    var hmacMd5 = new Hmac(MD5);
    var hmacSha1 = new Hmac(SHA1);
