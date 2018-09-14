@@ -1,8 +1,10 @@
+# Crypto
 [![TravisCI Build Status](https://travis-ci.org/HaxeFoundation/crypto.svg?branch=master)](https://travis-ci.org/HaxeFoundation/crypto)
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/HaxeFoundation/crypto?branch=master&svg=true)](https://ci.appveyor.com/project/HaxeFoundation/crypto)
 
-# crypto
 Cross platform cryptographic functions for Haxe
+
+
 
 ### Supported algorithms
   * Aes
@@ -40,6 +42,8 @@ Cross platform cryptographic functions for Haxe
    var text = Bytes.ofString("Haxe - The Cross-platform Toolkit");
    var iv:Bytes = Bytes.ofHex("4F021DB243BC633D7178183A9FA071E8");
    
+   aes.init(key,iv);
+   
    // Encrypt
    var data = aes.encrypt(Mode.CTR,text,Padding.NoPadding);
    trace("Encrypted text: "+ data.toHex());
@@ -57,6 +61,8 @@ Cross platform cryptographic functions for Haxe
    var text = Bytes.ofString("Haxe - The Cross-platform Toolkit");
    var iv:Bytes = Bytes.ofHex("7FC38460C9225873");
    
+   blowFish.init(key,iv);
+   
    // Encrypt
    var data = blowFish.encrypt(Mode.PCBC,text,Padding.PKCS7);
    trace("Encrypted text: "+ data.toHex());
@@ -73,6 +79,8 @@ Cross platform cryptographic functions for Haxe
    var key = Bytes.ofHex("2BD6459F82C5B300952C49104881FF482BD6459F82C5B300");
    var text = Bytes.ofString("Haxe - The Cross-platform Toolkit");
    var iv:Bytes = Bytes.ofHex("A015E0CFA1FED3B5");
+   
+   tdes.init(key,iv);
    
     // Encrypt
    var data = tdes.encrypt(Mode.OFB,text,Padding.NoPadding);
