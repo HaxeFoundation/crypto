@@ -67,17 +67,9 @@ class BlowFishTest extends Test
             "7CBAC9C2CF26D1BA", "5438ACA317D45230"
         ];
 
-    public function new() 
+    private function test(ciphers:Array<String>, cipherMode:Mode, padding:Padding, ivTable:Array<String>):Void
     {
-		super();
-        trace("Blowfish starts...");
-        test_ecb();
-        test_ctr();
-    }
-
-    public function test(ciphers:Array<String>, cipherMode:Mode, padding:Padding, ivTable:Array<String>):Void
-    {
-        trace("Starting "+cipherMode+" mode for "+keys.length+" keys");
+        trace("Blowfish with "+cipherMode+" mode for "+keys.length+" keys");
         var time = Timer.stamp();
 
         var blowFish : BlowFish = new BlowFish();
@@ -89,9 +81,9 @@ class BlowFishTest extends Test
             var iv:Bytes = (ivTable == null)?null:Bytes.ofHex(ivTable[i]);
             blowFish.init(key,iv);
             var enc = blowFish.encrypt(cipherMode,text,padding);
-            if ( enc.toHex().toUpperCase() != ciphers[i] ) throw "Wrong Blowfish encryption for "+plainText[i]+", expected "+ciphers[i]+" got "+enc.toHex()+" , mode: "+cipherMode;
+            eq( enc.toHex().toUpperCase(), ciphers[i] );
             var decr = blowFish.decrypt(cipherMode,enc,padding);
-            if ( decr.toHex().toUpperCase() != plainText[i] ) throw "Wrong Blowfish decryption for "+enc.toHex()+", expected "+plainText[i]+" got "+decr.toHex()+" , mode: "+cipherMode;
+            eq( decr.toHex().toUpperCase(), plainText[i] );
         }
 
         time = Timer.stamp()-time;
