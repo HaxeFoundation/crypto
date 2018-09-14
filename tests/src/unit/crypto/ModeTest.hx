@@ -56,13 +56,6 @@ class ModeTest extends Test
 
     static inline var BLOCK_SIZE : Int = 8;
 
-    public function new()
-    {
-		super();
-        test_encrypt();
-        test_decrypt();
-    }
-
     private function  encryptBlock( src:Bytes, srcIndex:Int, dst:Bytes, dstIndex:Int):Void
     {
     }
@@ -71,14 +64,9 @@ class ModeTest extends Test
     {
     }
 
-    private function checkmode(mode:String,data:Bytes,type:Mode):Void
-    {
-        if ( mode !=  data.toHex().toUpperCase() ) throw "Wrong mode "+type+" . Got "+data.toHex().toUpperCase()+" expected "+mode;
-           
-    }
-
     private function test_encrypt():Void
     {
+		trace("Start mode encrypt ...");
         var src:Bytes;
         var vector:Bytes;
         for(i in 0...plainText.length) 
@@ -86,51 +74,52 @@ class ModeTest extends Test
             src = Bytes.ofHex(plainText[i]);
             vector = Bytes.ofHex(iv[i]);
             CBC.encrypt(src,vector,BLOCK_SIZE,encryptBlock);
-            checkmode(cbc_txt[i],src,Mode.CBC);
+            eq(cbc_txt[i],src.toHex().toUpperCase());
             src = Bytes.ofHex(plainText[i]);
             CFB.encrypt(src,vector,BLOCK_SIZE,encryptBlock);
-            checkmode(cfb_txt[i],src,Mode.CFB);
+            eq(cfb_txt[i],src.toHex().toUpperCase());
             src = Bytes.ofHex(plainText[i]);
             CTR.encrypt(src,vector,BLOCK_SIZE,encryptBlock);
-            checkmode(ctr_txt[i],src,Mode.CTR);
+            eq(ctr_txt[i],src.toHex().toUpperCase());
             src = Bytes.ofHex(plainText[i]);
             ECB.encrypt(src,BLOCK_SIZE,encryptBlock);
-            checkmode(ecb_txt[i],src,Mode.ECB);
+            eq(ecb_txt[i],src.toHex().toUpperCase());
             src = Bytes.ofHex(plainText[i]);
             OFB.encrypt(src,vector,BLOCK_SIZE,encryptBlock);
-            checkmode(ofb_txt[i],src,Mode.OFB);
+            eq(ofb_txt[i],src.toHex().toUpperCase());
             src = Bytes.ofHex(plainText[i]);
             PCBC.encrypt(src,vector,BLOCK_SIZE,encryptBlock);
-            checkmode(pcbc_txt[i],src,Mode.PCBC);
+            eq(pcbc_txt[i],src.toHex().toUpperCase());
         }
         
     }
 
     private function test_decrypt():Void
     {
-       var src:Bytes;
+		trace("Start mode decrypt ...");
+        var src:Bytes;
         var vector:Bytes;
         for(i in 0...plainText.length) 
         {
             src = Bytes.ofHex(cbc_txt[i]);
             vector = Bytes.ofHex(iv[i]);
             CBC.decrypt(src,vector,BLOCK_SIZE,decryptBlock);
-            checkmode(plainText[i],src,Mode.CBC);
+            eq(plainText[i],src.toHex().toUpperCase(),Mode.CBC);
             src = Bytes.ofHex(cfb_txt[i]);
             CFB.decrypt(src,vector,BLOCK_SIZE,decryptBlock);
-            checkmode(plainText[i],src,Mode.CFB);
+            eq(plainText[i],src.toHex().toUpperCase(),Mode.CFB);
             src = Bytes.ofHex(ctr_txt[i]);
             CTR.decrypt(src,vector,BLOCK_SIZE,decryptBlock);
-            checkmode(plainText[i],src,Mode.CTR);
+            eq(plainText[i],src.toHex().toUpperCase(),Mode.CTR);
             src = Bytes.ofHex(ecb_txt[i]);
             ECB.decrypt(src,BLOCK_SIZE,decryptBlock);
-            checkmode(plainText[i],src,Mode.ECB);
+            eq(plainText[i],src.toHex().toUpperCase(),Mode.ECB);
             src = Bytes.ofHex(ofb_txt[i]);
             OFB.decrypt(src,vector,BLOCK_SIZE,decryptBlock);
-            checkmode(plainText[i],src,Mode.OFB);
+            eq(plainText[i],src.toHex().toUpperCase(),Mode.OFB);
             src = Bytes.ofHex(pcbc_txt[i]);
             PCBC.decrypt(src,vector,BLOCK_SIZE,decryptBlock);
-            checkmode(plainText[i],src,Mode.PCBC);
+            eq(plainText[i],src.toHex().toUpperCase(),Mode.PCBC);
         }
     }
 }

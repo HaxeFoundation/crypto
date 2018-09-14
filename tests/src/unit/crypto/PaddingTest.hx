@@ -52,64 +52,53 @@ class PaddingTest extends Test
 
     static inline var BLOCK_SIZE : Int = 8;
 
-    public function new()
-    {
-		super();
-        test_pad();
-        test_unpad();
-    }
-
-    private function checkPading(pad:String,data:Bytes,type:Padding):Void
-    {
-        if ( pad !=  data.toHex().toUpperCase() ) throw "Wrong padding "+type+" . Got "+data.toHex().toUpperCase()+" expected "+pad;
-           
-    }
-
     public function test_pad():Void
     {
+		trace("Start padding tests ...");
         for(i in 0...plainText.length)
         {
            var padAnsiX923 = AnsiX923.pad(Bytes.ofHex(plainText[i]), BLOCK_SIZE);
-           checkPading(pad_ansiX923[i],padAnsiX923,Padding.AnsiX923);
+           eq(pad_ansiX923[i],padAnsiX923.toHex().toUpperCase());
            var padBit = BitPadding.pad(Bytes.ofHex(plainText[i]), BLOCK_SIZE);
-           checkPading(pad_bit[i],padBit,Padding.BitPadding);
+           eq(pad_bit[i],padBit.toHex().toUpperCase());
            var padIso10126 = ISO10126.pad(Bytes.ofHex(plainText[i]), BLOCK_SIZE); //not check, random bytes
            var padNoPadding = NoPadding.pad(Bytes.ofHex(plainText[i]), BLOCK_SIZE);
-           checkPading(pad_nopad[i],padNoPadding,Padding.NoPadding);
+           eq(pad_nopad[i],padNoPadding.toHex().toUpperCase());
            var padNull = NullPadding.pad(Bytes.ofHex(plainText[i]), BLOCK_SIZE);
-           checkPading(pad_null[i],padNull,Padding.NullPadding);
+           eq(pad_null[i],padNull.toHex().toUpperCase());
            var padPkcs7 = PKCS7.pad(Bytes.ofHex(plainText[i]), BLOCK_SIZE);
-           checkPading(pad_pkcs7[i],padPkcs7,Padding.PKCS7);
+           eq(pad_pkcs7[i],padPkcs7.toHex().toUpperCase());
            var padSpace = SpacePadding.pad(Bytes.ofHex(plainText[i]), BLOCK_SIZE);
-           checkPading(pad_space[i],padSpace,Padding.SpacePadding);
+           eq(pad_space[i],padSpace.toHex().toUpperCase());
            var padTbc = TBC.pad(Bytes.ofHex(plainText[i]), BLOCK_SIZE);
-           checkPading(pad_tbc[i],padTbc,Padding.TBC);
+           eq(pad_tbc[i],padTbc.toHex().toUpperCase());
         }
     }
 
     public function test_unpad():Void
     {
+		trace("Start unpadding tests ...");
         for(i in 0...plainText.length)
         {
            var padAnsiX923 = AnsiX923.unpad(Bytes.ofHex(pad_ansiX923[i]));
-           checkPading(plainText[i],padAnsiX923,Padding.AnsiX923);
+           eq(plainText[i],padAnsiX923.toHex().toUpperCase());
            var padBit = BitPadding.unpad(Bytes.ofHex(pad_bit[i]));
-           checkPading(plainText[i],padBit,Padding.BitPadding);
+           eq(plainText[i],padBit.toHex().toUpperCase());
            var padIso10126 = ISO10126.unpad(Bytes.ofHex(pad_random[i]));
-           checkPading(plainText[i],padIso10126,Padding.ISO10126);
+           eq(plainText[i],padIso10126.toHex().toUpperCase());
            var padNoPadding = NoPadding.unpad(Bytes.ofHex(pad_nopad[i]));
-           checkPading(plainText[i],padNoPadding,Padding.NoPadding);
+           eq(plainText[i],padNoPadding.toHex().toUpperCase());
            if ( i != 0) //skip check on 00 bytes
            { 
             var padNull = NullPadding.unpad(Bytes.ofHex(pad_null[i]));
-            checkPading(plainText[i],padNull,Padding.NullPadding);
+            eq(plainText[i],padNull.toHex().toUpperCase());
            }
            var padPkcs7 = PKCS7.unpad(Bytes.ofHex(pad_pkcs7[i]));
-           checkPading(plainText[i],padPkcs7,Padding.PKCS7);
+           eq(plainText[i],padPkcs7.toHex().toUpperCase());
            var padSpace = SpacePadding.unpad(Bytes.ofHex(pad_space[i]));
-           checkPading(plainText[i],padSpace,Padding.SpacePadding);
+           eq(plainText[i],padSpace.toHex().toUpperCase());
            var padTbc = TBC.unpad(Bytes.ofHex(pad_tbc[i]));
-           checkPading(plainText[i],padTbc,Padding.TBC);
+           eq(plainText[i],padTbc.toHex().toUpperCase());
         }
     }
 }

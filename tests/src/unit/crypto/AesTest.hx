@@ -63,16 +63,6 @@ class AesTest extends Test
             "DC7E84BFDA79164B7ECD8486985D3860", "4FEBDC6740D20B3AC88F6AD82A4FB08D", "71AB47A086E86EEDF39D1C5BBA97C408", "0126141D67F37BE8538F5A8BE740E484"
     ];
 
-    public function new() 
-    {
-		super();
-        trace("Aes starts...");
-        test_ecb();
-        test_cbc();
-        test_cfb();
-        test_ofb();
-    }
-
     public function test_ecb():Void
     {
         test(ecb_ciphers,Mode.ECB,Padding.NoPadding,null);
@@ -93,9 +83,10 @@ class AesTest extends Test
         test(ofb_ciphers,Mode.OFB,Padding.NoPadding,ofb_iv);
     }
 
-    public function test(ciphers:Array<String>, cipherMode:Mode, padding:Padding, ivTable:Array<String>):Void
+    private function test(ciphers:Array<String>, cipherMode:Mode, padding:Padding, ivTable:Array<String>):Void
     {
-        trace("Starting "+cipherMode+" mode for "+keys.length+" keys");
+		if ( ciphers == null ) return;
+        trace("AES with "+cipherMode+" mode for "+keys.length+" keys");
         var time = Timer.stamp();
         
         var aes : Aes = new Aes();
@@ -107,9 +98,9 @@ class AesTest extends Test
             var iv:Bytes = (ivTable == null)?null:Bytes.ofHex(ivTable[i]);
             aes.init(key,iv);
             var enc = aes.encrypt(cipherMode,text,padding);
-            if ( enc.toHex().toUpperCase() != ciphers[i] ) throw "Wrong Aes encryption for "+plainText[i]+", expected "+ciphers[i]+" got "+enc.toHex()+" , mode: "+cipherMode;
+            eq( enc.toHex().toUpperCase(), ciphers[i] );
             var decr = aes.decrypt(cipherMode,enc,padding);
-            if ( decr.toHex().toUpperCase() != plainText[i] ) throw "Wrong Aes decryption for "+enc.toHex()+", expected "+plainText[i]+" got "+decr.toHex()+" , mode: "+cipherMode;
+            eq( decr.toHex().toUpperCase(), plainText[i] );
         }
         
         time = Timer.stamp()-time;

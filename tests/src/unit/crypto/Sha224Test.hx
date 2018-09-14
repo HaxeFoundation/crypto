@@ -7,15 +7,6 @@ import haxe.crypto.Sha224;
 class Sha224Test extends Test
 {
 
-
-    public function new()
-    {
-		super();
-
-        test_encrypt();
-        test_decrypt();
-    }
-
     public function test_encrypt():Void
     {
        eq(haxe.crypto.Sha224.encode(""), "d14a028c2a3a2bc9476102bb288234c415a2b01f828ea62ac5b3e42f");

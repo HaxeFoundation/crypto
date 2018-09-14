@@ -824,16 +824,11 @@ class TripleDesTest extends Test
              "FCFCFCFCFCFCFCFC", "FDFDFDFDFDFDFDFD", "FEFEFEFEFEFEFEFE", "FFFFFFFFFFFFFFFF", "0011223344556677", "EA024714AD5C4D84"
         ];
 
-    public function new() 
-    {
-		super();
-        trace("TripleDes starts...");
-        test_ecb();
-    }
-
     public function test(ciphers:Array<String>, cipherMode:Mode, padding:Padding, ivTable:Array<String>):Void
     {
-        trace("Starting "+cipherMode+" mode for "+keys.length+" keys");
+		if ( ciphers == null ) return;
+		
+        trace("Triple DES with  "+cipherMode+" mode for "+keys.length+" keys");
         var time = Timer.stamp();
         
         var tdes : TripleDes = new TripleDes();
@@ -845,9 +840,9 @@ class TripleDesTest extends Test
             var iv:Bytes = (ivTable == null)?null:Bytes.ofHex(ivTable[i]);
             tdes.init(key,iv);
             var enc = tdes.encrypt(cipherMode,text,padding);
-            if ( enc.toHex().toUpperCase() != ciphers[i] ) throw "Wrong Tripledes encryption for "+plainText[i]+", expected "+ciphers[i]+" got "+enc.toHex()+" , mode: "+cipherMode;
+            eq( enc.toHex().toUpperCase(), ciphers[i] );
             var decr = tdes.decrypt(cipherMode,enc,padding);
-            if ( decr.toHex().toUpperCase() != plainText[i] ) throw "Wrong Tripledes decryption for "+enc.toHex()+", expected "+plainText[i]+" got "+decr.toHex()+" , mode: "+cipherMode;
+            eq( decr.toHex().toUpperCase(), plainText[i] );
         }
 
         time = Timer.stamp()-time;

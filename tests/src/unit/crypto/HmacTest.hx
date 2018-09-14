@@ -18,9 +18,6 @@ class HmacTest extends Test
 		hmacMd5 = new haxe.crypto.Hmac(MD5);
 		hmacSha1 = new haxe.crypto.Hmac(SHA1);
 		hmacSha256 = new haxe.crypto.Hmac(SHA256);
-
-        test_encrypt();
-        test_decrypt();
     }
 
     public function test_encrypt():Void

@@ -69,6 +69,7 @@ class BlowFishTest extends Test
 
     private function test(ciphers:Array<String>, cipherMode:Mode, padding:Padding, ivTable:Array<String>):Void
     {
+		if ( ciphers == null ) return;
         trace("Blowfish with "+cipherMode+" mode for "+keys.length+" keys");
         var time = Timer.stamp();
 

@@ -7,14 +7,6 @@ import haxe.crypto.Sha256;
 class Sha256Test extends Test
 {
 
-    public function new()
-    {
-		super();
-		
-        test_encrypt();
-        test_decrypt();
-    }
-
     public function test_encrypt():Void
     {
        eq(haxe.crypto.Sha256.encode(""), "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
