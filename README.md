@@ -79,5 +79,44 @@ Cross platform cryptographic functions for Haxe
    data = tdes.decrypt(Mode.OFB,data,Padding.NoPadding);
    trace("Decrypted text: "+ data);
  ```
+ 
+  #### Hmac with MD5 / SHA224 / SHA256
+ ```haxe
+   var hmacMd5 = new Hmac(MD5);
+   var hmacSh224 = new Hmac(SHA224);
+   var hmacSha256 = new Hmac(SHA256);
 
-  
+   var key = ofHex("c8c2c9d386b63964");
+   var text = Bytes.ofString("Haxe - The Cross-platform Toolkit");
+    
+   var data = hmacMd5.make(key,text);
+   trace("HMac MD5: "+data.toHex());
+
+   var data = hmacSh224.make(key,text);
+   trace("HMac Sha224: "+data.toHex());
+
+   data = hmacSha256.make(key,text);
+   trace("HMac Sha256: "+data.toHex());
+ ```
+ 
+   #### SHA224
+   ```haxe
+   var text = Bytes.ofString("Haxe - The Cross-platform Toolkit");
+    
+   var dataText = Sha224.encode("Haxe - The Cross-platform Toolkit");
+   trace("Sha224: "+dataText);
+   
+   var dataBytes = Sha224.make(text);
+   trace("Sha224: "+dataBytes.toHex());
+   ```
+   
+   #### SHA256
+   ```haxe
+   var text = Bytes.ofString("Haxe - The Cross-platform Toolkit");
+    
+   var dataText = Sha256.encode("Haxe - The Cross-platform Toolkit");
+   trace("Sha256: "+dataText);
+   
+   var dataBytes = Sha256.make(text);
+   trace("Sha256: "+dataBytes.toHex());
+   ```
