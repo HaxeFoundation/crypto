@@ -124,36 +124,24 @@ class Sha224 {
         return HASH;
     }
 
-	static function str2blks( str : String ){
+	static function str2blks( s : String ) : Array<Int>
+	{
 #if !(neko || (cpp && !hxcpp_smart_strings))
-		var str = haxe.io.Bytes.ofString(str);
+		var s = haxe.io.Bytes.ofString(s);
 #end
-		var nblk = ((str.length + 8) >> 6) + 1;
-		var blks = new Array();
+		var nblk = ((s.length + 8) >> 6) + 1;
+		var blks = new Array<Int>();
 
-		//preallocate size
-		var blksSize = nblk * 16;
-		#if (neko || eval || cs || cpp || java || hl)
-		blks[blksSize - 1] = 0;
-		#end
-
-		#if !(cpp || cs || hl) //C++ and C# will already initialize them with zeroes.
-		for( i in 0...blksSize ) blks[i] = 0;
-		#end
-
-		var i = 0;
-		var max = str.length;
-		var l = max * 8;
-		while( i < max ) {
-			blks[i >> 2] |= #if !(neko || (cpp && !hxcpp_smart_strings)) str.get(i) #else StringTools.fastCodeAt(str, i) #end << (((l + i) % 4) * 8);
-			i++;
+		for (i in 0...nblk*16)
+			blks[i] = 0;
+		for (i in 0...s.length){
+			var p = i >> 2;
+			blks[p] |= #if !(neko || (cpp && !hxcpp_smart_strings)) s.get(i) #else s.charCodeAt(i) #end << (24 - ((i & 3) << 3));
 		}
-		blks[i >> 2] |= 0x80 << (((l + i) % 4) * 8);
-		var k = nblk * 16 - 2;
-		blks[k] = (l & 0xFF);
-		blks[k] |= ((l >>> 8) & 0xFF) << 8;
-		blks[k] |= ((l >>> 16) & 0xFF) << 16;
-		blks[k] |= ((l >>> 24) & 0xFF) << 24;
+		var i = s.length;
+		var p = i >> 2;
+		blks[p] |= 0x80 << (24 - ((i & 3) << 3));
+		blks[nblk * 16 - 1] = s.length * 8;
 		return blks;
 	}
 
