@@ -300,7 +300,7 @@ class Test {
         #elseif php
             return "Php";
 		#elseif python
-			return "Python"
+			return "Python";
 		#elseif lua
             return "Lua";
         #elseif neko
