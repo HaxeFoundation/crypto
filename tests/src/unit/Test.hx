@@ -26,7 +26,7 @@ class Test {
 	function eq<T>( v : T, v2 : T, ?pos ) {
 		incrCount(pos);
 		if( v != v2 ) {
-			report(Std.string(v)+" should be "+Std.string(v2),pos);
+			report(Std.string(v)+" should be "+Std.string(v2)+" . Target: "+getTarget(),pos);
 			success = false;
 		}
 	}
@@ -280,5 +280,39 @@ class Test {
 #if lua
 		Sys.exit(1);
 #end
+	}
+	
+	static function getTarget():String {
+		#if interp
+			return "Interp";
+		#elseif flash
+			return "Flash";
+		#elseif java
+			return "Java";
+		#elseif cs
+            return "Cs";
+		#elseif cpp
+            return "Cpp";
+		#elseif cppia
+            return "Cppia";
+		#elseif hl
+            return "Hashlink";
+        #elseif php
+            return "Php";
+		#elseif python
+			return "Python"
+		#elseif lua
+            return "Lua";
+        #elseif neko
+            return "Neko";
+        #elseif js
+            return "Js";
+		#elseif macro
+            return "Macro";
+		#elseif as3
+			return "AS3";
+		#else
+			return "Missing target name"
+		#end
 	}
 }
