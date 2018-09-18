@@ -26,9 +26,9 @@ package haxe.crypto;
 */
 class Sha256 {
 
-	public static function encode( s:String ) : String {
+	public static function encode( s:String, ?encoding : haxe.io.Encoding ) : String {
 		var sh = new Sha256();
-		var data = haxe.io.Bytes.ofString(s);
+		var data = haxe.io.Bytes.ofString(s, encoding);
 		var nblk = data.length*8;
 		var h = sh.doEncode(str2blks(data), nblk);
 		return sh.hex(h);

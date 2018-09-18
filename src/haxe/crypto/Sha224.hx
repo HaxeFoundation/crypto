@@ -26,10 +26,10 @@ package haxe.crypto;
 */
 class Sha224 {
 
-    public static function encode( s:String ) : String {
+    public static function encode( s:String, ?encoding : haxe.io.Encoding ) : String {
         var sh = new Sha224();
-		var data = haxe.io.Bytes.ofString(s);
-        var h = sh.doEncode(data );
+		var data = haxe.io.Bytes.ofString(s, encoding);
+        var h = sh.doEncode(data);
         return sh.hex(h);
     }
 
