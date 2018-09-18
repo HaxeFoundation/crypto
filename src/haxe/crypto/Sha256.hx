@@ -28,7 +28,9 @@ class Sha256 {
 
 	public static function encode( s:String ) : String {
 		var sh = new Sha256();
-		var h = sh.doEncode(str2blks(s), s.length*8);
+		var data = haxe.io.Bytes.ofString(s);
+		var nblk = data.length*8;
+		var h = sh.doEncode(str2blks(data), nblk);
 		return sh.hex(h);
 	}
 
@@ -104,37 +106,33 @@ class Sha256 {
 		Convert a string to a sequence of 16-word blocks, stored as an array.
 		Append padding bits and the length, as described in the SHA1 standard.
 	 */
-	static function str2blks( s : String ) : Array<Int>
+	static function str2blks( data : haxe.io.Bytes ) : Array<Int>
 	{
-#if !(neko || (cpp && !hxcpp_smart_strings))
-		var s = haxe.io.Bytes.ofString(s);
-#end
-		var nblk = ((s.length + 8) >> 6) + 1;
+		var nblk:Int = data.length;
 		var blks = new Array<Int>();
-
-		//preallocate size
-		var blksSize = nblk * 16;
-		#if (neko || eval || cs || cpp || java || hl)
-		blks[blksSize - 1] = 0;
-		#end
-
-		#if !(cpp || cs || hl) //C++ and C# will already initialize them with zeroes.
-		for( i in 0...blksSize ) blks[i] = 0;
-		#end
-		for (i in 0...s.length){
-			var p = i >> 2;
-			blks[p] |= #if !(neko || (cpp && !hxcpp_smart_strings)) s.get(i) #else s.charCodeAt(i) #end << (24 - ((i & 3) << 3));
+		data = haxe.crypto.padding.BitPadding.pad(data,8);
+		var i = 0;
+		while ( i < data.length) {
+			blks.push( bytesToInt(data,i));
+    		i +=4;
+   		}
+		var padding:Int = 16 - blks.length % 16;
+		for(j in 0...padding ) {
+			blks.push(0);
 		}
-		var i = s.length;
-		var p = i >> 2;
-		blks[p] |= 0x80 << (24 - ((i & 3) << 3));
-		var k = nblk * 16 - 1;
-		var l = s.length * 8;
-		blks[k] = (l & 0xFF);
-		blks[k] |= ((l >>> 8) & 0xFF) << 8;
-		blks[k] |= ((l >>> 16) & 0xFF) << 16;
-		blks[k] |= ((l >>> 24) & 0xFF) << 24;
+		 
+		blks[blks.length-1] = nblk*8;
+
 		return blks;
+	}
+	
+	private static function bytesToInt(bs:haxe.io.Bytes, off:Int):Int
+	{
+		var n:Int = ( bs.get(off) ) << 24;
+		n |= ( bs.get(++off) ) << 16;
+		n |= ( bs.get(++off) ) << 8;
+		n |= bs.get(++off)  ;
+		return n;
 	}
 
 	static function bytes2blks( b : haxe.io.Bytes ) : Array<Int> {
