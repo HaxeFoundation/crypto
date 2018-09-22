@@ -75,7 +75,7 @@ Cross platform cryptographic functions for Haxe
  
    #### Twofish
  ```haxe
-   var twoFish  : twoFish = new twoFish();
+   var twoFish  : TwoFish = new TwoFish();
    
    var key = Bytes.ofHex("ff08e2dcca459835ac30c39548ae848157ba5fdcc8e4977efc26c0d1cc7a25cb");
    var text = Bytes.ofHex("06051a69c4a72fa8b205ebdca3add79d5e904b5e9e6d08ed60233ad28b9540ba");
