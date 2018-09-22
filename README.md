@@ -9,6 +9,7 @@ Cross platform cryptographic functions for Haxe
 ### Supported algorithms
   * Aes
   * Blowfish
+  * Twofish
   * TripleDes
   * Hmac
   * Sha224
@@ -70,6 +71,24 @@ Cross platform cryptographic functions for Haxe
    // Decrypt
    data = blowFish.decrypt(Mode.PCBC,data,Padding.PKCS7);
    trace("Decrypted text: "+ data);
+ ```
+ 
+   #### Twofish
+ ```haxe
+   var twoFish  : twoFish = new twoFish();
+   
+   var key = Bytes.ofHex("ff08e2dcca459835ac30c39548ae848157ba5fdcc8e4977efc26c0d1cc7a25cb");
+   var text = Bytes.ofHex("06051a69c4a72fa8b205ebdca3add79d5e904b5e9e6d08ed60233ad28b9540ba");
+   
+   twoFish.init(key);
+   
+   // Encrypt
+   var data = twoFish.encrypt(Mode.ECB,text,Padding.NoPadding);
+   trace("Encrypted text: "+ data.toHex());
+   
+   // Decrypt
+   data = twoFish.decrypt(Mode.ECB,data,Padding.NoPadding);
+   trace("Decrypted text: "+ data.toHex());
  ```
  
   #### Triple DES / 3Des
