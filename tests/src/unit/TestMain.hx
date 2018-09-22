@@ -60,7 +60,8 @@ class TestMain {
 			new TripleDesTest(),
 			new Sha224Test(),
 			new Sha256Test(),
-			new HmacTest()
+			new HmacTest(),
+			new TwoFishTest()
 		];
 
 		TestIssues.addIssueClasses("src/unit/issues", "unit.issues");
