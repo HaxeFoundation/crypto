@@ -61,7 +61,8 @@ class TestMain {
 			new Sha224Test(),
 			new Sha256Test(),
 			new HmacTest(),
-			new TwoFishTest()
+			new TwoFishTest(),
+			new Ripemd160Test()
 		];
 
 		TestIssues.addIssueClasses("src/unit/issues", "unit.issues");

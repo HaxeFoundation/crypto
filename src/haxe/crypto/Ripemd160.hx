@@ -3,8 +3,6 @@ package haxe.crypto;
 import haxe.io.Bytes;
 import haxe.io.BytesBuffer;
 
-import haxe.crypto.padding.BitPadding;
-
 class Ripemd160
 {
     public static inline var DIGEST_SIZE : Int = 20; //160 bits
@@ -64,14 +62,29 @@ class Ripemd160
     public function finish() : Bytes
 	{
         var b = bytesBuffer.getBytes();
-        var len = b.length << 3;
-        b = BitPadding.pad(b,64);
+        var len = b.length;
+        var offset  = Math.floor(len/BLOCK_SIZE);
+        for(i in 0...offset) {
+            process(b,i*BLOCK_SIZE);
+        }
+        offset *= BLOCK_SIZE;
+        var block = Bytes.alloc(BLOCK_SIZE);
+        block.fill(0,block.length,0);
+        block.blit(0,b,offset,len-offset);
+        offset = len % block.length;
+        block.set(offset, 0x80);
+        if ( (offset+8) >= BLOCK_SIZE) {
+            process(block,0);
+            block.fill(0,block.length,0);
+        }
+        
+        len = len << 3;
         for(i in 0...8)
-			b.set(b.length - 8 +i, len >>> (i * 8) );
-        var offset = 0;
-        while ( offset < b.length)
+			block.set(block.length - 8 +i, len >>> (i * 8) );
+        offset = 0;
+        while ( offset < block.length)
         {
-            process(b,offset);
+            process(block,offset);
             offset += 64;
         }
         
