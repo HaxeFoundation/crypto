@@ -14,6 +14,7 @@ Cross platform cryptographic functions for Haxe
   * Hmac
   * Sha224
   * Sha256
+  * Ripemd-160
   
 ### Block cipher mode of operation
   * ECB
