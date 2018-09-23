@@ -1,4 +1,4 @@
-package unit;
+package unit.crypto;
 
 import unit.Test;
 import haxe.Timer;
