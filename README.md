@@ -155,3 +155,19 @@ Cross platform cryptographic functions for Haxe
    var dataBytes = Sha256.make(text);
    trace("Sha256: "+dataBytes.toHex());
    ```
+
+   #### Ripemd-160
+   ```haxe
+   var text = Bytes.ofString("Haxe - The Cross-platform Toolkit");
+   
+   var rpmd = Ripemd160.encode("Haxe - The Cross-platform Toolkit");
+   trace("Ripemd-160: "+rpmd);
+   
+   var rpmd = Ripemd160.make(text);
+   trace("Ripemd-160: "+rpmd.toHex());
+   
+   var rpmd = new Ripemd160();
+   rpmd.addBytes(text,0,text.length);
+   var rdata = rpmd.finish();
+   trace("Ripemd-160: "+rdata.toHex());
+   ```
