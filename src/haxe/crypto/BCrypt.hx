@@ -219,7 +219,7 @@ class BCrypt
         var hclen = clen >> 1;
         for(i in 0...64) {
             for(j in 0...hclen) {
-                this.encipher(cipherText,j<<1);
+                encipher(cipherText,j<<1);
             }
         }
         var b = Bytes.alloc(clen*4-1); //remove last byte
