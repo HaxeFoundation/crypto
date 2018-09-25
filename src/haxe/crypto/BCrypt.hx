@@ -134,9 +134,9 @@ class BCrypt
         0x3F09252D, 0xC208E69F, 0xB74E6132, 0xCE77E25B, 0x578FDFE3, 0x3AC372E6
     ];
 
-    var pBox : Array<Int>;
-    var sBox : Array<Int>;
-    var woffset : Int;
+    static var pBox : Array<Int>;
+    static var sBox : Array<Int>;
+    static var woffset : Int;
 
     public function new()
     {
@@ -234,7 +234,7 @@ class BCrypt
         return b;
     }
 
-    private function key(kBytes:Bytes):Void
+    private static function key(kBytes:Bytes):Void
     {
         woffset = 0;
         var lr = [0,0];
@@ -257,7 +257,7 @@ class BCrypt
         }
     }
 
-    private function extractWord(data:Bytes):Int
+    private static function extractWord(data:Bytes):Int
     {
         var word : Int = 0;
         for(i in 0...4) {
@@ -294,11 +294,11 @@ class BCrypt
             i += 2;
         }
     }
-    private function f(x:Int):Int {
+    private static function f(x:Int):Int {
         return (((sBox[(x >>> 24)] + sBox[0x100 | ((x >>> 16) & 0xff)]) ^ sBox[0x200 | ((x >>> 8) & 0xff)]) + sBox[0x300 | (x & 0xff)]);
     }
 
-    private function encipher(block:Array<Int>, offset:Int):Void
+    private static function encipher(block:Array<Int>, offset:Int):Void
     {
         var xl : Int = block[offset];
         var xr : Int = block[offset +1];
