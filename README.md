@@ -11,6 +11,7 @@ Cross platform cryptographic functions for Haxe
   * Blowfish
   * Twofish
   * TripleDes
+  * BCrypt
   * Hmac
   * Sha224
   * Sha256
@@ -110,6 +111,17 @@ Cross platform cryptographic functions for Haxe
    data = tdes.decrypt(Mode.OFB,data,Padding.NoPadding);
    trace("Decrypted text: "+ data);
  ```
+ 
+  #### BCrypt
+   ```haxe
+   var salt = BCrypt.generateSalt(10,BCrypt.Revision2B); // Example: $2b$10$xB5TcOrSHD2quBMES0W8aO
+    
+   var dataText = BCrypt.encode("Haxe - The Cross-platform Toolkit",salt);
+   trace("BCrypt: "+dataText); // Example: $2b$10$xB5TcOrSHD2quBMES0W8aOrxTs3ONJQzqYIe0l.s1BHO6KoYUY5IS
+   
+   var match = BCrypt.verify("Haxe - The Cross-platform Toolkit",dataText);
+   trace("Match: "+match);
+   ```
  
   #### Hmac with MD5 / SHA1 / SHA224 / SHA256
  ```haxe
