@@ -29,6 +29,7 @@ enum HashMethod {
 	SHA1;
 	SHA224;
 	SHA256;
+	RIPEMD160;
 }
 
 /**
@@ -40,18 +41,29 @@ class Hmac {
 	var blockSize : Int;
 	var length : Int;
 	
-	public function new( hashMethod : HashMethod ) {
-		method = hashMethod;
+	public function new( hashMethod : HashMethod ) 
+	{
+		if ( hashMethod != null) init(hashMethod);
+	}
+	
+	public function getSize():Int {
+        return length;
+    }
+	
+	public function init(hashMethod : HashMethod ):Void
+    {
+        method = hashMethod;
 		blockSize = switch ( hashMethod ) {
-			case MD5, SHA1, SHA224, SHA256: 64;
+			case MD5, SHA1, SHA224, SHA256, RIPEMD160: 64;
 		}
 		length = switch ( hashMethod ) {
 			case MD5: 16;
 			case SHA1: 20;
 			case SHA224: 28;
 			case SHA256: 32;
+            case RIPEMD160: 20;
 		}
-	}
+    }
 	
 	inline function doHash( b : haxe.io.Bytes ) : haxe.io.Bytes {
 		return switch ( method ) {
@@ -59,6 +71,7 @@ class Hmac {
 			case SHA1: Sha1.make(b);
 			case SHA224: Sha224.make(b);
 			case SHA256: Sha256.make(b);
+			case RIPEMD160: Ripemd160.make(b);
 		}
 	}
 	
