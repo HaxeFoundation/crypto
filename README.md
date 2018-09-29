@@ -15,7 +15,10 @@ Cross platform cryptographic functions for Haxe
   * Hmac
   * Sha224
   * Sha256
+  * Sha384
+  * Sha512
   * Ripemd-160
+  * PBKDF2
   
 ### Block cipher mode of operation
   * ECB
@@ -167,6 +170,28 @@ Cross platform cryptographic functions for Haxe
    var dataBytes = Sha256.make(text);
    trace("Sha256: "+dataBytes.toHex());
    ```
+   
+   #### SHA384
+   ```haxe
+   var text = Bytes.ofString("Haxe - The Cross-platform Toolkit");
+    
+   var dataText = Sha384.encode("Haxe - The Cross-platform Toolkit");
+   trace("Sha384: "+dataText);
+   
+   var dataBytes = Sha384.make(text);
+   trace("Sha384: "+dataBytes.toHex());
+   ```
+   
+   #### SHA512
+   ```haxe
+   var text = Bytes.ofString("Haxe - The Cross-platform Toolkit");
+    
+   var dataText = Sha512.encode("Haxe - The Cross-platform Toolkit");
+   trace("Sha512: "+dataText);
+   
+   var dataBytes = Sha512.make(text);
+   trace("Sha512: "+dataBytes.toHex());
+   ```
 
    #### Ripemd-160
    ```haxe
@@ -182,4 +207,15 @@ Cross platform cryptographic functions for Haxe
    rpmd.addBytes(text,0,text.length);
    var rdata = rpmd.finish();
    trace("Ripemd-160: "+rdata.toHex());
+   ```
+   
+   #### PBKDF2
+   ```haxe
+   var text = Bytes.ofString("Haxe - The Cross-platform Toolkit");
+   var salt = Bytes.ofString("salt");
+   
+   // Support: MD5, SHA1,	SHA224, SHA256, SHA384, SHA512, RIPEMD160
+   var pbkdf2 : Pbkdf2 = new Pbkdf2(SHA1);
+   var data = pbkdf2.encode(text,salt,4096,20);
+   trace("PBKDF2: "+data.toHex());
    ```
