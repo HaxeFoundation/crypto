@@ -26,7 +26,7 @@ class Sha384
         var state :Array<Int64>= [
 			Int64.make(0xcbbb9d5d,0xc1059ed8), Int64.make(0x629a292a,0x367cd507), Int64.make(0x9159015a,0x3070dd17), Int64.make(0x152fecd8,0xf70e5939),
 			Int64.make(0x67332667,0xffc00b31), Int64.make(0x8eb44a87,0x68581511), Int64.make(0xdb0c2e0d,0x64f98fa7), Int64.make(0x47b5481d,0xbefa4fa4)];
-        var off:Int = Math.floor(msg.length / (BLOCK_LEN * BLOCK_LEN));
+        var off:Int = Math.floor(msg.length / BLOCK_LEN ) * BLOCK_LEN;
         compress(state, msg, off);
         var block = Bytes.alloc(BLOCK_LEN);
         block.blit(0,msg,off,msg.length-off);

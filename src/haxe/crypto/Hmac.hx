@@ -29,6 +29,8 @@ enum HashMethod {
 	SHA1;
 	SHA224;
 	SHA256;
+	SHA384;
+	SHA512;
 	RIPEMD160;
 }
 
@@ -55,12 +57,15 @@ class Hmac {
         method = hashMethod;
 		blockSize = switch ( hashMethod ) {
 			case MD5, SHA1, SHA224, SHA256, RIPEMD160: 64;
+			case  SHA384, SHA512: 128;
 		}
 		length = switch ( hashMethod ) {
 			case MD5: 16;
 			case SHA1: 20;
 			case SHA224: 28;
 			case SHA256: 32;
+			case SHA384: 48;
+			case SHA512: 64;
             case RIPEMD160: 20;
 		}
     }
@@ -71,6 +76,8 @@ class Hmac {
 			case SHA1: Sha1.make(b);
 			case SHA224: Sha224.make(b);
 			case SHA256: Sha256.make(b);
+			case SHA384: Sha384.make(b);
+			case SHA512: Sha512.make(b);
 			case RIPEMD160: Ripemd160.make(b);
 		}
 	}
