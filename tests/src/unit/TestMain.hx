@@ -63,7 +63,10 @@ class TestMain {
 			new HmacTest(),
 			new TwoFishTest(),
 			new Ripemd160Test(),
-			new BCryptTest()
+			new BCryptTest(),
+			new Pbkdf2Test(),
+			new Sha384Test(),
+			new Sha512Test()
 		];
 
 		TestIssues.addIssueClasses("src/unit/issues", "unit.issues");
