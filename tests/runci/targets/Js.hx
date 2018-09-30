@@ -85,10 +85,6 @@ class Js {
 			// sc.close();
 		}
 
-		infoMsg("Test optimization:");
-		changeDirectory(optDir);
-		runCommand("haxe", ["run.hxml"]);
-		haxelibInstall("utest");
 		// changeDirectory(serverDir);
 		// runCommand("haxe", ["build.hxml"]);
 		// runCommand("node", ["test.js"]);

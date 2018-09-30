@@ -67,17 +67,5 @@ class Cs {
 
 		runCommand("haxe", ['compile-cs$compl.hxml','-dce','no']);
 		runCs("bin/cs/bin/TestMain-Debug.exe");
-
-		changeDirectory(sysDir);
-		haxelibInstall("utest");
-		runCommand("haxe", ["compile-cs.hxml",'-D','fast_cast']);
-		runCs("bin/cs/bin/Main-Debug.exe", []);
-
-		changeDirectory(miscDir + "csTwoLibs");
-		for (i in 1...5)
-		{
-			runCommand("haxe", ['compile-$i.hxml','-D','fast_cast']);
-			runCs("bin/main/bin/Main.exe");
-		}
 	}
 }

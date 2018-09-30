@@ -57,17 +57,8 @@ class Lua {
 			runCommand("luarocks",[]);
 			installLuaVersionDependencies(lv);
 
-			changeDirectory(unitDir);
 			runCommand("haxe", ["compile-lua.hxml"].concat(args));
 			runCommand("lua", ["bin/unit.lua"]);
-
-			changeDirectory(sysDir);
-			haxelibInstall("utest");
-			runCommand("haxe", ["compile-lua.hxml"].concat(args));
-			runCommand("lua", ["bin/lua/sys.lua"]);
-
-			changeDirectory(miscDir + "luaDeadCode/stringReflection");
-			runCommand("haxe", ["compile.hxml"]);
 		}
 	}
 }

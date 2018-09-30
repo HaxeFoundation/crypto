@@ -61,18 +61,5 @@ class Python {
 		for (py in pys) {
 			runCommand(py, ["bin/unit.py"]);
 		}
-
-		changeDirectory(sysDir);
-		haxelibInstall("utest");
-		runCommand("haxe", ["compile-python.hxml"]);
-		for (py in pys) {
-			runCommand(py, ["bin/python/sys.py"]);
-		}
-
-		changeDirectory(miscDir + "pythonImport");
-		runCommand("haxe", ["compile.hxml"]);
-		for (py in pys) {
-			runCommand(py, ["test.py"]);
-		}
 	}
 }
