@@ -2,9 +2,21 @@ language: haxe
 
 # TravisCI by default run on linux.
 # Let's enable both linux and mac builds because why not?
-os:
-  - linux
-  - osx
+matrix:
+  include:
+    #########
+    # linux #
+    #########
+    - os: linux
+      env:
+        - TEST=macro,hl,js,php,flash9,java,cs,python,lua
+        
+    #######
+    # osx #
+    #######
+    - os: osx
+      env:
+        - TEST=macro,hl,java,cs,lua,js,php,flash9,python
 
 # Let's use Ubuntu Trusty instead of Precise, which reached its EOL on April 28, 2017.
 dist: trusty
