@@ -85,4 +85,5 @@ install:
 
 script:
   - cd tests
-  - haxe compile.hxml
+  - haxe -version
+  - haxe RunCi.hxml

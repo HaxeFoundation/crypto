@@ -43,4 +43,5 @@ build: off
 
 test_script:
   - cd tests
-  - haxe compile.hxml
+  - haxe -version
+  - haxe RunCi.hxml
