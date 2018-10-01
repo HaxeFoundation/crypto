@@ -222,7 +222,7 @@ class BCrypt
                 encipher(cipherText,j<<1);
             }
         }
-        var b = Bytes.alloc(clen*4-1); //remove last byte
+        var b = Bytes.alloc(clen*4);
         var j = 0;
         for(i in 0...clen) 
         {
@@ -231,7 +231,7 @@ class BCrypt
             b.set(j++,(cipherText[i] >>> 8) & 0xff);
             b.set(j++,cipherText[i] & 0xff);
         }
-        return b;
+        return b.sub(0,23);
     }
 
     private static function key(kBytes:Bytes):Void

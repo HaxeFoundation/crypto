@@ -50,7 +50,7 @@ class TwoFishTest extends Test
 			"37FE26FF1CF66175F5DDF4C33B97A205"
         ];
 
-    private function test(ciphers:Array<String>, cipherMode:Mode, padding:Padding, ivTable:Array<String>):Void
+    private function test(ciphers:Array<String>=null, cipherMode:Mode=Mode.ECB, padding:Padding=Padding.NoPadding, ivTable:Array<String>=null):Void
     {
 		if ( ciphers == null ) return;
         trace("Twofish with "+cipherMode+" mode for "+keys.length+" keys");
