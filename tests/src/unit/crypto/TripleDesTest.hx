@@ -824,7 +824,7 @@ class TripleDesTest extends Test
              "FCFCFCFCFCFCFCFC", "FDFDFDFDFDFDFDFD", "FEFEFEFEFEFEFEFE", "FFFFFFFFFFFFFFFF", "0011223344556677", "EA024714AD5C4D84"
         ];
 
-    public function test(ciphers:Array<String>, cipherMode:Mode, padding:Padding, ivTable:Array<String>):Void
+    public function test(ciphers:Array<String>=null, cipherMode:Mode=Mode.ECB, padding:Padding=Padding.NoPadding, ivTable:Array<String>=null):Void
     {
 		if ( ciphers == null ) return;
 		

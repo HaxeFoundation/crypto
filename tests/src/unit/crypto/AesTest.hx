@@ -83,7 +83,7 @@ class AesTest extends Test
         test(ofb_ciphers,Mode.OFB,Padding.NoPadding,ofb_iv);
     }
 
-    private function test(ciphers:Array<String>, cipherMode:Mode, padding:Padding, ivTable:Array<String>):Void
+    private function test(ciphers:Array<String>=null, cipherMode:Mode=Mode.ECB, padding:Padding=Padding.NoPadding, ivTable:Array<String>=null):Void
     {
 		if ( ciphers == null ) return;
         trace("AES with "+cipherMode+" mode for "+keys.length+" keys");

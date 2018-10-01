@@ -67,7 +67,7 @@ class BlowFishTest extends Test
             "7CBAC9C2CF26D1BA", "5438ACA317D45230"
         ];
 
-    private function test(ciphers:Array<String>, cipherMode:Mode, padding:Padding, ivTable:Array<String>):Void
+    private function test(ciphers:Array<String>=null, cipherMode:Mode=Mode.ECB, padding:Padding=Padding.NoPadding, ivTable:Array<String>=null):Void
     {
 		if ( ciphers == null ) return;
         trace("Blowfish with "+cipherMode+" mode for "+keys.length+" keys");
