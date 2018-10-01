@@ -79,8 +79,13 @@ class Ripemd160
         }
         
         len = len << 3;
-        for(i in 0...8)
-			block.set(block.length - 8 +i, len >>> (i * 8) );
+        for(i in 0...8) {
+			if ( i > 3 ) {
+                block.set(block.length - 8 +i, 0 );
+            } else {
+				block.set(block.length - 8 +i, len >>> (i * 8) );
+			}
+		}
         offset = 0;
         while ( offset < block.length)
         {

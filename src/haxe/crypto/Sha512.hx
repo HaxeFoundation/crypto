@@ -40,7 +40,11 @@ class Sha512
         
         var len = msg.length << 3;
         for(i in 0...8) {
-            block.set(block.length - 1 - i,(len >>> (i * 8)));
+			if ( i > 3 ) {
+                block.set(block.length - 1 - i,0);
+            } else {
+				block.set(block.length - 1 - i,(len >>> (i * 8)));
+			}
         }
         compress(state, block, block.length);
   
