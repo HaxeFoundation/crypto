@@ -1,5 +1,27 @@
 language: haxe
 
+cache:
+  timeout: 1000
+  directories:
+    - $HOME/.opam
+    - $HOME/neko
+    - $HOME/apt-cache
+    - $HOME/hxcache
+    - $HOME/lua_env
+    - $HOME/.luarocks
+
+before_cache:
+  - if [ $TRAVIS_OS_NAME = 'linux' ]; then
+      sudo apt-get autoclean;
+      sudo rm -f $HOME/apt-cache/lock || true;
+    fi
+  # somehow these files are recreated everytime
+  - rm -f $HOME/lua_env/lib/liblua51.a
+  - rm -f $HOME/lua_env/lib/liblua52.a
+  - rm -f $HOME/lua_env/lib/liblua53.a
+  - rm -f $HOME/lua_env/lib/libluajit-5.1.a
+  #- if [ $TRAVIS_OS_NAME = 'osx' ]; then brew cleanup; fi
+
 # TravisCI by default run on linux.
 # Let's enable both linux and mac builds because why not?
 matrix:
@@ -9,14 +31,56 @@ matrix:
     #########
     - os: linux
       env:
+        - TEST=neko
+        - DEPLOY_API_DOCS=1
+        - DEPLOY_NIGHTLIES=1
+        # haxeci_decrypt (Deploy source package to ppa:haxe/snapshots.)
+        - secure: "Mw3p6bDZuqVQ6u7GrwLQfje5hhIOA4+mdqqLXYHP79UKdhgqb91Dn6IbG9vQ1VXVe64W4YZbQAMBMMRX5kEPDl6JvTVGSBhg00Mi69oO5qrCMcBI6f9FntG72YaVvLf+PA7co+vKrnJzaP2M9pe4SH9Ztbhy0YNxULp7NQ8FLsM="
+      addons:
+        ssh_known_hosts:
+          - haxe.org
+          - api.haxe.org
+      # install: *install_linux
+      
+    - os: linux
+      env:
         - TEST=macro,hl,js,php,flash9,java,cs,python,lua
+      before_install:
+        - "export DISPLAY=:99.0"
+        - "sh -e /etc/init.d/xvfb start"
+        - "export AUDIODEV=null"
+      # install: *install_linux
+        
+    - os: linux
+      env:
+        - TEST=cpp
+        - HXCPP_COMPILE_THREADS=4
+        - HXCPP_COMPILE_CACHE=~/hxcache
+        - JOB_DEPENDENCIES="gcc-multilib g++-multilib"
+      # install: *install_linux
         
     #######
     # osx #
     #######
     - os: osx
+      osx_image: xcode7.3 # to compile binaries that support older versions of Mac, and 10.11 is the min version that brew provides bottles
+      env:
+        - TEST=neko
+        - DEPLOY_NIGHTLIES=1
+      # install: *install_osx
+      
+    - os: osx
       env:
         - TEST=macro,hl,java,cs,lua,js,php,flash9,python
+      # install: *install_osx
+    
+    - os: osx
+      osx_image: xcode9.4 # to compile faster
+      env:
+        - TEST=cpp
+        - HXCPP_COMPILE_CACHE=~/hxcache
+        - HXCPP_COMPILE_THREADS=4
+      # install: *install_osx
 
 # Let's use Ubuntu Trusty instead of Precise, which reached its EOL on April 28, 2017.
 dist: trusty
