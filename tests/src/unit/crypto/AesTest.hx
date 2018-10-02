@@ -85,25 +85,26 @@ class AesTest extends Test
 
     private function test(ciphers:Array<String>=null, cipherMode:Mode=Mode.ECB, padding:Padding=Padding.NoPadding, ivTable:Array<String>=null):Void
     {
-		if ( ciphers == null ) return;
-        trace("AES with "+cipherMode+" mode for "+keys.length+" keys");
-        var time = Timer.stamp();
+		if ( ciphers != null ) {
+			trace("AES with "+cipherMode+" mode for "+keys.length+" keys");
+			var time = Timer.stamp();
         
-        var aes : Aes = new Aes();
+			var aes : Aes = new Aes();
 
-        for(i in 0...keys.length)
-        {
-            var key = Bytes.ofHex(keys[i]);
-            var text = Bytes.ofHex(plainText[i]);
-            var iv:Bytes = (ivTable == null)?null:Bytes.ofHex(ivTable[i]);
-            aes.init(key,iv);
-            var enc = aes.encrypt(cipherMode,text,padding);
-            eq( enc.toHex().toUpperCase(), ciphers[i] );
-            var decr = aes.decrypt(cipherMode,enc,padding);
-            eq( decr.toHex().toUpperCase(), plainText[i] );
-        }
+			for(i in 0...keys.length)
+			{
+				var key = Bytes.ofHex(keys[i]);
+				var text = Bytes.ofHex(plainText[i]);
+				var iv:Bytes = (ivTable == null)?null:Bytes.ofHex(ivTable[i]);
+				aes.init(key,iv);
+				var enc = aes.encrypt(cipherMode,text,padding);
+				eq( enc.toHex().toUpperCase(), ciphers[i] );
+				var decr = aes.decrypt(cipherMode,enc,padding);
+				eq( decr.toHex().toUpperCase(), plainText[i] );
+			}
         
-        time = Timer.stamp()-time;
-        trace("Finished : "+time+" seconds");
+			time = Timer.stamp()-time;
+			trace("Finished : "+time+" seconds");
+		}
     }
 }
