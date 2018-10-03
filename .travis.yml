@@ -64,7 +64,7 @@ matrix:
         ssh_known_hosts:
           - haxe.org
           - api.haxe.org
-      install: *install_linux
+      #install: *install_linux
       
     - os: linux
       env:
@@ -73,7 +73,7 @@ matrix:
         - "export DISPLAY=:99.0"
         - "sh -e /etc/init.d/xvfb start"
         - "export AUDIODEV=null"
-      install: *install_linux
+      #install: *install_linux
         
     - os: linux
       env:
@@ -81,7 +81,7 @@ matrix:
         - HXCPP_COMPILE_THREADS=4
         - HXCPP_COMPILE_CACHE=~/hxcache
         - JOB_DEPENDENCIES="gcc-multilib g++-multilib"
-      install: *install_linux
+      #install: *install_linux
         
     #######
     # osx #
@@ -91,12 +91,12 @@ matrix:
       env:
         - TEST=neko
         - DEPLOY_NIGHTLIES=1
-      install: *install_osx
+      #install: *install_osx
       
     - os: osx
       env:
         - TEST=macro,hl,java,cs,lua,js,php,flash9,python
-      install: *install_osx
+      #install: *install_osx
     
     - os: osx
       osx_image: xcode9.4 # to compile faster
@@ -104,7 +104,7 @@ matrix:
         - TEST=cpp
         - HXCPP_COMPILE_CACHE=~/hxcache
         - HXCPP_COMPILE_THREADS=4
-      install: *install_osx
+      #install: *install_osx
 
 # Let's use Ubuntu Trusty instead of Precise, which reached its EOL on April 28, 2017.
 dist: trusty
@@ -126,6 +126,9 @@ addons:
       # C++ (for rebuilding hxcpp)
       - gcc-multilib
       - g++-multilib
+      # HashLink
+      - ninja-build
+      - zlib1g-dev
       # Python
       - python3
       # C#
@@ -153,6 +156,7 @@ install:
       brew install phantomjs;
       brew upgrade python;
       brew install php;
+      brew install ninja;
     fi
   # Haxe Lua dependencies
   - if [ "${TRAVIS_OS_NAME}" = "linux" ]; then
