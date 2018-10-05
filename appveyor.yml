@@ -9,6 +9,7 @@ environment:
       DEPLOY_NIGHTLIES: 1
     - ARCH: 64
       TEST: "cpp"
+      DEPLOY_NIGHTLIES: 1
 
 install:
   # http://help.appveyor.com/discussions/problems/5616-not-able-to-build-due-to-problem-in-chocolateyinstallps1
@@ -26,8 +27,14 @@ install:
   # Install test dependencies
   - cinst phantomjs -y
   # Install php
-  - cinst php -y
+  - choco install php --version 7.2.0 -y
+  - echo extension=php_openssl.dll >> C:\tools\php72\php.ini
+  - echo extension=php_mbstring.dll >> C:\tools\php72\php.ini
+  - echo extension=php_sockets.dll >> C:\tools\php72\php.ini
   - RefreshEnv
+  # setup python
+  - cmd: mklink C:\Python34-x64\python3.exe C:\Python34-x64\python.exe
+  - set PATH=%PATH%;C:\Python34-x64
   # Install lua using hererocks
   - pip install hererocks
   - hererocks luaenv --lua 5.3 -rlatest
