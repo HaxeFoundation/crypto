@@ -56,6 +56,7 @@ class Cpp {
 					runCpp("bin/cpp/TestMain-debug", []);
 				}
 
+				/* stop cppia test at the moment
 				if (testCppia) {
 					runCommand("haxe", ["compile-cppia-host.hxml"]);
 					runCommand("haxe", ["compile-cppia.hxml"]);
@@ -65,7 +66,13 @@ class Cpp {
 					runCpp("bin/cppia/Host-debug", ["bin/unit.cppia"]);
 					runCpp("bin/cppia/Host-debug", ["bin/unit.cppia", "-jit"]);
 				}
+				*/
 		}
+
+		changeDirectory(sysDir);
+		haxelibInstall("utest");
+		runCommand("haxe", ["compile-cpp.hxml"]);
+		runCpp("bin/cpp/Main-debug", []);
 
 		// if (Sys.systemName() == "Mac")
 		// {
