@@ -6,10 +6,8 @@ environment:
   matrix:
     - ARCH: 64
       TEST: "neko,hl,python,cs,java,php,macro"
-      DEPLOY_NIGHTLIES: 1
     - ARCH: 64
       TEST: "cpp"
-      DEPLOY_NIGHTLIES: 1
 
 install:
   # http://help.appveyor.com/discussions/problems/5616-not-able-to-build-due-to-problem-in-chocolateyinstallps1

@@ -102,7 +102,7 @@ class RunCi {
 		}
 
 		if (success) {
-			deploy();
+			//deploy();
 		} else {
 			Sys.exit(1);
 		}

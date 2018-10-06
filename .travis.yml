@@ -56,14 +56,6 @@ matrix:
     - os: linux
       env:
         - TEST=neko
-        - DEPLOY_API_DOCS=1
-        - DEPLOY_NIGHTLIES=1
-        # haxeci_decrypt (Deploy source package to ppa:haxe/snapshots.)
-        - secure: "Mw3p6bDZuqVQ6u7GrwLQfje5hhIOA4+mdqqLXYHP79UKdhgqb91Dn6IbG9vQ1VXVe64W4YZbQAMBMMRX5kEPDl6JvTVGSBhg00Mi69oO5qrCMcBI6f9FntG72YaVvLf+PA7co+vKrnJzaP2M9pe4SH9Ztbhy0YNxULp7NQ8FLsM="
-      addons:
-        ssh_known_hosts:
-          - haxe.org
-          - api.haxe.org
       #install: *install_linux
       
     - os: linux
@@ -90,7 +82,6 @@ matrix:
       osx_image: xcode7.3 # to compile binaries that support older versions of Mac, and 10.11 is the min version that brew provides bottles
       env:
         - TEST=neko
-        - DEPLOY_NIGHTLIES=1
       #install: *install_osx
       
     - os: osx
