@@ -65,25 +65,25 @@ class AesTest extends Test
 
     public function test_ecb():Void
     {
-        test(ecb_ciphers,Mode.ECB,Padding.NoPadding,null);
+        aes_main(ecb_ciphers,Mode.ECB,Padding.NoPadding,null);
     }
 
     public function test_cbc():Void
     {
-        test(cbc_ciphers,Mode.CBC,Padding.NoPadding,cbc_iv);
+        aes_main(cbc_ciphers,Mode.CBC,Padding.NoPadding,cbc_iv);
     }
 
     public function test_cfb():Void
     {
-        test(cfb_ciphers,Mode.CFB,Padding.NoPadding,cfb_iv);
+        aes_main(cfb_ciphers,Mode.CFB,Padding.NoPadding,cfb_iv);
     }
 
     public function test_ofb():Void
     {
-        test(ofb_ciphers,Mode.OFB,Padding.NoPadding,ofb_iv);
+        aes_main(ofb_ciphers,Mode.OFB,Padding.NoPadding,ofb_iv);
     }
 
-    private function test(ciphers:Array<String>=null, cipherMode:Mode=Mode.ECB, padding:Padding=Padding.NoPadding, ivTable:Array<String>=null):Void
+    private function aes_main(ciphers:Array<String>=null, cipherMode:Mode=Mode.ECB, padding:Padding=Padding.NoPadding, ivTable:Array<String>=null):Void
     {
 		if ( ciphers != null ) {
 			trace("AES with "+cipherMode+" mode for "+keys.length+" keys");

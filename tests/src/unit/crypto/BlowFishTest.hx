@@ -67,7 +67,7 @@ class BlowFishTest extends Test
             "7CBAC9C2CF26D1BA", "5438ACA317D45230"
         ];
 
-    private function test(ciphers:Array<String>=null, cipherMode:Mode=Mode.ECB, padding:Padding=Padding.NoPadding, ivTable:Array<String>=null):Void
+    private function blowfish_main(ciphers:Array<String>=null, cipherMode:Mode=Mode.ECB, padding:Padding=Padding.NoPadding, ivTable:Array<String>=null):Void
     {
 		if ( ciphers == null ) return;
         trace("Blowfish with "+cipherMode+" mode for "+keys.length+" keys");
@@ -93,11 +93,11 @@ class BlowFishTest extends Test
 
     public function test_ecb():Void
     {
-        test(ecb_ciphers,Mode.ECB,Padding.NoPadding,null);
+        blowfish_main(ecb_ciphers,Mode.ECB,Padding.NoPadding,null);
     }
 
     public function test_ctr():Void
     {
-        test(ctr_ciphers,Mode.CTR,Padding.NoPadding,ctr_iv);
+        blowfish_main(ctr_ciphers,Mode.CTR,Padding.NoPadding,ctr_iv);
     }
 }

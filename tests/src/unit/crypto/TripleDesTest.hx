@@ -824,7 +824,7 @@ class TripleDesTest extends Test
              "FCFCFCFCFCFCFCFC", "FDFDFDFDFDFDFDFD", "FEFEFEFEFEFEFEFE", "FFFFFFFFFFFFFFFF", "0011223344556677", "EA024714AD5C4D84"
         ];
 
-    public function test(ciphers:Array<String>=null, cipherMode:Mode=Mode.ECB, padding:Padding=Padding.NoPadding, ivTable:Array<String>=null):Void
+    public function tripledes_main(ciphers:Array<String>=null, cipherMode:Mode=Mode.ECB, padding:Padding=Padding.NoPadding, ivTable:Array<String>=null):Void
     {
 		if ( ciphers == null ) return;
 		
@@ -851,6 +851,6 @@ class TripleDesTest extends Test
 
     public function test_ecb():Void
     {
-        test(ecb_ciphers,Mode.ECB,Padding.NoPadding,null);
+        tripledes_main(ecb_ciphers,Mode.ECB,Padding.NoPadding,null);
     }
 }

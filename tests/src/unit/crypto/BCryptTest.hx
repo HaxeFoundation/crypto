@@ -13,6 +13,8 @@ class BCryptTest extends Test
 		#if python
 		//too slow
 		eq(BCrypt.encode("password","$2a$05$bvIG6Nmid91Mu9RcmmWZfO"), "$2a$05$bvIG6Nmid91Mu9RcmmWZfO5HJIMCT8riNW0hEp8f6/FuA2/mHZFpe" );
+		#elseif flash
+		eq(BCrypt.encode("password","$2a$05$bvIG6Nmid91Mu9RcmmWZfO"), "$2a$05$bvIG6Nmid91Mu9RcmmWZfO5HJIMCT8riNW0hEp8f6/FuA2/mHZFpe" );
 		#else
         eq(BCrypt.encode("password","$2a$05$bvIG6Nmid91Mu9RcmmWZfO"), "$2a$05$bvIG6Nmid91Mu9RcmmWZfO5HJIMCT8riNW0hEp8f6/FuA2/mHZFpe" );
         eq(BCrypt.encode("","$2b$10$wZ.uNrpCdxqrD/btVW9soe"), "$2b$10$wZ.uNrpCdxqrD/btVW9soe6bpm0kAXneRfcovqH1BWlTIPmwgZXgC");
