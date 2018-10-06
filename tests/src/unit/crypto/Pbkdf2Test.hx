@@ -24,6 +24,8 @@ class Pbkdf2Test extends Test
         eq(data.toHex(),"3fa5ec8ee44d6d3fd38205716cf705ec621caab1");
         data = pbkdf2.encode(key,salt,4096,20);
         eq(data.toHex(),"4b007901b765489abead49d926f721d065a429c1");
+		#if !flash
+		//for flash script has executed for longer than the default timeout period of 15 seconds
         key = Bytes.ofString("passwordPASSWORDpassword");
         salt = Bytes.ofString("saltSALTsaltSALTsaltSALTsaltSALTsalt");
         data = pbkdf2.encode(key,salt,4096,25);
@@ -32,7 +34,7 @@ class Pbkdf2Test extends Test
         salt = Bytes.ofString("salt");
         data = pbkdf2.encode(key,salt,4096,20);
         eq(data.toHex(),"c4ed6bab10468a29fe46fe6f16c2ac9b6ea23974");
-
+		#end
         time = Timer.stamp()-time;
         trace("Finished : "+time+" seconds");
     }
