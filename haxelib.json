@@ -1,0 +1,11 @@
+{
+  "name": "crypto",
+  "url": "https://github.com/HaxeFoundation/crypto",
+  "license": "MIT",
+  "classPath": "src",
+  "tags":["crypto","utility","hash","auth","cross","web","aes","blowfish","twofish","tripledes","bcrypt","hmac","sha224","sha256","sha384","sha512","ripemd-160","pbkdf2","ecb","cbc","pcbc","cfb","ofb","ctr","ansix923","bitpadding","iso10126","nullpadding","pkcs7","spacepadding","tbc"],
+  "description": "Cryptography library",
+  "version": "1.0.0-alpha",
+  "releasenote": "Initial release",
+  "contributors":["flashultra"]
+}
