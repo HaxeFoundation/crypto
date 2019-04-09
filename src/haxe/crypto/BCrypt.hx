@@ -1,5 +1,6 @@
 package haxe.crypto;
 
+import haxe.ds.Vector;
 import haxe.io.Bytes;
 
 class BCrypt
@@ -18,16 +19,18 @@ class BCrypt
     public static var CHARS(default,null) = "./ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 	public static var BYTES(default,null) = haxe.io.Bytes.ofString(CHARS);
 
-    private static var BF_CRYPT_CIPHERTEXT : Array<Int> = [
+    private static var BF_CRYPT_CIPHERTEXT:Vector<Int>;
+    
+    private static var BF_CRYPT_CIPHERTEXT_ARRAY : Array<Int> = [
         0x4f727068, 0x65616e42, 0x65686f6c, 0x64657253, 0x63727944, 0x6f756274
     ];
 
-    private static var KP:Array<Int> = [
+    private static var KP_ARRAY:Array<Int> = [
         0x243F6A88, 0x85A308D3, 0x13198A2E, 0x03707344, 0xA4093822, 0x299F31D0, 0x082EFA98, 0xEC4E6C89, 0x452821E6, 0x38D01377,
         0xBE5466CF, 0x34E90C6C, 0xC0AC29B7, 0xC97C50DD, 0x3F84D5B5, 0xB5470917, 0x9216D5D9, 0x8979FB1B
     ];
 
-    private static var KS:Array<Int> = [
+    private static var KS_ARRAY:Array<Int> = [
         0xD1310BA6, 0x98DFB5AC, 0x2FFD72DB, 0xD01ADFB7, 0xB8E1AFED, 0x6A267E96, 0xBA7C9045, 0xF12C7F99, 0x24A19947, 0xB3916CF7,
         0x0801F2E2, 0x858EFC16, 0x636920D8, 0x71574E69, 0xA458FEA3, 0xF4933D7E, 0x0D95748F, 0x728EB658, 0x718BCD58, 0x82154AEE,
         0x7B54A41D, 0xC25A59B5, 0x9C30D539, 0x2AF26013, 0xC5D1B023, 0x286085F0, 0xCA417918, 0xB8DB38EF, 0x8E79DCB0, 0x603A180E, 
@@ -134,12 +137,13 @@ class BCrypt
         0x3F09252D, 0xC208E69F, 0xB74E6132, 0xCE77E25B, 0x578FDFE3, 0x3AC372E6
     ];
 
-    static var pBox : Array<Int>;
-    static var sBox : Array<Int>;
+    static var pBox : Vector<Int>;
+    static var sBox : Vector<Int>;
     static var woffset : Int;
 
     public function new()
     {
+        BF_CRYPT_CIPHERTEXT = Vector.fromArrayCopy(BF_CRYPT_CIPHERTEXT_ARRAY);
     }
 
     public static function encode( password : String, salt : String ) : String
@@ -207,10 +211,10 @@ class BCrypt
         if ( saltBytes.length != 16 ) throw "Salt length should be 16 bytes";
         if (numberOfRounds < 4 || numberOfRounds > 31) throw "Number of rounds should be between 4 and 31 (included)";
         var rounds = 1 << numberOfRounds;
-        var cipherText = [for(i in BF_CRYPT_CIPHERTEXT) i];
+        var cipherText = Vector.fromArrayCopy(BF_CRYPT_CIPHERTEXT_ARRAY);
         var clen = cipherText.length;
-        pBox = KP.copy();
-        sBox = KS.copy();
+        pBox = Vector.fromArrayCopy(KP_ARRAY);
+        sBox = Vector.fromArrayCopy(KS_ARRAY);
         enhanceKeySchedule(passwordBytes,saltBytes);
         for(i in 0...rounds) {
             key(passwordBytes);
@@ -237,7 +241,7 @@ class BCrypt
     private static function key(kBytes:Bytes):Void
     {
         woffset = 0;
-        var lr = [0,0];
+        var lr = Vector.fromArrayCopy([0,0]);
         for(i in 0...P_SZ) {
             pBox[i] ^= extractWord(kBytes);
         }
@@ -270,7 +274,7 @@ class BCrypt
     private function enhanceKeySchedule(password : Bytes, salt:Bytes):Void
     {
         woffset = 0;
-        var lr = [0,0];
+        var lr = Vector.fromArrayCopy([0,0]);
         for(i in 0...P_SZ) {
             pBox[i] ^= extractWord(password);
         }
@@ -298,7 +302,7 @@ class BCrypt
         return (((sBox[(x >>> 24)] + sBox[0x100 | ((x >>> 16) & 0xff)]) ^ sBox[0x200 | ((x >>> 8) & 0xff)]) + sBox[0x300 | (x & 0xff)]);
     }
 
-    private static function encipher(block:Array<Int>, offset:Int):Void
+    private static function encipher(block:Vector<Int>, offset:Int):Void
     {
         var xl : Int = block[offset];
         var xr : Int = block[offset +1];
