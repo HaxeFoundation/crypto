@@ -21,6 +21,8 @@
  */
 package haxe.crypto;
 
+import haxe.ds.Vector;
+
 /**
     Creates a Sha256 of a String.
 */
@@ -50,8 +52,8 @@ class Sha256 {
 	public function new() {
 	}
 
-	function doEncode( m : Array<Int>, l : Int ) : Array<Int> {
-		var K : Array<Int> = [
+	function doEncode( m : Vector<Int>, l : Int ) : Vector<Int> {
+		var K : Vector<Int> = Vector.fromArrayCopy([
 			0x428A2F98,0x71374491,0xB5C0FBCF,0xE9B5DBA5,0x3956C25B,
 			0x59F111F1,0x923F82A4,0xAB1C5ED5,0xD807AA98,0x12835B01,
 			0x243185BE,0x550C7DC3,0x72BE5D74,0x80DEB1FE,0x9BDC06A7,
@@ -65,13 +67,13 @@ class Sha256 {
 			0x2748774C,0x34B0BCB5,0x391C0CB3,0x4ED8AA4A,0x5B9CCA4F,
 			0x682E6FF3,0x748F82EE,0x78A5636F,0x84C87814,0x8CC70208,
 			0x90BEFFFA,0xA4506CEB,0xBEF9A3F7,0xC67178F2
-		];
-		var HASH : Array<Int> = [
+		]);
+		var HASH : Vector<Int> = Vector.fromArrayCopy([
 			0x6A09E667,0xBB67AE85,0x3C6EF372,0xA54FF53A,
 			0x510E527F,0x9B05688C,0x1F83D9AB,0x5BE0CD19
-		];
+		]);
 
-		var W = new Array<Int>();
+		var W = new Vector<Int>(65);
 		W[64] = 0;
 		var a:Int,b:Int,c:Int,d:Int,e:Int,f:Int,g:Int,h:Int;
 		var T1, T2;
@@ -106,19 +108,24 @@ class Sha256 {
 		Convert a string to a sequence of 16-word blocks, stored as an array.
 		Append padding bits and the length, as described in the SHA1 standard.
 	 */
-	static function str2blks( data : haxe.io.Bytes ) : Array<Int>
+	static function str2blks( data : haxe.io.Bytes ) : Vector<Int>
 	{
 		var nblk:Int = data.length;
-		var blks = new Array<Int>();
 		data = haxe.crypto.padding.BitPadding.pad(data,8);
+		var blksLenght = (data.length>>2);
+		blksLenght +=  16 - blksLenght % 16;
+		var blks = new Vector<Int>(blksLenght);
 		var i = 0;
+		var pos = 0;
 		while ( i < data.length) {
-			blks.push( bytesToInt(data,i));
+			blks[pos] = bytesToInt(data,i);
     		i +=4;
+			pos++;
    		}
-		var padding:Int = 16 - blks.length % 16;
+		var padding:Int = 16 - pos % 16;
 		for(j in 0...padding ) {
-			blks.push(0);
+			blks[pos] = 0;
+			pos++;
 		}
 		 
 		blks[blks.length-1] = nblk*8;
@@ -135,9 +142,9 @@ class Sha256 {
 		return n;
 	}
 
-	static function bytes2blks( b : haxe.io.Bytes ) : Array<Int> {
+	static function bytes2blks( b : haxe.io.Bytes ) : Vector<Int> {
 		var nblk = ((b.length + 8) >> 6) + 1;
-		var blks = new Array<Int>();
+		var blks = new Vector<Int>(nblk*16);
 
 		for (i in 0...nblk*16)
 			blks[i] = 0;
@@ -198,7 +205,7 @@ class Sha256 {
 		return (msw << 16) | (lsw & 0xFFFF);
 	}
 
-	function hex( a : Array<Int> ){
+	function hex( a : Vector<Int> ){
 		var str = "";
 		for( num in a ) {
 			str += StringTools.hex(num, 8);

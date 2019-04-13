@@ -1,5 +1,6 @@
 package haxe.crypto;
 
+import haxe.ds.Vector;
 import haxe.io.Bytes;
 import haxe.Int32;
 
@@ -7,13 +8,13 @@ import haxe.crypto.mode.*;
 import haxe.crypto.padding.*;
 
 class BlowFish
-{
-    public static var KP:Array<Int32> = [
+{  
+    public static var KP_ARRAY:Array<Int32> = [
         0x243F6A88, 0x85A308D3, 0x13198A2E, 0x03707344, 0xA4093822, 0x299F31D0, 0x082EFA98, 0xEC4E6C89, 0x452821E6, 0x38D01377,
         0xBE5466CF, 0x34E90C6C, 0xC0AC29B7, 0xC97C50DD, 0x3F84D5B5, 0xB5470917, 0x9216D5D9, 0x8979FB1B
     ];
 
-    public static var KS0:Array<Int32> = [
+    public static var KS0_ARRAY:Array<Int32> = [
         0xD1310BA6, 0x98DFB5AC, 0x2FFD72DB, 0xD01ADFB7, 0xB8E1AFED, 0x6A267E96, 0xBA7C9045, 0xF12C7F99, 0x24A19947, 0xB3916CF7,
         0x0801F2E2, 0x858EFC16, 0x636920D8, 0x71574E69, 0xA458FEA3, 0xF4933D7E, 0x0D95748F, 0x728EB658, 0x718BCD58, 0x82154AEE,
         0x7B54A41D, 0xC25A59B5, 0x9C30D539, 0x2AF26013, 0xC5D1B023, 0x286085F0, 0xCA417918, 0xB8DB38EF, 0x8E79DCB0, 0x603A180E, 
@@ -42,7 +43,7 @@ class BlowFish
         0xFF34052E, 0xC5855664, 0x53B02D5D, 0xA99F8FA1, 0x08BA4799, 0x6E85076A
     ];
 
-    public static var KS1:Array<Int32> = [
+    public static var KS1_ARRAY:Array<Int32> = [
         0x4B7A70E9, 0xB5B32944, 0xDB75092E, 0xC4192623, 0xAD6EA6B0, 0x49A7DF7D, 0x9CEE60B8, 0x8FEDB266, 0xECAA8C71, 0x699A17FF,
         0x5664526C, 0xC2B19EE1, 0x193602A5, 0x75094C29, 0xA0591340, 0xE4183A3E, 0x3F54989A, 0x5B429D65, 0x6B8FE4D6, 0x99F73FD6,
         0xA1D29C07, 0xEFE830F5, 0x4D2D38E6, 0xF0255DC1, 0x4CDD2086, 0x8470EB26, 0x6382E9C6, 0x021ECC5E, 0x09686B3F, 0x3EBAEFC9,
@@ -71,7 +72,7 @@ class BlowFish
         0x3D28F89E, 0xF16DFF20, 0x153E21E7, 0x8FB03D4A, 0xE6E39F2B, 0xDB83ADF7
     ];
 
-    public static var KS2:Array<Int32> = [
+    public static var KS2_ARRAY:Array<Int32> = [
         0xE93D5A68, 0x948140F7, 0xF64C261C, 0x94692934, 0x411520F7, 0x7602D4F7, 0xBCF46B2E, 0xD4A20068, 0xD4082471, 0x3320F46A,
         0x43B7D4B7, 0x500061AF, 0x1E39F62E, 0x97244546, 0x14214F74, 0xBF8B8840, 0x4D95FC1D, 0x96B591AF, 0x70F4DDD3, 0x66A02F45,
         0xBFBC09EC, 0x03BD9785, 0x7FAC6DD0, 0x31CB8504, 0x96EB27B3, 0x55FD3941, 0xDA2547E6, 0xABCA0A9A, 0x28507825, 0x530429F4,
@@ -100,7 +101,7 @@ class BlowFish
         0x362ABFCE, 0xDDC6C837, 0xD79A3234, 0x92638212, 0x670EFA8E, 0x406000E0
     ];
 
-    public static var KS3:Array<Int32> = [
+    public static var KS3_ARRAY:Array<Int32> = [
         0x3A39CE37, 0xD3FAF5CF, 0xABC27737, 0x5AC52D1B, 0x5CB0679E, 0x4FA33742, 0xD3822740, 0x99BC9BBE, 0xD5118E9D, 0xBF0F7315,
         0xD62D1C7E, 0xC700C47B, 0xB78C1B6B, 0x21A19045, 0xB26EB1BE, 0x6A366EB4, 0x5748AB2F, 0xBC946E79, 0xC6A376D2, 0x6549C2C8,
         0x530FF8EE, 0x468DDE7D, 0xD5730A1D, 0x4CD04DC6, 0x2939BBDB, 0xA9BA4650, 0xAC9526E8, 0xBE5EE304, 0xA1FAD5F0, 0x6A2D519A,
@@ -134,11 +135,11 @@ class BlowFish
     static inline var SBOX_SK : Int = 256;
     static inline var P_SZ : Int = ROUNDS+2;
 
-    var s0:Array<Int32>;
-    var s1:Array<Int32>;
-    var s2:Array<Int32>;
-    var s3:Array<Int32>;
-    var p:Array<Int32>;
+    var s0:Vector<Int32>;
+    var s1:Vector<Int32>;
+    var s2:Vector<Int32>;
+    var s3:Vector<Int32>;
+    var p:Vector<Int32>;
 
     public var iv(default, set):Bytes;
 
@@ -258,7 +259,7 @@ class BlowFish
         return (((s0[(x >>> 24)] + s1[(x >>> 16) & 0xff]) ^ s2[(x >>> 8) & 0xff]) + s3[x & 0xff]);
     }
 
-    private function processTable( xl:Int32, xr:Int32, table:Array<Int32>):Void
+    private function processTable( xl:Int32, xr:Int32, table:Vector<Int32>):Void
     {
         var size:Int = table.length;
         var s:Int = 0;
@@ -288,12 +289,12 @@ class BlowFish
 
     private function setKey(key:Bytes):Void
     {
-        s0 = KS0.copy();
-        s1 = KS1.copy();
-        s2 = KS2.copy();
-        s3 = KS3.copy();
+        s0 = Vector.fromArrayCopy(KS0_ARRAY);
+        s1 = Vector.fromArrayCopy(KS1_ARRAY);
+        s2 = Vector.fromArrayCopy(KS2_ARRAY);
+        s3 = Vector.fromArrayCopy(KS3_ARRAY);
 
-        p = KP.copy();
+        p = Vector.fromArrayCopy(KP_ARRAY);
 
         var keyLength = key.length;
         var keyIndex = 0;

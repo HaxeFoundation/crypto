@@ -1,5 +1,6 @@
 package haxe.crypto;
 
+import haxe.ds.Vector;
 import haxe.io.Bytes;
 
 import haxe.crypto.mode.*;
@@ -7,7 +8,10 @@ import haxe.crypto.padding.*;
 
 class TwoFish
 {
-    public static var Q0:Array<Int> = [
+    static var Q0:Vector<Int>;
+    static var Q1:Vector<Int>;
+
+    public static var Q0_ARRAY:Array<Int> = [
        	0xA9, 0x67, 0xB3, 0xE8, 0x04, 0xFD, 0xA3, 0x76, 0x9A, 0x92, 0x80, 0x78, 0xE4, 0xDD, 0xD1, 0x38,
 		0x0D, 0xC6, 0x35, 0x98, 0x18, 0xF7, 0xEC, 0x6C, 0x43, 0x75, 0x37, 0x26, 0xFA, 0x13, 0x94, 0x48,
 		0xF2, 0xD0, 0x8B, 0x30, 0x84, 0x54, 0xDF, 0x23, 0x19, 0x5B, 0x3D, 0x59, 0xF3, 0xAE, 0xA2, 0x82,
@@ -26,7 +30,7 @@ class TwoFish
 		0xCA, 0x10, 0x21, 0xF0, 0xD3, 0x5D, 0x0F, 0x00, 0x6F, 0x9D, 0x36, 0x42, 0x4A, 0x5E, 0xC1, 0xE0
     ];
 
-    public static var Q1:Array<Int> = [
+    public static var Q1_ARRAY:Array<Int> = [
        	0x75, 0xF3, 0xC6, 0xF4, 0xDB, 0x7B, 0xFB, 0xC8, 0x4A, 0xD3, 0xE6, 0x6B, 0x45, 0x7D, 0xE8, 0x4B,
 		0xD6, 0x32, 0xD8, 0xFD, 0x37, 0x71, 0xF1, 0xE1, 0x30, 0x0F, 0xF8, 0x1B, 0x87, 0xFA, 0x06, 0x3F,
 		0x5E, 0xBA, 0xAE, 0x5B, 0x8A, 0x00, 0xBC, 0x9D, 0x6D, 0xC1, 0xB1, 0x0E, 0x80, 0x5D, 0xD2, 0xD5,
@@ -60,10 +64,10 @@ class TwoFish
     static inline var ROUND_SUBKEYS : Int = OUTPUT_WHITEN + ( BLOCK_SIZE >> 2 );
     static inline var COUNT_SUBKEYS : Int = ROUND_SUBKEYS + 2*ROUNDS;
 
-    private var sBoxKeys  : Array<Int>;
-    private var subKeys : Array<Int>;
+    private var sBoxKeys  : Vector<Int>;
+    private var subKeys : Vector<Int>;
     private var keyLength : Int;
-    private var mdsMatrix : Array<Array<Int>> = [ for(i in 0...4) [ for (i  in 0...256) 0] ];
+    private var mdsMatrix : Vector<Vector<Int>> = Vector.fromArrayCopy([ for(i in 0...4) Vector.fromArrayCopy([ for (i  in 0...256) 0]) ]);
     public var iv(default, set):Bytes;
 
     function set_iv(vector) {
@@ -79,6 +83,8 @@ class TwoFish
 
     public function new(?key:Bytes, ?iv:Bytes)
     {
+        Q0 = Vector.fromArrayCopy(Q0_ARRAY);
+        Q1 = Vector.fromArrayCopy(Q1_ARRAY);
         if ( key != null ) init(key,iv);
         calculateMds();
     }
@@ -96,13 +102,12 @@ class TwoFish
 
     private function setKey(key:Bytes):Void
     {
-        sBoxKeys = new Array();
-        subKeys = new Array();
         keyLength = key.length;
         if ( keyLength != 16 && keyLength != 24  && keyLength != 32 ) throw "Key size should be 128, 192 or 256 bits";
-        var k32e : Array<Int> = new Array<Int>();
-        var k32o : Array<Int> = new Array<Int>();
         var k64Cnt = keyLength >> 3;
+        var k32e : Vector<Int> = new Vector<Int>(k64Cnt);
+        var k32o : Vector<Int> = new Vector<Int>(k64Cnt);
+        sBoxKeys = new Vector<Int>(k64Cnt);
         for(i in 0...k64Cnt) 
         {
             var m = i*8;
@@ -112,6 +117,7 @@ class TwoFish
         }
         
         var cSubKeys = COUNT_SUBKEYS >> 1;
+        subKeys = new Vector<Int>(2*cSubKeys + 1);
         for(i in 0...cSubKeys) 
         {
             var step = i * SUBKEY_STEP;
@@ -269,9 +275,9 @@ class TwoFish
 
     private function calculateMds():Void
     {
-        var m1 : Array<Int> = new Array<Int>();
-        var mX : Array<Int> = new Array<Int>();
-        var mY : Array<Int> = new Array<Int>();
+        var m1 : Vector<Int> = new Vector<Int>(2);
+        var mX : Vector<Int> = new Vector<Int>(2);
+        var mY : Vector<Int> = new Vector<Int>(2);
 
         for (i  in 0...256) 
         {
@@ -329,7 +335,7 @@ class TwoFish
         return r;
     }
 
-    public function f32(x:Int, k32:Array<Int>, keyLenght:Int):Int
+    public function f32(x:Int, k32:Vector<Int>, keyLenght:Int):Int
     {
         var xb0 = b0(x);
         var xb1 = b1(x);

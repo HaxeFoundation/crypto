@@ -21,6 +21,7 @@
  */
 package haxe.crypto;
 
+import haxe.ds.Vector;
 /**
     Creates a Sha224 of a String.
 */
@@ -49,8 +50,8 @@ class Sha224 {
     public function new() {
     }
 
-    function doEncode( data : haxe.io.Bytes ) : Array<Int> {
-        var K : Array<Int> = [
+    function doEncode( data : haxe.io.Bytes ) : Vector<Int> {
+        var K : Vector<Int> = Vector.fromArrayCopy([
             0x428A2F98, 0x71374491, 0xB5C0FBCF, 0xE9B5DBA5,
             0x3956C25B, 0x59F111F1, 0x923F82A4, 0xAB1C5ED5,
             0xD807AA98, 0x12835B01, 0x243185BE, 0x550C7DC3,
@@ -67,18 +68,18 @@ class Sha224 {
             0x391C0CB3, 0x4ED8AA4A, 0x5B9CCA4F, 0x682E6FF3,
             0x748F82EE, 0x78A5636F, 0x84C87814, 0x8CC70208,
             0x90BEFFFA, 0xA4506CEB, 0xBEF9A3F7, 0xC67178F2
-        ];
-        var HASH : Array<Int> = [
+        ]);
+        var HASH : Vector<Int> = Vector.fromArrayCopy([
             0xc1059ed8, 0x367cd507, 0x3070dd17, 0xf70e5939,
             0xffc00b31, 0x68581511, 0x64f98fa7, 0xbefa4fa4
-        ];
-        var W = new Array<Int>();
+        ]);
+        var W = new Vector<Int>(65);
         W[64] = 0;
 
         var a:Int,b:Int,c:Int,d:Int,e:Int,f:Int,g:Int,h:Int,i:Int,j:Int;
         var T1, T2;
         var i : Int = 0;
-        var blocks : Array<Int> = str2blks(data);
+        var blocks : Vector<Int> = str2blks(data);
 
         while ( i < blocks.length ) {
             a = HASH[0];
@@ -123,19 +124,24 @@ class Sha224 {
         return HASH;
     }
 
-	static function str2blks( data : haxe.io.Bytes ) : Array<Int>
+	static function str2blks( data : haxe.io.Bytes ) : Vector<Int>
 	{
 		var nblk:Int = data.length;
-		var blks = new Array<Int>();
-		data = haxe.crypto.padding.BitPadding.pad(data,8);
+        data = haxe.crypto.padding.BitPadding.pad(data,8);
+        var blksLenght = (data.length>>2);
+		blksLenght +=  16 - blksLenght % 16;
+		var blks = new Vector<Int>(blksLenght);
 		var i = 0;
+        var pos = 0;
 		while ( i < data.length) {
-			blks.push( bytesToInt(data,i));
+			blks[pos] = bytesToInt(data,i);
     		i +=4;
+            pos++;
    		}
-		var padding:Int = 16 - blks.length % 16;
+		var padding:Int = 16 - pos % 16;
 		for(j in 0...padding ) {
-			blks.push(0);
+			blks[pos] = 0;
+			pos++;
 		}
 		 
 		blks[blks.length-1] = nblk*8;
@@ -203,7 +209,7 @@ class Sha224 {
         return ROTR(x, 17) ^ ROTR(x, 19) ^ SHR(x, 10);
     }
 
-    function hex( a : Array<Int> ){
+    function hex( a : Vector<Int> ){
         var str = "";
         for( num in a ) {
             str += StringTools.hex(num, 8);

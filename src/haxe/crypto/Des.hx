@@ -1,11 +1,19 @@
 package haxe.crypto;
 
+import haxe.ds.Vector;
 import haxe.io.Bytes;
 
 class Des
 {
-	
-    static var PC1:Array<Int> =
+	static var PC1:Vector<Int>;
+    static var PC2:Vector<Int>;
+    static var ITERATION_SHIFT:Vector<Int>;
+    static var E:Vector<Int>;
+    static var P_BOX:Vector<Int>;
+    static var IP:Vector<Int>;
+    static var FP:Vector<Int>;
+
+    static var PC1_ARRAY:Array<Int> =
     [
         57, 49, 41, 33, 25, 17, 9,
         1,  58, 50, 42, 34, 26, 18,
@@ -17,7 +25,7 @@ class Des
         21, 13, 5,  28, 20, 12, 4
     ];
 
-    static var PC2:Array<Int>=
+    static var PC2_ARRAY:Array<Int>=
     [
         14, 17, 11, 24, 1,  5,
         3,  28, 15, 6,  21, 10,
@@ -29,7 +37,7 @@ class Des
         46, 42, 50, 36, 29, 32
     ];
 
-    static var ITERATION_SHIFT:Array<Int> =
+    static var ITERATION_SHIFT_ARRAY:Array<Int> =
     [
         1, 1, 2, 2,
         2, 2, 2, 2,
@@ -37,7 +45,7 @@ class Des
         2, 2, 2, 1
     ];
 
-    static var E:Array<Int> =
+    static var E_ARRAY:Array<Int> =
     [
         32, 1,  2,  3,  4,  5,
         4,  5,  6,  7,  8,  9,
@@ -100,7 +108,7 @@ class Des
 		[ 2, 1, 14, 7, 4, 10, 8, 13, 15, 12, 9, 0, 3, 5, 6, 11 ]
     ]];
 
-    static var P_BOX:Array<Int> =
+    static var P_BOX_ARRAY:Array<Int> =
     [
         16, 7,  20, 21,
         29, 12, 28, 17,
@@ -112,7 +120,7 @@ class Des
         22, 11, 4,  25
     ];
 
-    static var IP:Array<Int> =
+    static var IP_ARRAY:Array<Int> =
     [
         58, 50, 42, 34, 26, 18, 10, 2,
         60, 52, 44, 36, 28, 20, 12, 4,
@@ -124,7 +132,7 @@ class Des
         63, 55, 47, 39, 31, 23, 15, 7
     ];
 
-    static var FP:Array<Int> =
+    static var FP_ARRAY:Array<Int> =
     [
         40, 8, 48, 16, 56, 24, 64, 32,
         39, 7, 47, 15, 55, 23, 63, 31,
@@ -138,25 +146,32 @@ class Des
 
     public function new(?key:Bytes, ?iv:Bytes) 
     {
+        PC1 = Vector.fromArrayCopy(PC1_ARRAY);
+        PC2 = Vector.fromArrayCopy(PC2_ARRAY);
+        ITERATION_SHIFT = Vector.fromArrayCopy(ITERATION_SHIFT_ARRAY);
+        E = Vector.fromArrayCopy(E_ARRAY);
+        P_BOX = Vector.fromArrayCopy(P_BOX_ARRAY);
+        IP = Vector.fromArrayCopy(IP_ARRAY);
+        FP = Vector.fromArrayCopy(FP_ARRAY);
     }
 
-    public function desEncrypt(data:Bytes,keys:Array<Int64>):Int64
+    public function desEncrypt(data:Bytes,keys:Vector<Int64>):Int64
     {
         var block = bytesToInt64(data,0);
     	return cipher(block, true, keys);
     }
 
-    public function desDecrypt(block:Int64, keys:Array<Int64>):Bytes
+    public function desDecrypt(block:Int64, keys:Vector<Int64>):Bytes
     {
         var data = Bytes.alloc(8);
         int64ToBytes(cipher(block, false,keys),data,0);
     	return data;
     }
 
-    public function keygen(data:Bytes,offset:Int=0):Array<Int64>
+    public function keygen(data:Bytes,offset:Int=0):Vector<Int64>
     {
         var key:Int64 = bytesToInt64(data,offset);
-        var subKeys:Array<Int64> = new Array<Int64>();
+        var subKeys:Vector<Int64> = new Vector<Int64>(16);
     	key = pch1(key);
 		var highB:Int32 = (key.high << 4 ) | ( (key.low  >> 28) & 0x0f );
     	var lowB:Int32 = (key.low & 0x0FFFFFFF);
@@ -172,7 +187,7 @@ class Des
     	return subKeys;
     }
 
-    private function cipher(block:Int64,  encrypt:Bool, subKeys:Array<Int64>):Int64
+    private function cipher(block:Int64,  encrypt:Bool, subKeys:Vector<Int64>):Int64
     {
     	block = ip(block);
 
@@ -257,7 +272,7 @@ class Des
     	return permutation(input, PC2, 56);
     }
 
-    private function permutation(input:Int64, indexTable:Array<Int>, len:Int):Int64
+    private function permutation(input:Int64, indexTable:Vector<Int>, len:Int):Int64
     {
         var out:Int64 = 0;
         var idx = 0;

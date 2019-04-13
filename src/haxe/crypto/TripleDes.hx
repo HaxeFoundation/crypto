@@ -1,6 +1,7 @@
 package haxe.crypto;
 
 import haxe.io.Bytes;
+import haxe.ds.Vector;
 import haxe.crypto.mode.*;
 import haxe.crypto.padding.*;
 
@@ -8,7 +9,7 @@ class TripleDes extends Des
 {
     static inline var BLOCK_SIZE : Int = 8;
 
-    private var keys:Array<Array<Int64>>;
+    private var keys:Vector<Vector<Int64>>;
 
     public var iv(default, set):Bytes;
 
@@ -27,7 +28,7 @@ class TripleDes extends Des
     {
         super(key,iv);
         if ( key != null ) init(key,iv);         // Key size 168 bits
-        keys = new Array<Array<Int64>>();
+        keys = new Vector<Vector<Int64>>(3);
     }
 
     public function init(key:Bytes, ?iv:Bytes):Void

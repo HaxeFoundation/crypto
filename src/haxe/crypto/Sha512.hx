@@ -1,5 +1,6 @@
 package haxe.crypto;
 
+import haxe.ds.Vector;
 import haxe.Int64;
 import haxe.io.Bytes;
 import haxe.io.Encoding;
@@ -23,9 +24,9 @@ class Sha512
 	}
 
     function doEncode( msg:Bytes) : Bytes {
-        var state :Array<Int64>= [
+        var state :Vector<Int64>= Vector.fromArrayCopy([
 			Int64.make(0x6A09E667,0xF3BCC908), Int64.make(0xBB67AE85,0x84CAA73B), Int64.make(0x3C6EF372,0xFE94F82B), Int64.make(0xA54FF53A,0x5F1D36F1),
-			Int64.make(0x510E527F,0xADE682D1), Int64.make(0x9B05688C,0x2B3E6C1F), Int64.make(0x1F83D9AB,0xFB41BD6B), Int64.make(0x5BE0CD19,0x137E2179)];
+			Int64.make(0x510E527F,0xADE682D1), Int64.make(0x9B05688C,0x2B3E6C1F), Int64.make(0x1F83D9AB,0xFB41BD6B), Int64.make(0x5BE0CD19,0x137E2179)]);
         var off:Int = Math.floor(msg.length / BLOCK_LEN ) * BLOCK_LEN;
         compress(state, msg, off);
         var block = Bytes.alloc(BLOCK_LEN);
@@ -54,12 +55,12 @@ class Sha512
         return result;
     }
 
-    function compress(state:Array<Int64>, blocks:Bytes, len:Int) {
+    function compress(state:Vector<Int64>, blocks:Bytes, len:Int) {
 		if (len < 0 || len % BLOCK_LEN != 0) throw "Illegal argument";
         var i = 0;
         while(i < len )
 		{
-			var schedule: Array<Int64> = [for(k in 0...80) Int64.make(0,0)];
+			var schedule: Vector<Int64> = Vector.fromArrayCopy([for(k in 0...80) Int64.make(0,0)]);
             for(j in 0...BLOCK_LEN) {
 				schedule[(j >>> 3)] |= Int64.ofInt((blocks.get(i + j) & 0xFF)) << ((7 - j % 8) * 8);
             }
@@ -107,7 +108,7 @@ class Sha512
         return ( (x >>> n) | (x << (64 - n)) );
     }
 
-    public static var ROUND_CONSTANTS:Array<Int64> = [
+    public static var ROUND_CONSTANTS:Vector<Int64> = Vector.fromArrayCopy([
 		Int64.make(0x428A2F98,0xD728AE22), Int64.make(0x71374491,0x23EF65CD), Int64.make(0xB5C0FBCF,0xEC4D3B2F), Int64.make(0xE9B5DBA5,0x8189DBBC),
 		Int64.make(0x3956C25B,0xF348B538), Int64.make(0x59F111F1,0xB605D019), Int64.make(0x923F82A4,0xAF194F9B), Int64.make(0xAB1C5ED5,0xDA6D8118),
 		Int64.make(0xD807AA98,0xA3030242), Int64.make(0x12835B01,0x45706FBE), Int64.make(0x243185BE,0x4EE4B28C), Int64.make(0x550C7DC3,0xD5FFB4E2),
@@ -128,5 +129,5 @@ class Sha512
 		Int64.make(0x06F067AA,0x72176FBA), Int64.make(0x0A637DC5,0xA2C898A6), Int64.make(0x113F9804,0xBEF90DAE), Int64.make(0x1B710B35,0x131C471B),
 		Int64.make(0x28DB77F5,0x23047D84), Int64.make(0x32CAAB7B,0x40C72493), Int64.make(0x3C9EBE0A,0x15C9BEBC), Int64.make(0x431D67C4,0x9C100D4C),
 		Int64.make(0x4CC5D4BE,0xCB3E42B6), Int64.make(0x597F299C,0xFC657E2A), Int64.make(0x5FCB6FAB,0x3AD6FAEC), Int64.make(0x6C44198C,0x4A475817)
-    ];
+    ]);
 }
