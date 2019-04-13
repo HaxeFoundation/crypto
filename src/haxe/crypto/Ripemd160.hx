@@ -145,7 +145,7 @@ class Ripemd160
 	{
         var data : Vector<Int> = new Vector(16);
         for(i in 0...16) {
-            data.push(bytesToInt32(src,offset + i*4));
+            data[i] = bytesToInt32(src,offset + i*4);
         }
         var al = state[0], ar = state[0];
         var bl = state[1], br = state[1];
