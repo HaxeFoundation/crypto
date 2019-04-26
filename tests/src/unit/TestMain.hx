@@ -66,7 +66,8 @@ class TestMain {
 			new BCryptTest(),
 			new Pbkdf2Test(),
 			new Sha384Test(),
-			new Sha512Test()
+			new Sha512Test(),
+			new Salsa20Test()
 		];
 
 		TestIssues.addIssueClasses("src/unit/issues", "unit.issues");
