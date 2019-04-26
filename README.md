@@ -20,6 +20,7 @@ Cross platform cryptographic functions for Haxe
   * Ripemd-160
   * PBKDF2
   * Salsa20
+  * XSalsa20
   
 ### Block cipher mode of operation
   * ECB
@@ -251,4 +252,20 @@ Cross platform cryptographic functions for Haxe
    salsa.seek(0);
    plainData = salsa.decrypt(data);
    trace("Salsa20 decrypt ( with seek position ) : "+ plainData.toString());
+   ``` 
+   
+   #### XSalsa20
+   ```haxe
+   var key = Sha256.make(Bytes.ofString("secret key"));
+   var nonce = Bytes.ofHex("9E645A74E9E0A60D8243ACD9177AB51A1BEB8D5A2F5D700C");
+   var msg = Bytes.ofString("Haxe - The Cross-platform Toolkit");
+   var xsalsa = new XSalsa20();
+   xsalsa.init(key,nonce);
+   var data = xsalsa.encrypt(msg);
+   trace("XSalsa20 encrypt: "+data.toHex());
+
+   var xsalsaDecrypt =  new XSalsa20();
+   xsalsaDecrypt.init(key,nonce);
+   var plainData = xsalsaDecrypt.decrypt(data);
+   trace("XSalsa20 decrypt: "+ plainData.toString());
    ```
