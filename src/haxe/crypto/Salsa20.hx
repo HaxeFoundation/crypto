@@ -12,7 +12,7 @@ class Salsa20 {
 	];
 
 	static var counter : Int64;
-	static var state:Vector<Int> = new Vector<Int>(16);
+	public var state:Vector<Int> = new Vector<Int>(16);
 	static var buffer:Vector<Int> = new Vector<Int>(16);
 	static var expandState:Bytes = Bytes.alloc(64);
 	private var sigmas:Vector<Int>;
@@ -35,12 +35,23 @@ class Salsa20 {
 		if ( key.length != 16 && key.length != 32 )
 			throw "Wrong key size";
 		
+		setConstant(key);
+		setNonce(nonce);
+		setKey(key);
+		reset();
+	}
+
+	private function setConstant(key:Bytes):Void
+	{
 		var sigmaOffset:Int =  (key.length == 16)?0:4;
 		state[0] = sigmas[sigmaOffset];
 		state[5] = sigmas[sigmaOffset+1];
 		state[10] = sigmas[sigmaOffset+2];
 		state[15] = sigmas[sigmaOffset+3];
+	}
 
+	public function setKey(key:Bytes):Void
+	{
 		if ( key.length == 16 ) {
 			for(i in 0...4) {
 				state[i+1] = state[i+11] = bytesToInt32(key,i*4);
@@ -51,9 +62,6 @@ class Salsa20 {
 				state[i+11] = bytesToInt32(key,i*4+16);
 			}
 		}
-
-		setNonce(nonce);
-		reset();
 	}
 
 	public function setNonce(nonce:Bytes):Void

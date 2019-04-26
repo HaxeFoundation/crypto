@@ -67,7 +67,8 @@ class TestMain {
 			new Pbkdf2Test(),
 			new Sha384Test(),
 			new Sha512Test(),
-			new Salsa20Test()
+			new Salsa20Test(),
+			new XSalsa20Test()
 		];
 
 		TestIssues.addIssueClasses("src/unit/issues", "unit.issues");
