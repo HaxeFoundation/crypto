@@ -5,7 +5,7 @@ import haxe.Timer;
 import haxe.io.Bytes;
 import haxe.crypto.Salsa20;
 
-class SalsaTest extends Test
+class Salsa20Test extends Test
 {
     var keys = [
         "80000000000000000000000000000000", "00400000000000000000000000000000", "00002000000000000000000000000000",
