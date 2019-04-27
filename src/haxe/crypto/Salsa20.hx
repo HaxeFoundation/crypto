@@ -11,7 +11,7 @@ class Salsa20 {
 			0x61707865, 0x3320646E, 0x79622D32, 0x6B206574
 	];
 
-	static var counter : Int64;
+	private var counter : Int64;
 	public var state:Vector<Int> = new Vector<Int>(16);
 	static var buffer:Vector<Int> = new Vector<Int>(16);
 	static var expandState:Bytes = Bytes.alloc(64);

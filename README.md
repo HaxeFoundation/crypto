@@ -21,6 +21,7 @@ Cross platform cryptographic functions for Haxe
   * PBKDF2
   * Salsa20
   * XSalsa20
+  * ChaCha
   
 ### Block cipher mode of operation
   * ECB
@@ -268,4 +269,20 @@ Cross platform cryptographic functions for Haxe
    xsalsaDecrypt.init(key,nonce);
    var plainData = xsalsaDecrypt.decrypt(data);
    trace("XSalsa20 decrypt: "+ plainData.toString());
+   ```   
+   
+   #### ChaCha
+   ```haxe
+   var key = Sha256.make(Bytes.ofString("secret key"));
+   var nonce = Bytes.ofHex("0F1E2D3C4B596877");
+   var msg = Bytes.ofString("Haxe - The Cross-platform Toolkit");
+   var chaCha = new ChaCha();
+   chaCha.init(key,nonce);
+   var data = chaCha.encrypt(msg);
+   trace("ChaCha encrypt: "+data.toHex());
+
+   var chaChaDecrypt =  new ChaCha();
+   chaChaDecrypt.init(key,nonce);
+   var plainData = chaChaDecrypt.decrypt(data);
+   trace("ChaCha decrypt: "+ plainData.toString());
    ```
