@@ -16,13 +16,17 @@ class XSalsa20 extends Salsa20
 		if ( key.length != 32 )
 			throw "Wrong key size. Exptected 32 bytes key";
 		
-        this.nonce = nonce;
-
 		setConstant(key);
 		setNonce(nonce);
 		setKey(key);
 		reset();
 	}
+
+    public override function setNonce(nonce:Bytes):Void
+	{
+        super.setNonce(nonce);
+        this.nonce = nonce;
+    }
 
     public override function setKey(key:Bytes):Void
     {
