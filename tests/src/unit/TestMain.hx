@@ -69,7 +69,8 @@ class TestMain {
 			new Sha512Test(),
 			new Salsa20Test(),
 			new XSalsa20Test(),
-			new ChaChaTest()
+			new ChaChaTest(),
+			new RC4Test()
 		];
 
 		TestIssues.addIssueClasses("src/unit/issues", "unit.issues");
