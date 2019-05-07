@@ -23,6 +23,7 @@ Cross platform cryptographic functions for Haxe
   * XSalsa20
   * ChaCha
   * RC4
+  * SCrypt
   
 ### Block cipher mode of operation
   * ECB
@@ -290,7 +291,7 @@ Cross platform cryptographic functions for Haxe
    
    #### RC4 ( ARC4 )
    ```haxe
-   var key = Bytes.ofHex("a99c5476d5e5d61d425c01fa29632171"));
+   var key = Bytes.ofHex("a99c5476d5e5d61d425c01fa29632171");
    var msg = Bytes.ofString("Haxe - The Cross-platform Toolkit");
    var rc4 = new RC4();
    rc4.init(key);
@@ -300,4 +301,13 @@ Cross platform cryptographic functions for Haxe
    rc4.init(key);
    var plainData = rc4.decrypt(data);
    trace("RC4 decrypt: "+ plainData.toString());
+   ```
+   
+   #### SCrypt
+   ```haxe
+   var salt = Bytes.ofHex("536F6469756D43686C6F72696465");
+   var password = Bytes.ofString("Haxe - The Cross-platform Toolkit");
+   var scrypt:SCrypt = new SCrypt();
+   var data = scrypt.hash(password, salt, 1024, 8, 1, 64);
+   trace("SCrypt hash: "+data.toHex());
    ```
