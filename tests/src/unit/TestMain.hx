@@ -70,7 +70,8 @@ class TestMain {
 			new Salsa20Test(),
 			new XSalsa20Test(),
 			new ChaChaTest(),
-			new RC4Test()
+			new RC4Test(),
+			new SCryptTest()
 		];
 
 		TestIssues.addIssueClasses("src/unit/issues", "unit.issues");
