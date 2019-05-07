@@ -46,7 +46,7 @@ class ChaCha extends Salsa20
 		state[15] = bytesToInt32(nonce,4);
 	}
 
-	override public function generateBlock(input:Vector<Int>, output:Vector<Int>, rounds:Int = 20):Void 
+	override public function generateBlock(input:Vector<Int>, output:Vector<Int>, rounds:Int = 20, offset:Int = 0):Void 
 	{
 		if ((rounds & 1) != 0) {
 			throw "Rounds should be a positive, even number";
