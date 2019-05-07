@@ -6,7 +6,6 @@ import haxe.Timer;
 import haxe.crypto.SCrypt;
 
 class SCryptTest extends Test {
-	public function new() {}
 
 	var plainText = [
 		"",
