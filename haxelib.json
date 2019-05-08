@@ -4,8 +4,8 @@
   "license": "MIT",
   "classPath": "src",
   "tags":["crypto","utility","hash","auth","cross","web","aes","blowfish","twofish","tripledes","bcrypt","hmac","sha224","sha256","sha384","sha512","ripemd-160","pbkdf2","salsa20","xsalsa","chacha","ecb","cbc","pcbc","cfb","ofb","ctr","ansix923","bitpadding","iso10126","nullpadding","pkcs7","spacepadding","tbc"],
-  "description": "Cross-platform crypto library : Aes, BCrypt, BlowFish, Des, TripleDes, TwoFish, Hmac, Pbkdf2, Ripemd160, Sha224, Sha256, Sha384, Sha512, Salsa20, XSalsa, ChaCha, cbc, cfb, ctr, ecb, ofb, pcbc",
-  "version": "1.0.2-alpha",
-  "releasenote": "Add Salsa20, XSalsa and ChaCha algorithms",
+  "description": "Cross-platform crypto library with support of : Aes, BCrypt, BlowFish, Des, TripleDes, TwoFish, Hmac, Pbkdf2, Ripemd160, Sha224, Sha256, Sha384, Sha512, Salsa20, XSalsa, ChaCha, SCrypt, RC4. Block cipher mode of operation:  cbc, cfb, ctr, ecb, ofb, pcbc",
+  "version": "0.3.0",
+  "releasenote": "Add SCrypt and RC4 ( ARC4) algorithms",
   "contributors":["flashultra"]
 }
