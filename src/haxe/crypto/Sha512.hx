@@ -3,7 +3,7 @@ package haxe.crypto;
 import haxe.ds.Vector;
 import haxe.Int64;
 import haxe.io.Bytes;
-import haxe.io.Encoding;
+#if !haxe3 import haxe.io.Encoding; #end
 
 class Sha512 
 {
@@ -12,8 +12,8 @@ class Sha512
     public function new() {
 	}
 
-	public static function encode( s:String, ?encoding : haxe.io.Encoding ) : String {
-		var data = haxe.io.Bytes.ofString(s, encoding);
+	public static function encode( s:String #if !haxe3 , ?encoding : haxe.io.Encoding #end ) : String {
+		var data = haxe.io.Bytes.ofString(s #if !haxe3 , encoding #end );
 		var out = new Sha512().doEncode(data);
 		return out.toHex();
 	}

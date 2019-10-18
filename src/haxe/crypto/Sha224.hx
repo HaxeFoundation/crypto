@@ -27,9 +27,9 @@ import haxe.ds.Vector;
 */
 class Sha224 {
 
-    public static function encode( s:String, ?encoding : haxe.io.Encoding ) : String {
+    public static function encode( s:String #if !haxe3 , ?encoding : haxe.io.Encoding #end ) : String {
         var sh = new Sha224();
-		var data = haxe.io.Bytes.ofString(s, encoding);
+		var data = haxe.io.Bytes.ofString(s #if !haxe3 , encoding #end );
         var h = sh.doEncode(data);
         return sh.hex(h);
     }
@@ -158,7 +158,7 @@ class Sha224 {
 		return n;
 	}
 
-    extern
+    #if haxe3 @:extern #else extern #end
     inline static function safeAdd(x, y) {
         var lsw = (x & 0xFFFF) + (y & 0xFFFF);
         var msw = (x >>> 16) + (y >>> 16) + (lsw >>> 16);
@@ -166,45 +166,45 @@ class Sha224 {
     }
 
     // ++
-    extern
+    #if haxe3 @:extern #else extern #end
     inline function ROTR(X, n) {
         return ( X >>> n ) | (X << (32 - n));
     }
 
     // ++
-    extern
+    #if haxe3 @:extern #else extern #end
     inline function SHR(X, n) {
         return ( X >>> n );
     }
 
     // ++
-    extern
+    #if haxe3 @:extern #else extern #end
     inline function Ch(x, y, z) {
         return ((x & y) ^ ((~x) & z));
     }
 
     // ++
-    extern
+    #if haxe3 @:extern #else extern #end
     inline function Maj(x, y, z) {
         return ((x & y) ^ (x & z) ^ (y & z));
     }
 
-    extern
+    #if haxe3 @:extern #else extern #end
     inline function Sigma0(x) {
         return ROTR(x, 2) ^ ROTR(x, 13) ^ ROTR(x, 22);
     }
 
-    extern
+    #if haxe3 @:extern #else extern #end
     inline function Sigma1(x) {
         return ROTR(x, 6) ^ ROTR(x, 11) ^ ROTR(x, 25);
     }
 
-    extern
+    #if haxe3 @:extern #else extern #end
     inline function Gamma0(x) {
         return ROTR(x, 7) ^ ROTR(x, 18) ^ SHR(x, 3);
     }
 
-    extern
+    #if haxe3 @:extern #else extern #end
     inline function Gamma1(x) {
         return ROTR(x, 17) ^ ROTR(x, 19) ^ SHR(x, 10);
     }
