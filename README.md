@@ -2,11 +2,15 @@
 [![TravisCI Build Status](https://travis-ci.org/HaxeFoundation/crypto.svg?branch=master)](https://travis-ci.org/HaxeFoundation/crypto)
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/HaxeFoundation/crypto?branch=master&svg=true)](https://ci.appveyor.com/project/HaxeFoundation/crypto)
 
-Cross platform cryptographic functions for Haxe
+Cross platform cryptographic functions for Haxe 4 and 3
 
+This brings cryptographic functions for Haxe 4, with `-lib crypto` after having installed it with `haxelib install crypto`.
 
+It is also usable on Haxe 3, where there is already a `haxe.crypto` package containing Adler32, Base64, BaseCode, Crc32, HMac, Md5, Sha1, Sha224, Sha256. 
+Using this library on Haxe 3 with `-lib crypto` will overload the `haxe.crypto` package and allow support for Aes, BCrypt, BlowFish, Des, Pbkdf2, Ripemd160, Sha384, Sha512, TripleDes, TwoFish in addition to the previous 9 classes.
 
 ### Supported algorithms
+
   * Aes
   * Blowfish
   * Twofish
