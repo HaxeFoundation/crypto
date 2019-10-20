@@ -28,9 +28,9 @@ import haxe.ds.Vector;
 */
 class Sha256 {
 
-	public static function encode( s:String #if !haxe3 , ?encoding : haxe.io.Encoding #end ) : String {
+	public static function encode( s:String #if haxe4 , ?encoding : haxe.io.Encoding #end ) : String {
 		var sh = new Sha256();
-		var data = haxe.io.Bytes.ofString(s #if !haxe3 , encoding #end );
+		var data = haxe.io.Bytes.ofString(s #if haxe4 , encoding #end );
 		var nblk = data.length*8;
 		var h = sh.doEncode(str2blks(data), nblk);
 		return sh.hex(h);

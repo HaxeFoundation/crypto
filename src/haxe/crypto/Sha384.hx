@@ -3,7 +3,7 @@ package haxe.crypto;
 import haxe.ds.Vector;
 import haxe.Int64;
 import haxe.io.Bytes;
-#if !haxe3 import haxe.io.Encoding; #end
+#if haxe4 import haxe.io.Encoding; #end
 
 class Sha384
 {
@@ -12,8 +12,8 @@ class Sha384
     public function new() {
 	}
 
-    public static function encode( s:String #if !haxe3 , ?encoding : haxe.io.Encoding #end ) : String {
-		var data = haxe.io.Bytes.ofString(s #if !haxe3 , encoding #end );
+    public static function encode( s:String #if haxe4 , ?encoding : haxe.io.Encoding #end ) : String {
+		var data = haxe.io.Bytes.ofString(s #if haxe4 , encoding #end );
 		var out = new Sha384().doEncode(data);
 		return out.toHex();
 	}

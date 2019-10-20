@@ -27,9 +27,9 @@ import haxe.ds.Vector;
 */
 class Sha224 {
 
-    public static function encode( s:String #if !haxe3 , ?encoding : haxe.io.Encoding #end ) : String {
+    public static function encode( s:String #if haxe4 , ?encoding : haxe.io.Encoding #end ) : String {
         var sh = new Sha224();
-		var data = haxe.io.Bytes.ofString(s #if !haxe3 , encoding #end );
+		var data = haxe.io.Bytes.ofString(s #if haxe4 , encoding #end );
         var h = sh.doEncode(data);
         return sh.hex(h);
     }
