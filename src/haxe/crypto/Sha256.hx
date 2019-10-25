@@ -28,9 +28,9 @@ import haxe.ds.Vector;
 */
 class Sha256 {
 
-	public static function encode( s:String, ?encoding : haxe.io.Encoding ) : String {
+	public static function encode( s:String #if haxe4 , ?encoding : haxe.io.Encoding #end ) : String {
 		var sh = new Sha256();
-		var data = haxe.io.Bytes.ofString(s, encoding);
+		var data = haxe.io.Bytes.ofString(s #if haxe4 , encoding #end );
 		var nblk = data.length*8;
 		var h = sh.doEncode(str2blks(data), nblk);
 		return sh.hex(h);
@@ -158,47 +158,48 @@ class Sha256 {
 		blks[nblk * 16 - 1] = b.length * 8;
 		return blks;
 	}
-	extern
+
+    @:extern
 	inline function S(X, n) {
 		return ( X >>> n ) | (X << (32 - n));
 	}
 
-	extern
+    @:extern
 	inline function R(X, n) {
 		return ( X >>> n );
 	}
 
-	extern
+    @:extern
 	inline function Ch(x, y, z) {
 		return ((x & y) ^ ((~x) & z));
 	}
 
-	extern
+    @:extern
 	inline function Maj(x, y, z) {
 		return ((x & y) ^ (x & z) ^ (y & z));
 	}
 
-	extern
+    @:extern
 	inline function Sigma0256(x) {
 		return (S(x, 2) ^ S(x, 13) ^ S(x, 22));
 	}
 
-	extern
+    @:extern
 	inline function Sigma1256(x) {
 		return (S(x, 6) ^ S(x, 11) ^ S(x, 25));
 	}
 
-	extern
+    @:extern
 	inline function Gamma0256(x) {
 		return (S(x, 7) ^ S(x, 18) ^ R(x, 3));
 	}
 
-	extern
+    @:extern
 	inline function Gamma1256(x) {
 		return (S(x, 17) ^ S(x, 19) ^ R(x, 10));
 	}
 
-	extern
+    @:extern
 	inline function safeAdd(x, y) {
 		var lsw = (x & 0xFFFF) + (y & 0xFFFF);
 		var msw = (x >> 16) + (y >> 16) + (lsw >> 16);
