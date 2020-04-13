@@ -5,7 +5,7 @@ import haxe.Int64;
 import haxe.io.Bytes;
 #if haxe4 import haxe.io.Encoding; #end
 
-class Sha512 
+class Sha512
 {
     inline static var BLOCK_LEN:Int = 128;
 
@@ -13,14 +13,30 @@ class Sha512
 	}
 
 	public static function encode( s:String #if haxe4 , ?encoding : haxe.io.Encoding #end ) : String {
+		#if php
+			#if haxe4
+			return php.Global.hash('sha512', s);
+			#else
+			return untyped __php__("hash('sha512', {0})", s);
+			#end
+		#else
 		var data = haxe.io.Bytes.ofString(s #if haxe4 , encoding #end );
 		var out = new Sha512().doEncode(data);
 		return out.toHex();
+		#end
 	}
 
 	public static function make( b : haxe.io.Bytes ) : haxe.io.Bytes {
+		#if php
+			#if haxe4
+			return Bytes.ofData(php.Global.hash('sha512', b.getData(), true));
+			#else
+			return Bytes.ofData(untyped __php__("hash('sha512', {0}, true)", b.getData()));
+			#end
+		#else
 		var out = new Sha512().doEncode(b);
 		return out;
+		#end
 	}
 
     function doEncode( msg:Bytes) : Bytes {
@@ -38,7 +54,7 @@ class Sha512
 			compress(state, block, block.length);
             block.fill(0,block.length,0);
 		}
-        
+
         var len = msg.length << 3;
         for(i in 0...8) {
 			if ( i > 3 ) {
@@ -48,7 +64,7 @@ class Sha512
 			}
         }
         compress(state, block, block.length);
-  
+
         var result = Bytes.alloc(state.length * 8);
         for (i in 0...result.length)
 			result.set(i, (state[i >>> 3] >>> ((7 - i % 8) * 8)).low);
@@ -70,7 +86,7 @@ class Sha512
 					+ (ror64(schedule[j-15],  1) ^ ror64(schedule[j-15],  8) ^ (schedule[j-15] >>> 7))
 					+ (ror64(schedule[j- 2], 19) ^ ror64(schedule[j- 2], 61) ^ (schedule[j- 2] >>> 6));
 			}
-			
+
 			var a = state[0];
 			var b = state[1];
 			var c = state[2];
