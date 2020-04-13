@@ -45,9 +45,9 @@ class Sha224 {
     public static function make( b : haxe.io.Bytes ) : haxe.io.Bytes {
         #if php
             #if haxe4
-            return Bytes.ofData(php.Global.hash('sha224', b.getData(), true));
+            return haxe.io.Bytes.ofData(php.Global.hash('sha224', b.getData(), true));
             #else
-            return Bytes.ofData(untyped __php__("hash('sha224', {0}, true)", b.getData()));
+            return haxe.io.Bytes.ofData(untyped __php__("hash('sha224', {0}, true)", b.getData()));
             #end
         #else
         var h = new Sha224().doEncode(b);
