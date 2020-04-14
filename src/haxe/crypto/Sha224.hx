@@ -28,13 +28,28 @@ import haxe.ds.Vector;
 class Sha224 {
 
     public static function encode( s:String #if haxe4 , ?encoding : haxe.io.Encoding #end ) : String {
+        #if php
+            #if haxe4
+            return php.Global.hash('sha224', s);
+            #else
+            return untyped __php__("hash('sha224', {0})", s);
+            #end
+        #else
         var sh = new Sha224();
-		var data = haxe.io.Bytes.ofString(s #if haxe4 , encoding #end );
+        var data = haxe.io.Bytes.ofString(s #if haxe4 , encoding #end );
         var h = sh.doEncode(data);
         return sh.hex(h);
+        #end
     }
 
     public static function make( b : haxe.io.Bytes ) : haxe.io.Bytes {
+        #if php
+            #if haxe4
+            return haxe.io.Bytes.ofData(php.Global.hash('sha224', b.getData(), true));
+            #else
+            return haxe.io.Bytes.ofData(untyped __php__("hash('sha224', {0}, true)", b.getData()));
+            #end
+        #else
         var h = new Sha224().doEncode(b);
         var out = haxe.io.Bytes.alloc(28);
         var p = 0;
@@ -45,6 +60,7 @@ class Sha224 {
             out.set(p++,h[i]&0xFF);
         }
         return out;
+        #end
     }
 
     public function new() {
@@ -143,12 +159,12 @@ class Sha224 {
 			blks[pos] = 0;
 			pos++;
 		}
-		 
+
 		blks[blks.length-1] = nblk*8;
 
 		return blks;
 	}
-	
+
 	private static function bytesToInt(bs:haxe.io.Bytes, off:Int):Int
 	{
 		var n:Int = ( bs.get(off) ) << 24;
