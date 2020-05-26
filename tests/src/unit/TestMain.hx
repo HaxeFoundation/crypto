@@ -71,7 +71,8 @@ class TestMain {
 			new XSalsa20Test(),
 			new ChaChaTest(),
 			new RC4Test(),
-			new SCryptTest()
+			new SCryptTest(),
+			new Poly1305Test()
 		];
 
 		TestIssues.addIssueClasses("src/unit/issues", "unit.issues");

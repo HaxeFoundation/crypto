@@ -28,7 +28,8 @@ Using this library on Haxe 3 with `-lib crypto` will overload the `haxe.crypto` 
   * ChaCha
   * RC4
   * SCrypt
-  
+  * Poly1305
+   
 ### Block cipher mode of operation
   * ECB
   * CBC
@@ -315,3 +316,27 @@ Using this library on Haxe 3 with `-lib crypto` will overload the `haxe.crypto` 
    var data = scrypt.hash(password, salt, 1024, 8, 1, 64);
    trace("SCrypt hash: "+data.toHex());
    ```
+
+   #### Poly1305
+   ```haxe
+   var key = Sha256.make(Bytes.ofString("secret key")); //32 bytes key
+   var msg = Bytes.ofString("Haxe - The Cross-platform Toolkit");
+  
+   var poly1305 = new Poly1305();
+   var data = poly1305.encode(msg,key); 
+   trace("Poly1305 encrypt: "+data.toHex());
+   
+   // Verify
+   var verify = poly1305.verify(msg,key,data);
+   trace("OK: "+verify);
+
+   // Streaming API
+   var poly1305 = new Poly1305();
+   poly1305.init(key);
+   poly1305.update(msg, 0, msg.length);
+   msg = Bytes.ofString("Haxe can build cross-platform applications.");
+   poly1305.update(msg, 0, msg.length);
+   var data = poly1305.finish();
+   trace("Poly1305 encrypt: "+ data.toHex());
+   ```   
+   
