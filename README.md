@@ -15,6 +15,7 @@ Using this library on Haxe 3 with `-lib crypto` will overload the `haxe.crypto` 
   * Blowfish
   * Twofish
   * TripleDes
+  * Des 
   * BCrypt
   * Hmac
   * Sha224
@@ -122,6 +123,25 @@ Using this library on Haxe 3 with `-lib crypto` will overload the `haxe.crypto` 
    
    // Decrypt
    data = tdes.decrypt(Mode.OFB,data,Padding.NoPadding);
+   trace("Decrypted text: "+ data);
+ ```
+  
+  ####  DES 
+ ```haxe
+   var des:Des = new Des();
+   
+   var key = Bytes.ofHex("9816854577667254");
+   var text = Bytes.ofString("Haxe - The Cross-platform Toolkit");
+   var iv:Bytes = Bytes.ofHex("69cf9d79757adcab");
+   
+   des.init(key,iv);
+   
+    // Encrypt
+   var data = des.encrypt(Mode.CTR,text,Padding.NoPadding);
+   trace("Encrypted text: "+ data.toHex());
+   
+   // Decrypt
+   data = des.decrypt(Mode.CTR,data,Padding.NoPadding);
    trace("Decrypted text: "+ data);
  ```
  

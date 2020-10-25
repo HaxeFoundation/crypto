@@ -2,9 +2,14 @@ package haxe.crypto;
 
 import haxe.ds.Vector;
 import haxe.io.Bytes;
+import haxe.crypto.mode.*;
+import haxe.crypto.padding.*;
 
 class Des
 {
+    static inline var BLOCK_SIZE : Int = 8;
+    private var key:Vector<Int64>;
+
 	static var PC1:Vector<Int>;
     static var PC2:Vector<Int>;
     static var ITERATION_SHIFT:Vector<Int>;
@@ -144,6 +149,19 @@ class Des
         33, 1, 41,  9, 49, 17, 57, 25
     ];
 
+    public var iv(default, set):Bytes;
+
+    function set_iv(vector) {
+        iv = vector;
+        if (iv == null) 
+        {
+            iv = Bytes.alloc(BLOCK_SIZE);
+            iv.fill(0,BLOCK_SIZE,0x00);
+        }
+        
+        return iv;
+    }
+
     public function new(?key:Bytes, ?iv:Bytes) 
     {
         PC1 = Vector.fromArrayCopy(PC1_ARRAY);
@@ -153,6 +171,114 @@ class Des
         P_BOX = Vector.fromArrayCopy(P_BOX_ARRAY);
         IP = Vector.fromArrayCopy(IP_ARRAY);
         FP = Vector.fromArrayCopy(FP_ARRAY);
+
+        if ( key != null ) init(key,iv); 
+    }
+
+    public function init(key:Bytes, ?iv:Bytes):Void
+    {
+        var keyLength = key.length;
+        if ( keyLength < 8 ) throw "Specified key is not a valid size for Des algorithm";   
+        this.iv = iv;
+        this.key = keygen(key);
+    }
+
+    public function encrypt(cipherMode:Mode, data:Bytes, ?padding:Padding=Padding.PKCS7):Bytes
+    { 
+        var out:Bytes;
+            
+        switch(padding)  {
+            //CBC, ECB  and PCBC requires padding
+            case Padding.NoPadding:
+                out = NoPadding.pad(data,BLOCK_SIZE); 
+            case Padding.PKCS7:
+                out = PKCS7.pad(data,BLOCK_SIZE);
+            case Padding.BitPadding:
+                out = BitPadding.pad(data,BLOCK_SIZE);
+            case Padding.AnsiX923:
+                out = AnsiX923.pad(data,BLOCK_SIZE);
+            case Padding.ISO10126:
+                out = ISO10126.pad(data,BLOCK_SIZE);
+            case Padding.NullPadding:
+                out = NullPadding.pad(data,BLOCK_SIZE);
+            case Padding.SpacePadding:
+                out = SpacePadding.pad(data,BLOCK_SIZE);
+            case Padding.TBC:
+                out = TBC.pad(data,BLOCK_SIZE);
+        }
+    
+        switch (cipherMode) {
+            case Mode.CBC:
+                CBC.encrypt(out,iv,BLOCK_SIZE,encryptBlock);
+            case Mode.ECB:
+                ECB.encrypt(out,BLOCK_SIZE,encryptBlock);
+            case Mode.PCBC:
+                PCBC.encrypt(out,iv,BLOCK_SIZE,encryptBlock);
+            case Mode.CTR:
+                CTR.encrypt(out,iv,BLOCK_SIZE,encryptBlock);
+            case Mode.CFB:
+                CFB.encrypt(out,iv,BLOCK_SIZE,encryptBlock);
+            case Mode.OFB:
+                OFB.encrypt(out,iv,BLOCK_SIZE,encryptBlock);
+        }
+    
+        return out;
+    }
+    
+    public function decrypt(cipherMode:Mode, data:Bytes, ?padding:Padding=Padding.PKCS7):Bytes 
+    {
+        var out:Bytes = data;
+    
+        switch (cipherMode) {
+            case Mode.CBC:
+                CBC.decrypt(out,iv,BLOCK_SIZE,decryptBlock);
+            case Mode.ECB:
+                ECB.decrypt(out,BLOCK_SIZE,decryptBlock);
+            case Mode.PCBC:
+                PCBC.decrypt(out,iv,BLOCK_SIZE,decryptBlock);
+            case Mode.CTR:
+                CTR.decrypt(out,iv,BLOCK_SIZE,encryptBlock);
+            case Mode.CFB:
+                CFB.decrypt(out,iv,BLOCK_SIZE,encryptBlock);
+            case Mode.OFB:
+                OFB.decrypt(out,iv,BLOCK_SIZE,encryptBlock);
+        }
+    
+        switch(padding)  {
+            case Padding.NoPadding:
+                out = NoPadding.unpad(out);
+            case Padding.PKCS7:
+                out = PKCS7.unpad(out);
+            case Padding.BitPadding:
+                out = BitPadding.unpad(out);
+            case Padding.AnsiX923:
+                out = AnsiX923.unpad(out);
+            case Padding.ISO10126:
+                out = ISO10126.unpad(out);
+            case Padding.NullPadding:
+                out = NullPadding.unpad(out);
+            case Padding.SpacePadding:
+                out = SpacePadding.unpad(out);
+            case Padding.TBC:
+                out = TBC.unpad(out);
+        }
+    
+        return out;
+    }
+
+    private function encryptBlock( src:Bytes, srcIndex:Int, dst:Bytes, dstIndex:Int):Void
+    {
+         var block = bytesToInt64(src, srcIndex);
+        var xb =  cipher(block, true, key);
+        int64ToBytes(xb, dst, dstIndex);
+        trace("Encrypt block: "+dst.toHex());
+    }
+        
+    private function decryptBlock( src:Bytes, srcIndex:Int, dst:Bytes, dstIndex:Int):Void
+    {
+        var block = bytesToInt64(src, srcIndex);
+        var xb =  cipher(block,false,key);
+        int64ToBytes(xb, dst, dstIndex);
     }
 
     public function desEncrypt(data:Bytes,keys:Vector<Int64>):Int64
