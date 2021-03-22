@@ -227,7 +227,7 @@ class Des
     
     public function decrypt(cipherMode:Mode, data:Bytes, ?padding:Padding=Padding.PKCS7):Bytes 
     {
-        var out:Bytes = data;
+        var out : Bytes = data.sub(0,data.length);  // prevent input data from being changed unexpectedly
     
         switch (cipherMode) {
             case Mode.CBC:
