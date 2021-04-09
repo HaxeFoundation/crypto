@@ -23,7 +23,7 @@ class CTR
 
             var j = blockSize;
             while (j-- >= 0) {
-                vkey.set(j, vkey.get(j) + 1);
+                vkey.set(j, (vkey.get(j) + 1) #if js & 0xff #end);
                 if (vkey.get(j) != 0) break;  
             }
 
