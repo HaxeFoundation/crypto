@@ -1,11 +1,15 @@
 0.4.0
 ------------------
-[js] Fix for AES ctr 128 bit 
+[js] Fix for AES ctr 128 bit
+
 Fix for Aes, Blowfish, Des and Twofish decrypt() functions shred the encrypted input bytes
-…rypted input bytes
+
 Add support for Des
+
 Add support for Poly1305
+
 Use native php implementations for SHA
+
 Make all classes haxe3 compatible
 
 0.3.0
