@@ -7,13 +7,14 @@ class SpacePadding
 {
     public static  function pad(ciphertext:Bytes, blockSize:Int):Bytes
     {
-        var buffer: BytesBuffer = new BytesBuffer();
-        buffer.addBytes(ciphertext,0,ciphertext.length);
         var padding:Int = blockSize - ciphertext.length % blockSize;
-        for(i in 0...padding) {
-          buffer.addByte(0x20); 
+        var bsize = ciphertext.length+padding;
+        var buffer: Bytes =Bytes.alloc(bsize);
+        buffer.blit(0,ciphertext,0,ciphertext.length);
+        for(i in ciphertext.length...bsize) {
+          buffer.set(i,0x20); 
         }
-        return buffer.getBytes();
+        return buffer;
     }
 
     public static function unpad(encrypt:Bytes):Bytes

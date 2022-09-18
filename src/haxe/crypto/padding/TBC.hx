@@ -9,13 +9,14 @@ class TBC
     {
         var tb = ciphertext.get(ciphertext.length-1) & 1;
         var paddingByte = (tb == 1)?0x00:0xFF;
-        var buffer: BytesBuffer = new BytesBuffer();
-        buffer.addBytes(ciphertext,0,ciphertext.length);
         var padding:Int = blockSize - ciphertext.length % blockSize;
-        for(i in 0...padding) {
-          buffer.addByte(paddingByte); 
+        var bsize = ciphertext.length+padding;
+        var buffer: Bytes =Bytes.alloc(bsize);
+        buffer.blit(0,ciphertext,0,ciphertext.length);
+        for(i in ciphertext.length...bsize) {
+            buffer.set(i,paddingByte); 
         }
-        return buffer.getBytes();
+        return buffer;
     }
 
     public static function unpad(encrypt:Bytes):Bytes

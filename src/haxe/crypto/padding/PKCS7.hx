@@ -9,13 +9,14 @@ class PKCS7
     {
         if ( blockSize > 255 ) throw "PKCS#7 padding cannot be longer than 255 bytes";
         if ( blockSize < 0 ) throw "PKCS#7 padding size must be positive";
-        var buffer: BytesBuffer = new BytesBuffer();
-        buffer.addBytes(ciphertext,0,ciphertext.length);
         var padding:Int = blockSize - ciphertext.length % blockSize;
-        for(i in 0...padding) {
-          buffer.addByte(padding & 0xFF); 
+        var bsize = ciphertext.length+padding;
+        var buffer: Bytes =Bytes.alloc(bsize);
+        buffer.blit(0,ciphertext,0,ciphertext.length);
+        for(i in ciphertext.length...bsize) {
+          buffer.set(i,padding & 0xFF); 
         }
-        return buffer.getBytes();
+        return buffer;
     }
 
     public static  function unpad(encrypt:Bytes):Bytes

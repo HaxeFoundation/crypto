@@ -7,14 +7,15 @@ class ISO10126
 {
     public static function pad(ciphertext:Bytes, blockSize:Int):Bytes
     {
-        var buffer: BytesBuffer = new BytesBuffer();
-        buffer.addBytes(ciphertext,0,ciphertext.length);
-        var padding:Int = blockSize - ciphertext.length % blockSize -1;
-        for(i in 0...padding) {
-          buffer.addByte(Std.random(255)); 
-        }
-        buffer.addByte(padding+1);
-        return buffer.getBytes();
+      var padding:Int = blockSize - ciphertext.length % blockSize -1;
+      var bsize = ciphertext.length+padding;
+      var buffer: Bytes =Bytes.alloc(bsize+1);
+      buffer.blit(0,ciphertext,0,ciphertext.length);
+      for(i in ciphertext.length...bsize) {
+        buffer.set(i,Std.random(256)); 
+      }
+      buffer.set(bsize+1,padding+1);
+      return buffer;
     }
 
     public static function unpad(encrypt:Bytes):Bytes
