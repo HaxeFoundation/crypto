@@ -24,7 +24,6 @@ class Aes
 
 	private var Nk:Int;
 	private var Nr:Int;
-	private var halfNk:Int;
 
 	private var roundKey:Vector<Int>;
 	private var rRoundKey:Vector<Int>;
@@ -52,7 +51,6 @@ class Aes
 	public function init(key:Bytes, ?iv:Bytes):Void {
 		Nk = key.length >> 2;
 		Nr = Nk + 6;
-		halfNk = Nk >> 1;
 		keyRows = (Nr + 1) * 4;
 		state = new Vector<Int>(Nk);
 		this.iv = iv;
@@ -243,17 +241,17 @@ class Aes
 	}
 
 	private function encryptBlock(src:Bytes, srcIndex:Int, dst:Bytes, dstIndex:Int):Void {
-		for (i in 0...halfNk) {
+		for (i in 0...4) {
 			state[i] = bytesToInt32(src, srcIndex + (i << 2));
 		}
 		generateBlock(roundKey, SUB_BYTES_MIX_COLUMN_0, SUB_BYTES_MIX_COLUMN_1, SUB_BYTES_MIX_COLUMN_2, SUB_BYTES_MIX_COLUMN_3, SBOX);
-		for (i in 0...halfNk) {
+		for (i in 0...4) {
 			int32ToBytes(state[i], dst, dstIndex + (i << 2));
 		}
 	}
 
 	public function decryptBlock(src:Bytes, srcIndex:Int, dst:Bytes, dstIndex:Int = 0):Void {
-		for (i in 0...halfNk) {
+		for (i in 0...4) {
 			state[i] = bytesToInt32(src, srcIndex + (i << 2));
 		}
 		var t:Int = state[1];
@@ -263,7 +261,7 @@ class Aes
 		t = state[1];
 		state[1] = state[3];
 		state[3] = t;
-		for (i in 0...halfNk) {
+		for (i in 0...4) {
 			int32ToBytes(state[i], dst, dstIndex + (i << 2));
 		}
 	}
