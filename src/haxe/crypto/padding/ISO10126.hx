@@ -14,7 +14,7 @@ class ISO10126
       for(i in ciphertext.length...bsize) {
         buffer.set(i,Std.random(256)); 
       }
-      buffer.set(bsize+1,padding+1);
+      buffer.set(bsize,padding+1);
       return buffer;
     }
 
