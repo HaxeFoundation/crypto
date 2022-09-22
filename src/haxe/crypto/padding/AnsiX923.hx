@@ -14,7 +14,7 @@ class AnsiX923
       for(i in ciphertext.length...bsize) {
         buffer.set(i,0x00); 
       }
-      buffer.set(bsize+1,padding+1);
+      buffer.set(bsize,padding+1);
       return buffer;
     }
 
