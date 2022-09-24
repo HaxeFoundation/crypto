@@ -199,8 +199,6 @@ jobs:
         with:
           submodules: recursive
       - uses: actions/download-artifact@v1
-        with:
-          name: win${{env.ARCH}}Binaries
 
       - name: Install Neko from S3
         shell: pwsh
@@ -297,8 +295,6 @@ jobs:
         with:
           submodules: recursive
       - uses: actions/download-artifact@v1
-        with:
-          name: win${{env.ARCH}}Binaries
 
       - name: Install Neko from S3
         shell: pwsh
@@ -393,8 +389,6 @@ jobs:
         with:
           submodules: recursive
       - uses: actions/download-artifact@v1
-        with:
-          name: macBinaries
 
       - name: Install Neko from S3
         run: |
