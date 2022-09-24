@@ -73,6 +73,8 @@ class System {
 		if (displayed == null)
 			displayed = getDisplayCmd(cmd, args);
 
+		var cdir = Sys.getCwd();
+		infoMsg('Directory: $cdir');
 		infoMsg('Command: $displayed');
 
 		final t = Timer.stamp();
