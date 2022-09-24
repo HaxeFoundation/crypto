@@ -89,8 +89,7 @@ jobs:
       - name: Setup haxelib
         shell: pwsh
         run: |
-          mkdir "$env:HAXELIB_ROOT"
-          haxelib setup "$env:HAXELIB_ROOT"
+          haxelib setup ~/haxelib
       - name: Test
         shell: pwsh
         run: haxe RunCi.hxml
@@ -173,8 +172,7 @@ jobs:
       - name: Setup haxelib
         shell: pwsh
         run: |
-          mkdir "$env:HAXELIB_ROOT"
-          haxelib setup "$env:HAXELIB_ROOT"
+          haxelib setup ~/haxelib
       - name: Test
         shell: pwsh
         run: haxe RunCi.hxml
@@ -256,8 +254,7 @@ jobs:
       - name: Setup haxelib
         shell: pwsh
         run: |
-          mkdir "$env:HAXELIB_ROOT"
-          haxelib setup "$env:HAXELIB_ROOT"
+          haxelib setup ~/haxelib
       - name: Test
         shell: pwsh
         run: haxe RunCi.hxml
@@ -341,8 +338,7 @@ jobs:
       - name: Setup haxelib
         shell: pwsh
         run: |
-          mkdir "$env:HAXELIB_ROOT"
-          haxelib setup "$env:HAXELIB_ROOT"
+           haxelib setup ~/haxelib
       - name: Test
         shell: pwsh
         run: haxe RunCi.hxml
