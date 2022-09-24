@@ -31,7 +31,6 @@ jobs:
       - uses: actions/checkout@main
         with:
           submodules: recursive
-      - uses: actions/download-artifact@v1
 
       - name: Install Neko from S3
         shell: pwsh
@@ -117,7 +116,6 @@ jobs:
       - uses: actions/checkout@main
         with:
           submodules: recursive
-      - uses: actions/download-artifact@v1
 
       - name: Install Neko from S3
         shell: pwsh
@@ -203,7 +201,6 @@ jobs:
       - uses: actions/checkout@main
         with:
           submodules: recursive
-      - uses: actions/download-artifact@v1
 
       - name: Install Neko from S3
         shell: pwsh
@@ -299,7 +296,6 @@ jobs:
       - uses: actions/checkout@main
         with:
           submodules: recursive
-      - uses: actions/download-artifact@v1
 
       - name: Install Neko from S3
         shell: pwsh
@@ -393,7 +389,6 @@ jobs:
       - uses: actions/checkout@main
         with:
           submodules: recursive
-      - uses: actions/download-artifact@v1
 
       - name: Install Neko from S3
         run: |
