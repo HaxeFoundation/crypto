@@ -192,7 +192,8 @@ jobs:
       matrix:
         # TODO enable lua after https://github.com/HaxeFoundation/haxe/issues/5024
         target: [macro, js, hl, cpp, 'java,jvm', cs, php, python, flash9, neko]
-        haxe_latest_dist: windows64/haxe_latest.zip
+        include:
+          - haxe_latest_dist: windows64/haxe_latest.zip
     steps:
       - uses: actions/checkout@main
         with:
@@ -289,7 +290,8 @@ jobs:
         # TODO jvm: https://github.com/HaxeFoundation/haxe/issues/8601
         # TODO enable lua after https://github.com/HaxeFoundation/haxe/issues/5024
         target: [macro, js, hl, cpp, java, cs, php, python, neko]
-        haxe_latest_dist: windows/haxe_latest.zip
+        include:
+          - haxe_latest_dist: windows/haxe_latest.zip
     steps:
       - uses: actions/checkout@main
         with:
@@ -382,10 +384,10 @@ jobs:
       fail-fast: false
       matrix:
         target: [macro, js, hl, cpp, 'java,jvm', cs, php, python, flash9, neko]
-        haxe_latest_dist: mac/haxe_latest.tar.gz
         include:
           - target: hl
             BREW_PACKAGES: ninja
+            haxe_latest_dist: mac/haxe_latest.tar.gz
     steps:
       - uses: actions/checkout@main
         with:
