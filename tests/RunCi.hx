@@ -47,7 +47,7 @@ class RunCi {
 			try {
 				changeDirectory(unitDir);
 				haxelibInstallGit("haxe-utest", "utest", "master", "--always");
-
+				changeDirectory(cwd);
 				var args = switch (ci) {
 					case null:
 						[];
