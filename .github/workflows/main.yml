@@ -18,63 +18,85 @@ jobs:
       packages: write
     env:
       FORCE_COLOR: 1
+      PLATFORM: linux64
+      TEST: ${{matrix.target}}
+    strategy:
+      fail-fast: false
+      matrix:
+        # TODO enable lua after https://github.com/HaxeFoundation/haxe/issues/5024
+        target: [macro, js, hl, cpp, 'java,jvm', cs, php, python, flash9, neko]
+        include:
+          - haxe_latest_dist: linux64/haxe_latest.zip
     steps:
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v1
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Install Earthly
-        run: sudo /bin/sh -c 'wget https://github.com/earthly/earthly/releases/download/v0.6.13/earthly-linux-amd64 -O /usr/local/bin/earthly && chmod +x /usr/local/bin/earthly && /usr/local/bin/earthly bootstrap --with-autocomplete'
-
       - uses: actions/checkout@main
         with:
           submodules: recursive
+      - uses: actions/download-artifact@v1
 
-      - name: Set CONTAINER_ vars
+      - name: Install Neko from S3
+        shell: pwsh
         run: |
-          echo "CONTAINER_REG=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV;
-          echo "CONTAINER_TAG=$(echo ${{ github.ref_name }} | sed -e 's/[^A-Za-z0-9\.]/-/g')" >> $GITHUB_ENV;
+          Invoke-WebRequest https://build.haxe.org/builds/neko/$env:PLATFORM/neko_latest.zip -OutFile $env:RUNNER_TEMP/neko_latest.zip
+          Expand-Archive $env:RUNNER_TEMP/neko_latest.zip -DestinationPath $env:RUNNER_TEMP
+          $NEKOPATH = Get-ChildItem $env:RUNNER_TEMP/neko-*-*
+          echo "$NEKOPATH" >> $env:GITHUB_PATH
+          echo "NEKOPATH=$NEKOPATH" >> $env:GITHUB_ENV
+      - name: Print Neko version
+        run: neko -version 2>&1
+       - name: Setup Haxe
+        shell: pwsh
+        run: |
+          set -eux
+          
+          download_url="https://build.haxe.org/builds/haxe/${{ matrix.haxe_latest_dist }}"
+          echo "Downloading [$download_url]..."
+          if [[ ${{ matrix.target }} == win* ]]; then
+            curl -fsSL --retry 3 --retry-delay 5 "$download_url" -o /tmp/haxe.zip
+            7z x /tmp/haxe.zip -o/tmp
+            mv -v /tmp/haxe_* /tmp/haxe
+            cygpath -w '/tmp/haxe/' >> $GITHUB_PATH
+            echo "HAXE_STD_PATH=$(cygpath -w '/tmp/haxe/std')" >> $GITHUB_ENV
+          else
+            mkdir /tmp/haxe
+            curl -fsSL --retry 3 --retry-delay 5 "$download_url" -o /tmp/haxe.tar.gz
+            tar xzvf /tmp/haxe.tar.gz -C /tmp/haxe --strip-components=1
+            echo "/tmp/haxe/" >> $GITHUB_PATH
+            echo "HAXE_STD_PATH=/tmp/haxe/std" >> $GITHUB_ENV
+          fi
+      - name: Print Haxe version
+        shell: pwsh
+        run: haxe -version
 
-      - name: Build devcontainer
-        run: earthly +devcontainer --IMAGE_NAME="ghcr.io/${CONTAINER_REG}_devcontainer" --IMAGE_TAG="${CONTAINER_TAG}-amd64" --IMAGE_CACHE="ghcr.io/haxefoundation/haxe_devcontainer:development-amd64"
-        env:
-          EARTHLY_PUSH: "${{ github.event_name == 'push' }}"
-          EARTHLY_USE_INLINE_CACHE: true
-          EARTHLY_SAVE_INLINE_CACHE: true
-
-      - name: Set ADD_REVISION=1 for non-release
-        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
-        run: echo "ADD_REVISION=1" >> $GITHUB_ENV
-
-      - name: Build
-        run: earthly +build --ADD_REVISION="$ADD_REVISION" --SET_SAFE_DIRECTORY="true"
-        env:
-          EARTHLY_PUSH: "${{ github.event_name == 'push' }}"
-          EARTHLY_REMOTE_CACHE: "ghcr.io/${{env.CONTAINER_REG}}_cache:build-${{env.CONTAINER_TAG}}-amd64"
-
-      - name: Build xmldoc
-        run: earthly +xmldoc --COMMIT="${{ github.sha }}" --BRANCH="${{ github.ref_name }}"
-
-      - name: Upload xmldoc artifact
-        uses: actions/upload-artifact@v1.0.0
-        with:
-          name: xmldoc
-          path: extra/doc
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v1.0.0
-        with:
-          name: linuxBinaries
-          path: out/linux/amd64
-
+      - name: "Make Python 3 be available as python3 in the cmdline"
+        shell: pwsh
+        run: |
+          Set-PSDebug -Trace 1
+          $pypath = python -c "import sys; print(sys.executable)"
+          $py3path = $pypath.replace("python.exe","python3.exe")
+          cmd /c mklink $py3path $pypath
+          python3 -V
+      - name: Install hererocks
+        if: matrix.target == 'lua'
+        shell: cmd
+        run: |
+          pip install hererocks
+          hererocks lua53 -l5.3 -rlatest
+          call lua53/bin/activate
+      - name: Install wget
+        if: matrix.target == 'flash9'
+        shell: cmd
+        run: |
+          choco install wget
+          wget --version
+      - name: Setup haxelib
+        shell: pwsh
+        run: |
+          mkdir "$env:HAXELIB_ROOT"
+          haxelib setup "$env:HAXELIB_ROOT"
       - name: Test
-        run: earthly +test-all --GITHUB_ACTIONS="$GITHUB_ACTIONS"
-        env:
-          EARTHLY_PUSH: "${{ github.event_name == 'push' }}"
-          EARTHLY_REMOTE_CACHE: "ghcr.io/${{env.CONTAINER_REG}}_cache:test-${{env.CONTAINER_TAG}}-amd64"
+        shell: pwsh
+        run: haxe RunCi.hxml
+        working-directory: ${{github.workspace}}/tests
 
   linux-arm64:
     runs-on: ubuntu-18.04
@@ -82,102 +104,85 @@ jobs:
       packages: write
     env:
       FORCE_COLOR: 1
+      PLATFORM: linux-arm64
+      TEST: ${{matrix.target}}
+    strategy:
+      fail-fast: false
+      matrix:
+        # TODO enable lua after https://github.com/HaxeFoundation/haxe/issues/5024
+        target: [macro, js, hl, cpp, 'java,jvm', cs, php, python, flash9, neko]
+        include:
+          - haxe_latest_dist: linux-arm64/haxe_latest.zip
     steps:
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v1
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Install Earthly
-        run: sudo /bin/sh -c 'wget https://github.com/earthly/earthly/releases/download/v0.6.13/earthly-linux-amd64 -O /usr/local/bin/earthly && chmod +x /usr/local/bin/earthly && /usr/local/bin/earthly bootstrap --with-autocomplete'
-
-      - name: Set up QEMU
-        id: qemu
-        uses: docker/setup-qemu-action@v1
-        with:
-            image: tonistiigi/binfmt:latest
-            platforms: all
-
       - uses: actions/checkout@main
         with:
           submodules: recursive
+      - uses: actions/download-artifact@v1
 
-      - name: Set CONTAINER_ vars
+      - name: Install Neko from S3
+        shell: pwsh
         run: |
-          echo "CONTAINER_REG=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV;
-          echo "CONTAINER_TAG=$(echo ${{ github.ref_name }} | sed -e 's/[^A-Za-z0-9\.]/-/g')" >> $GITHUB_ENV;
-
-      - name: Build devcontainer
-        run: earthly --platform=linux/arm64 +devcontainer --IMAGE_NAME="ghcr.io/${CONTAINER_REG}_devcontainer" --IMAGE_TAG="${CONTAINER_TAG}-arm64" --IMAGE_CACHE="ghcr.io/haxefoundation/haxe_devcontainer:development-arm64"
-        env:
-          EARTHLY_PUSH: "${{ github.event_name == 'push' }}"
-          EARTHLY_USE_INLINE_CACHE: true
-          EARTHLY_SAVE_INLINE_CACHE: true
-
-      - name: Set ADD_REVISION=1 for non-release
-        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
-        run: echo "ADD_REVISION=1" >> $GITHUB_ENV
-
-      - name: Build
-        run: earthly --platform=linux/arm64 +build --ADD_REVISION="$ADD_REVISION" --SET_SAFE_DIRECTORY="true"
-        env:
-          EARTHLY_PUSH: "${{ github.event_name == 'push' }}"
-          EARTHLY_REMOTE_CACHE: "ghcr.io/${{env.CONTAINER_REG}}_cache:build-${{env.CONTAINER_TAG}}-arm64"
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v1.0.0
-        with:
-          name: linuxArm64Binaries
-          path: out/linux/arm64
-
-      # Do not run test for arm64 for now
-
-  linux-multiarch:
-    needs: [linux-amd64, linux-arm64]
-    runs-on: ubuntu-18.04
-    permissions:
-      packages: write
-    env:
-      FORCE_COLOR: 1
-    steps:
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v1
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Install Earthly
-        run: sudo /bin/sh -c 'wget https://github.com/earthly/earthly/releases/download/v0.6.13/earthly-linux-amd64 -O /usr/local/bin/earthly && chmod +x /usr/local/bin/earthly && /usr/local/bin/earthly bootstrap --with-autocomplete'
-
-      - name: Set up QEMU
-        id: qemu
-        uses: docker/setup-qemu-action@v1
-        with:
-            image: tonistiigi/binfmt:latest
-            platforms: all
-
-      - uses: actions/checkout@main
-        with:
-          submodules: recursive
-
-      - name: Set CONTAINER_ vars
+          Invoke-WebRequest https://build.haxe.org/builds/neko/$env:PLATFORM/neko_latest.zip -OutFile $env:RUNNER_TEMP/neko_latest.zip
+          Expand-Archive $env:RUNNER_TEMP/neko_latest.zip -DestinationPath $env:RUNNER_TEMP
+          $NEKOPATH = Get-ChildItem $env:RUNNER_TEMP/neko-*-*
+          echo "$NEKOPATH" >> $env:GITHUB_PATH
+          echo "NEKOPATH=$NEKOPATH" >> $env:GITHUB_ENV
+      - name: Print Neko version
+        run: neko -version 2>&1
+       - name: Setup Haxe
+        shell: pwsh
         run: |
-          echo "CONTAINER_REG=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV;
-          echo "CONTAINER_TAG=$(echo ${{ github.ref_name }} | sed -e 's/[^A-Za-z0-9\.]/-/g')" >> $GITHUB_ENV;
+          set -eux
+          
+          download_url="https://build.haxe.org/builds/haxe/${{ matrix.haxe_latest_dist }}"
+          echo "Downloading [$download_url]..."
+          if [[ ${{ matrix.target }} == win* ]]; then
+            curl -fsSL --retry 3 --retry-delay 5 "$download_url" -o /tmp/haxe.zip
+            7z x /tmp/haxe.zip -o/tmp
+            mv -v /tmp/haxe_* /tmp/haxe
+            cygpath -w '/tmp/haxe/' >> $GITHUB_PATH
+            echo "HAXE_STD_PATH=$(cygpath -w '/tmp/haxe/std')" >> $GITHUB_ENV
+          else
+            mkdir /tmp/haxe
+            curl -fsSL --retry 3 --retry-delay 5 "$download_url" -o /tmp/haxe.tar.gz
+            tar xzvf /tmp/haxe.tar.gz -C /tmp/haxe --strip-components=1
+            echo "/tmp/haxe/" >> $GITHUB_PATH
+            echo "HAXE_STD_PATH=/tmp/haxe/std" >> $GITHUB_ENV
+          fi
+      - name: Print Haxe version
+        shell: pwsh
+        run: haxe -version
 
-      - name: Build devcontainer
-        run: earthly +devcontainer-multiarch --IMAGE_NAME="ghcr.io/${CONTAINER_REG}_devcontainer" --IMAGE_TAG="${CONTAINER_TAG}"
-        env:
-          EARTHLY_PUSH: "${{ github.event_name == 'push' }}"
-          EARTHLY_USE_INLINE_CACHE: true
-          EARTHLY_SAVE_INLINE_CACHE: true
-
-      - name: Set ADD_REVISION=1 for non-release
-        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
-        run: echo "ADD_REVISION=1" >> $GITHUB_ENV
+      - name: "Make Python 3 be available as python3 in the cmdline"
+        shell: pwsh
+        run: |
+          Set-PSDebug -Trace 1
+          $pypath = python -c "import sys; print(sys.executable)"
+          $py3path = $pypath.replace("python.exe","python3.exe")
+          cmd /c mklink $py3path $pypath
+          python3 -V
+      - name: Install hererocks
+        if: matrix.target == 'lua'
+        shell: cmd
+        run: |
+          pip install hererocks
+          hererocks lua53 -l5.3 -rlatest
+          call lua53/bin/activate
+      - name: Install wget
+        if: matrix.target == 'flash9'
+        shell: cmd
+        run: |
+          choco install wget
+          wget --version
+      - name: Setup haxelib
+        shell: pwsh
+        run: |
+          mkdir "$env:HAXELIB_ROOT"
+          haxelib setup "$env:HAXELIB_ROOT"
+      - name: Test
+        shell: pwsh
+        run: haxe RunCi.hxml
+        working-directory: ${{github.workspace}}/tests       
 
   windows64-test:
     runs-on: windows-latest
