@@ -224,7 +224,7 @@ jobs:
           Set-Variable -Name download_url -Value "https://build.haxe.org/builds/haxe/${{ matrix.haxe_latest_dist }}"
           echo "Downloading [$download_url]..."
           curl -fsSL --retry 3 --retry-delay 5 "$download_url" -o  $env:TEMP/haxe.zip
-          7z x  $env:TEMP/haxe.zip -o  $env:TEMP
+          7z x  $env:TEMP/haxe.zip "-o$env:TEMP"
           mv -v  $env:TEMP/haxe_*  $env:TEMP/haxe
           cygpath -w '$env:TEMP/haxe/' >> $GITHUB_PATH
           echo "HAXE_STD_PATH=$(cygpath -w '$env:TEMP/haxe/std')" >> $GITHUB_ENV
@@ -309,7 +309,7 @@ jobs:
           Set-Variable -Name download_url -Value "https://build.haxe.org/builds/haxe/${{ matrix.haxe_latest_dist }}"
           echo "Downloading [$download_url]..."
           curl -fsSL --retry 3 --retry-delay 5 "$download_url" -o  $env:TEMP/haxe.zip
-          7z x  $env:TEMP/haxe.zip -o  $env:TEMP
+          7z x  $env:TEMP/haxe.zip "-o $env:TEMP"
           mv -v  $env:TEMP/haxe_*  $env:TEMP/haxe
           cygpath -w '$env:TEMP/haxe/' >> $GITHUB_PATH
           echo "HAXE_STD_PATH=$(cygpath -w '$env:TEMP/haxe/std')" >> $GITHUB_ENV
