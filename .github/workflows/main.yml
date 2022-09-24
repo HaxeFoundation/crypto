@@ -43,7 +43,7 @@ jobs:
           echo "NEKOPATH=$NEKOPATH" >> $env:GITHUB_ENV
       - name: Print Neko version
         run: neko -version 2>&1
-       - name: Setup Haxe
+      - name: Setup Haxe
         shell: pwsh
         run: |
           set -eux
@@ -129,7 +129,7 @@ jobs:
           echo "NEKOPATH=$NEKOPATH" >> $env:GITHUB_ENV
       - name: Print Neko version
         run: neko -version 2>&1
-       - name: Setup Haxe
+      - name: Setup Haxe
         shell: pwsh
         run: |
           set -eux
