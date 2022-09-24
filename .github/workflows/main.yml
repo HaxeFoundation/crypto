@@ -36,10 +36,14 @@ jobs:
         shell: pwsh
         run: |
           Invoke-WebRequest https://build.haxe.org/builds/neko/$env:PLATFORM/neko_latest.tar.gz -OutFile $env:RUNNER_TEMP/neko_latest.tar.gz
-          Expand-Archive $env:RUNNER_TEMP/neko_latest.tar.gz -DestinationPath $env:RUNNER_TEMP
-          $NEKOPATH = Get-ChildItem $env:RUNNER_TEMP/neko-*-*
-          echo "$NEKOPATH" >> $env:GITHUB_PATH
-          echo "NEKOPATH=$NEKOPATH" >> $env:GITHUB_ENV
+          tar -xf $RUNNER_TEMP/neko_latest.tar.gz -C $RUNNER_TEMP
+          NEKOPATH=`echo $RUNNER_TEMP/neko-*-*`
+          sudo mkdir -p /usr/local/bin
+          sudo mkdir -p /usr/local/lib/neko
+          sudo ln -s $NEKOPATH/{neko,nekoc,nekoml,nekotools}  /usr/local/bin/
+          sudo ln -s $NEKOPATH/libneko.*                      /usr/local/lib/
+          sudo ln -s $NEKOPATH/*.ndll                         /usr/local/lib/neko/
+          echo "NEKOPATH=$NEKOPATH" >> $GITHUB_ENV
       - name: Print Neko version
         run: neko -version 2>&1
       - name: Setup Haxe
@@ -113,10 +117,14 @@ jobs:
         shell: pwsh
         run: |
           Invoke-WebRequest https://build.haxe.org/builds/neko/$env:PLATFORM/neko_latest.tar.gz -OutFile $env:RUNNER_TEMP/neko_latest.tar.gz
-          Expand-Archive $env:RUNNER_TEMP/neko_latest.tar.gz -DestinationPath $env:RUNNER_TEMP
-          $NEKOPATH = Get-ChildItem $env:RUNNER_TEMP/neko-*-*
-          echo "$NEKOPATH" >> $env:GITHUB_PATH
-          echo "NEKOPATH=$NEKOPATH" >> $env:GITHUB_ENV
+          tar -xf $RUNNER_TEMP/neko_latest.tar.gz -C $RUNNER_TEMP
+          NEKOPATH=`echo $RUNNER_TEMP/neko-*-*`
+          sudo mkdir -p /usr/local/bin
+          sudo mkdir -p /usr/local/lib/neko
+          sudo ln -s $NEKOPATH/{neko,nekoc,nekoml,nekotools}  /usr/local/bin/
+          sudo ln -s $NEKOPATH/libneko.*                      /usr/local/lib/
+          sudo ln -s $NEKOPATH/*.ndll                         /usr/local/lib/neko/
+          echo "NEKOPATH=$NEKOPATH" >> $GITHUB_ENV
       - name: Print Neko version
         run: neko -version 2>&1
       - name: Setup Haxe
@@ -207,8 +215,6 @@ jobs:
       - name: Setup Haxe
         shell: pwsh
         run: |
-          set -eux
-          
           download_url="https://build.haxe.org/builds/haxe/${{ matrix.haxe_latest_dist }}"
           echo "Downloading [$download_url]..."
           curl -fsSL --retry 3 --retry-delay 5 "$download_url" -o /tmp/haxe.zip
@@ -294,8 +300,6 @@ jobs:
       - name: Setup Haxe
         shell: pwsh
         run: |
-          set -eux
-          
           download_url="https://build.haxe.org/builds/haxe/${{ matrix.haxe_latest_dist }}"
           echo "Downloading [$download_url]..."
           curl -fsSL --retry 3 --retry-delay 5 "$download_url" -o /tmp/haxe.zip
