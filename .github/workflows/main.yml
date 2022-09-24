@@ -14,7 +14,6 @@ jobs:
 
   linux-amd64:
     runs-on: ubuntu-18.04
-    haxe_latest_dist: linux64/haxe_latest.tar.gz
     permissions:
       packages: write
     env:
@@ -79,7 +78,6 @@ jobs:
 
   linux-arm64:
     runs-on: ubuntu-18.04
-    haxe_latest_dist: linux-arm64/haxe_latest.tar.gz
     permissions:
       packages: write
     env:
@@ -183,7 +181,6 @@ jobs:
 
   windows64-test:
     runs-on: windows-latest
-    haxe_latest_dist: windows64/haxe_latest.zip
     env:
       ACTIONS_ALLOW_UNSECURE_COMMANDS: true
       PLATFORM: windows64
@@ -195,6 +192,7 @@ jobs:
       matrix:
         # TODO enable lua after https://github.com/HaxeFoundation/haxe/issues/5024
         target: [macro, js, hl, cpp, 'java,jvm', cs, php, python, flash9, neko]
+        haxe_latest_dist: windows64/haxe_latest.zip
     steps:
       - uses: actions/checkout@main
         with:
@@ -279,7 +277,6 @@ jobs:
 
   windows-test:
     runs-on: windows-latest
-    haxe_latest_dist: windows/haxe_latest.zip
     env:
       ACTIONS_ALLOW_UNSECURE_COMMANDS: true
       PLATFORM: windows
@@ -292,6 +289,7 @@ jobs:
         # TODO jvm: https://github.com/HaxeFoundation/haxe/issues/8601
         # TODO enable lua after https://github.com/HaxeFoundation/haxe/issues/5024
         target: [macro, js, hl, cpp, java, cs, php, python, neko]
+        haxe_latest_dist: windows/haxe_latest.zip
     steps:
       - uses: actions/checkout@main
         with:
@@ -376,7 +374,6 @@ jobs:
 
   mac-test:
     runs-on: macos-latest
-    haxe_latest_dist: mac/haxe_latest.tar.gz
     env:
       PLATFORM: mac
       TEST: ${{matrix.target}}
@@ -385,6 +382,7 @@ jobs:
       fail-fast: false
       matrix:
         target: [macro, js, hl, cpp, 'java,jvm', cs, php, python, flash9, neko]
+        haxe_latest_dist: mac/haxe_latest.tar.gz
         include:
           - target: hl
             BREW_PACKAGES: ninja
