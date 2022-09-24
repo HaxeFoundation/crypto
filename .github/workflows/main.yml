@@ -14,6 +14,7 @@ jobs:
 
   linux-amd64:
     runs-on: ubuntu-18.04
+    haxe_latest_dist: linux64/haxe_latest.tar.gz
     permissions:
       packages: write
     env:
@@ -78,6 +79,7 @@ jobs:
 
   linux-arm64:
     runs-on: ubuntu-18.04
+    haxe_latest_dist: linux-arm64/haxe_latest.tar.gz
     permissions:
       packages: write
     env:
@@ -181,6 +183,7 @@ jobs:
 
   windows64-test:
     runs-on: windows-latest
+    haxe_latest_dist: windows64/haxe_latest.zip
     env:
       ACTIONS_ALLOW_UNSECURE_COMMANDS: true
       PLATFORM: windows64
@@ -221,12 +224,23 @@ jobs:
       - name: Setup Haxe
         shell: pwsh
         run: |
-          $DOWNLOADDIR="./win$($env:ARCH)Binaries"
-          Expand-Archive $DOWNLOADDIR/*_bin.zip -DestinationPath $DOWNLOADDIR
-          Set-PSDebug -Trace 1
-          $HAXEPATH = Get-ChildItem $DOWNLOADDIR/haxe_*_* -Directory
-          Write-Host "::add-path::$HAXEPATH"
-          Write-Host "::set-env name=HAXELIB_ROOT::$HAXEPATH\lib"
+          set -eux
+          
+          download_url="https://build.haxe.org/builds/haxe/${{ matrix.haxe_latest_dist }}"
+          echo "Downloading [$download_url]..."
+          if [[ ${{ matrix.target }} == win* ]]; then
+            curl -fsSL --retry 3 --retry-delay 5 "$download_url" -o /tmp/haxe.zip
+            7z x /tmp/haxe.zip -o/tmp
+            mv -v /tmp/haxe_* /tmp/haxe
+            cygpath -w '/tmp/haxe/' >> $GITHUB_PATH
+            echo "HAXE_STD_PATH=$(cygpath -w '/tmp/haxe/std')" >> $GITHUB_ENV
+          else
+            mkdir /tmp/haxe
+            curl -fsSL --retry 3 --retry-delay 5 "$download_url" -o /tmp/haxe.tar.gz
+            tar xzvf /tmp/haxe.tar.gz -C /tmp/haxe --strip-components=1
+            echo "/tmp/haxe/" >> $GITHUB_PATH
+            echo "HAXE_STD_PATH=/tmp/haxe/std" >> $GITHUB_ENV
+          fi
       - name: Print Haxe version
         shell: pwsh
         run: haxe -version
@@ -265,6 +279,7 @@ jobs:
 
   windows-test:
     runs-on: windows-latest
+    haxe_latest_dist: windows/haxe_latest.zip
     env:
       ACTIONS_ALLOW_UNSECURE_COMMANDS: true
       PLATFORM: windows
@@ -306,12 +321,23 @@ jobs:
       - name: Setup Haxe
         shell: pwsh
         run: |
-          $DOWNLOADDIR="./win$($env:ARCH)Binaries"
-          Expand-Archive $DOWNLOADDIR/*_bin.zip -DestinationPath $DOWNLOADDIR
-          Set-PSDebug -Trace 1
-          $HAXEPATH = Get-ChildItem $DOWNLOADDIR/haxe_*_* -Directory
-          Write-Host "::add-path::$HAXEPATH"
-          Write-Host "::set-env name=HAXELIB_ROOT::$HAXEPATH\lib"
+          set -eux
+          
+          download_url="https://build.haxe.org/builds/haxe/${{ matrix.haxe_latest_dist }}"
+          echo "Downloading [$download_url]..."
+          if [[ ${{ matrix.target }} == win* ]]; then
+            curl -fsSL --retry 3 --retry-delay 5 "$download_url" -o /tmp/haxe.zip
+            7z x /tmp/haxe.zip -o/tmp
+            mv -v /tmp/haxe_* /tmp/haxe
+            cygpath -w '/tmp/haxe/' >> $GITHUB_PATH
+            echo "HAXE_STD_PATH=$(cygpath -w '/tmp/haxe/std')" >> $GITHUB_ENV
+          else
+            mkdir /tmp/haxe
+            curl -fsSL --retry 3 --retry-delay 5 "$download_url" -o /tmp/haxe.tar.gz
+            tar xzvf /tmp/haxe.tar.gz -C /tmp/haxe --strip-components=1
+            echo "/tmp/haxe/" >> $GITHUB_PATH
+            echo "HAXE_STD_PATH=/tmp/haxe/std" >> $GITHUB_ENV
+          fi
       - name: Print Haxe version
         shell: pwsh
         run: haxe -version
@@ -350,6 +376,7 @@ jobs:
 
   mac-test:
     runs-on: macos-latest
+    haxe_latest_dist: mac/haxe_latest.tar.gz
     env:
       PLATFORM: mac
       TEST: ${{matrix.target}}
@@ -386,15 +413,23 @@ jobs:
 
       - name: Setup Haxe
         run: |
-          # mkdir ./macBinaries
-          # curl -sSL https://build.haxe.org/builds/haxe/mac/haxe_latest.tar.gz -o ./macBinaries/haxe_bin.tar.gz
-          set -ex
-          tar -xf macBinaries/*_bin.tar.gz -C macBinaries --strip-components=1
-          sudo mkdir -p /usr/local/bin/
-          sudo mkdir -p /usr/local/share/haxe/
-          sudo ln -s `pwd`/macBinaries/haxe /usr/local/bin/haxe
-          sudo ln -s `pwd`/macBinaries/haxelib /usr/local/bin/haxelib
-          sudo ln -s `pwd`/macBinaries/std /usr/local/share/haxe/std
+          set -eux
+          
+          download_url="https://build.haxe.org/builds/haxe/${{ matrix.haxe_latest_dist }}"
+          echo "Downloading [$download_url]..."
+          if [[ ${{ matrix.target }} == win* ]]; then
+            curl -fsSL --retry 3 --retry-delay 5 "$download_url" -o /tmp/haxe.zip
+            7z x /tmp/haxe.zip -o/tmp
+            mv -v /tmp/haxe_* /tmp/haxe
+            cygpath -w '/tmp/haxe/' >> $GITHUB_PATH
+            echo "HAXE_STD_PATH=$(cygpath -w '/tmp/haxe/std')" >> $GITHUB_ENV
+          else
+            mkdir /tmp/haxe
+            curl -fsSL --retry 3 --retry-delay 5 "$download_url" -o /tmp/haxe.tar.gz
+            tar xzvf /tmp/haxe.tar.gz -C /tmp/haxe --strip-components=1
+            echo "/tmp/haxe/" >> $GITHUB_PATH
+            echo "HAXE_STD_PATH=/tmp/haxe/std" >> $GITHUB_ENV
+          fi
       - name: Print Haxe version
         run: haxe -version
 
