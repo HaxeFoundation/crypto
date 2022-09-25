@@ -198,9 +198,10 @@ jobs:
       - uses: actions/checkout@main
         with:
           submodules: recursive
-      - uses: nanasess/setup-php@v3
+      - uses: shivammathur/setup-php@v2
         with:
           php-version: '7.4'
+          extensions: none, mbstring
 
       - name: Install Neko from S3
         shell: pwsh
