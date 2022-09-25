@@ -23,19 +23,5 @@ class Java {
 
 		runCommand("haxe", ["compile-java.hxml","-dce","no"].concat(args));
 		runCommand("java", ["-jar", "bin/java/TestMain-Debug.jar"]);
-
-		infoMsg("Testing java-lib extras");
-		changeDirectory(Path.join([unitDir, 'bin']));
-		final libTestDir = 'java-lib-tests';
-		if (!FileSystem.exists(libTestDir))
-			runNetworkCommand("git", ["clone", "https://github.com/waneck/java-lib-tests.git", "--depth", "1"]);
-
-		for (dir in FileSystem.readDirectory(libTestDir)) {
-			final path = Path.join([libTestDir, dir]);
-			if (FileSystem.isDirectory(path))
-				for (file in FileSystem.readDirectory(path))
-					if (file.endsWith('.hxml'))
-						runCommand("haxe", ["--cwd", path, file]);
-		}
 	}
 }
