@@ -200,7 +200,7 @@ jobs:
           submodules: recursive
       - uses: shivammathur/setup-php@v2
         with:
-          php-version: '7.4'
+          php-version: '8.1'
           extensions: mbstring
 
       - name: Install Neko from S3
