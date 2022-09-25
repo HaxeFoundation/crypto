@@ -67,10 +67,10 @@ class Cpp {
 		if (testCppia) {
 			runCommand("haxe", ["compile-cppia-host.hxml", "-D", archFlag].concat(args));
 			runCommand("haxe", ["compile-cppia.hxml"].concat(args));
-			runCpp("unit/bin/cppia/Host-debug", ["bin/unit.cppia"]);
+			runCpp("src/unit/bin/cppia/Host-debug", ["bin/unit.cppia"]);
 
 			if (!isLinuxArm64) // FIXME
-				runCpp("unit/bin/cppia/Host-debug", ["bin/unit.cppia", "-jit"]);
+				runCpp("src/unit/bin/cppia/Host-debug", ["bin/unit.cppia", "-jit"]);
 		}
 
 	}

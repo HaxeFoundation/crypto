@@ -77,7 +77,7 @@ class Php {
 		}
 
 		for(prefix in prefixes) {
-			changeDirectory(unitMDir);
+			changeDirectory(cwd);
 			if(isCi())
 				deleteDirectoryRecursively(binDir);
 
