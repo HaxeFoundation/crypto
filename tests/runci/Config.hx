@@ -12,6 +12,7 @@ class Config {
 	static public final cwd = Sys.getCwd();
 	static public final repoDir = FileSystem.fullPath("..") + "/";
 	static public final unitDir = Path.join([cwd, "src/unit"]);
+	static public final unitMDir = Path.join([cwd, "unit"]);
 	static public final sysDir = Path.join([cwd, "sys"]);
 	static public final optDir = cwd + "optimization/";
 	static public final displayDir = Path.join([cwd, "display"]);
