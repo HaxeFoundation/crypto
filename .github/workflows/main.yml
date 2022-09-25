@@ -201,7 +201,7 @@ jobs:
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '7.4'
-          extensions: none, mbstring
+          extensions: mbstring
 
       - name: Install Neko from S3
         shell: pwsh
@@ -214,6 +214,8 @@ jobs:
       - name: Print Neko version
         run: neko -version 2>&1
 
+      - name: Print PHP extension
+        run: php -i | grep mbstring
       # - name: Quick test
       #   shell: pwsh
       #   run: |
