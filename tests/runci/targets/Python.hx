@@ -64,26 +64,5 @@ class Python {
 		for (py in pys) {
 			runCommand(py, ["bin/unit.py"]);
 		}
-
-		changeDirectory(sysDir);
-		runCommand("haxe", ["compile-python.hxml"].concat(args));
-		for (py in pys) {
-			runSysTest(py, ["bin/python/sys.py"]);
-		}
-
-		changeDirectory(getMiscSubDir("python"));
-		runCommand("haxe", ["run.hxml"]);
-
-		changeDirectory(getMiscSubDir('python', "pythonImport"));
-		runCommand("haxe", ["compile.hxml"]);
-		for (py in pys) {
-			runCommand(py, ["test.py"]);
-		}
-
-		changeDirectory(threadsDir);
-		runCommand("haxe", ["build.hxml", "--python", "export/threads.py"].concat(args));
-		for (py in pys) {
-			runCommand(py, ["export/threads.py"]);
-		}
 	}
 }

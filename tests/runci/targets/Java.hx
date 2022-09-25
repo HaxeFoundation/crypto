@@ -24,17 +24,6 @@ class Java {
 		runCommand("haxe", ["compile-java.hxml","-dce","no"].concat(args));
 		runCommand("java", ["-jar", "bin/java/TestMain-Debug.jar"]);
 
-		changeDirectory(miscJavaDir);
-		runCommand("haxe", ["run.hxml"]);
-
-		changeDirectory(sysDir);
-		runCommand("haxe", ["compile-java.hxml"].concat(args));
-		runSysTest("java", ["-jar", "bin/java/Main-Debug.jar"]);
-
-		changeDirectory(threadsDir);
-		runCommand("haxe", ["build.hxml", "-java", "export/java"].concat(args));
-		runCommand("java", ["-jar", "export/java/Main.jar"]);
-
 		infoMsg("Testing java-lib extras");
 		changeDirectory(Path.join([unitDir, 'bin']));
 		final libTestDir = 'java-lib-tests';

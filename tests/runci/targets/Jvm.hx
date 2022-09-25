@@ -17,12 +17,5 @@ class Jvm {
 			runCommand("java", ["-jar", "bin/unit.jar"]);
 		}
 
-		changeDirectory(sysDir);
-		runCommand("haxe", ["compile-jvm.hxml"].concat(args));
-		runSysTest("java", ["-jar", "bin/jvm/sys.jar"]);
-
-		changeDirectory(threadsDir);
-		runCommand("haxe", ["build.hxml", "--jvm", "export/threads.jar"].concat(args));
-		runCommand("java", ["-jar", "export/threads.jar"]);
 	}
 }

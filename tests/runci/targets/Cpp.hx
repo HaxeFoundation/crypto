@@ -73,24 +73,5 @@ class Cpp {
 				runCpp("bin/cppia/Host-debug", ["bin/unit.cppia", "-jit"]);
 		}
 
-		changeDirectory(sysDir);
-		runCommand("haxe", ["-D", archFlag, "--each", "compile-cpp.hxml"].concat(args));
-		runSysTest(FileSystem.fullPath("bin/cpp/Main-debug"));
-
-		if (!isLinuxArm64) { // FIXME
-			changeDirectory(threadsDir);
-			runCommand("haxe", ["-D", archFlag, "build.hxml", "-cpp", "export/cpp"]);
-			runCpp("export/cpp/Main");
-		}
-
-		// if (Sys.systemName() == "Mac")
-		// {
-		// 	changeDirectory(getMiscSubDir("cppObjc"));
-		// 	runCommand("haxe", ["build.hxml"]);
-		// 	runCpp("bin/TestObjc-debug");
-		// }
-
-		changeDirectory(miscCppDir);
-		runCommand("haxe", ["run.hxml"]);
 	}
 }

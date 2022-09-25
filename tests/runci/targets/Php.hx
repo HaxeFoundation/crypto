@@ -68,9 +68,6 @@ class Php {
 	static public function run(args:Array<String>) {
 		getPhpDependencies();
 
-		changeDirectory(miscPhpDir);
-		runCommand("haxe", ["run.hxml"]);
-
 		final binDir = "bin/php";
 
 		final prefixes = [[]];
@@ -87,12 +84,6 @@ class Php {
 			runCommand("haxe", ["compile-php.hxml"].concat(prefix).concat(args));
 			runCommand("php", generateArgs(binDir + "/index.php"));
 
-			changeDirectory(sysDir);
-			if(isCi())
-				deleteDirectoryRecursively(binDir);
-
-			runCommand("haxe", ["compile-php.hxml"].concat(prefix).concat(args));
-			runSysTest("php", generateArgs(binDir + "/Main/index.php"));
 		}
 	}
 }

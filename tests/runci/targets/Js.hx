@@ -73,8 +73,6 @@ class Js {
 		];
 
 		infoMsg("Test ES6:");
-		changeDirectory(getMiscSubDir("es6"));
-		runCommand("haxe", ["run.hxml"]);
 
 		haxelibInstallGit("HaxeFoundation", "hxnodejs");
 		final env = Sys.environment();
@@ -117,22 +115,5 @@ class Js {
 				sc.close();
 		}
 
-		infoMsg("Test optimization:");
-		changeDirectory(optDir);
-		runCommand("haxe", ["run.hxml"]);
-
-		runci.targets.Java.getJavaDependencies(); // this is awkward
-		haxelibInstallGit("Simn", "haxeserver");
-		changeDirectory(serverDir);
-		runCommand("haxe", ["build.hxml"]);
-		runCommand("node", ["test.js"]);
-
-		changeDirectory(sysDir);
-		installNpmPackages(["deasync"]);
-		runCommand("haxe", ["compile-js.hxml"].concat(args));
-		runSysTest("node", ["bin/js/sys.js"]);
-
-		changeDirectory(miscJsDir);
-		runCommand("haxe", ["run.hxml"]);
 	}
 }

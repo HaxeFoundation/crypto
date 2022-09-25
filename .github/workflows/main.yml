@@ -118,6 +118,7 @@ jobs:
       - name: Install Neko from S3
         shell: pwsh
         run: |
+          echo "curl -sSL https://build.haxe.org/builds/neko/$PLATFORM/neko_latest.tar.gz -o $RUNNER_TEMP/neko_latest.tar.gz"
           sudo curl -sSL https://build.haxe.org/builds/neko/$PLATFORM/neko_latest.tar.gz -o $RUNNER_TEMP/neko_latest.tar.gz
           sudo tar -xf $RUNNER_TEMP/neko_latest.tar.gz -C --directory=$RUNNER_TEMP
           sudo NEKOPATH=`echo $RUNNER_TEMP/neko-*-*`
