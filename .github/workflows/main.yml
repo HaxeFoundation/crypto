@@ -36,7 +36,7 @@ jobs:
         shell: pwsh
         run: |
           sudo curl -sSL https://build.haxe.org/builds/neko/$PLATFORM/neko_latest.tar.gz -o $RUNNER_TEMP/neko_latest.tar.gz
-          sudo tar -xf $RUNNER_TEMP/neko_latest.tar.gz -C $RUNNER_TEMP
+          sudo tar -xf $RUNNER_TEMP/neko_latest.tar.gz -C --directory=$RUNNER_TEMP
           sudo NEKOPATH=`echo $RUNNER_TEMP/neko-*-*`
           sudo mkdir -p /usr/local/bin
           sudo mkdir -p /usr/local/lib/neko
@@ -119,7 +119,7 @@ jobs:
         shell: pwsh
         run: |
           sudo curl -sSL https://build.haxe.org/builds/neko/$PLATFORM/neko_latest.tar.gz -o $RUNNER_TEMP/neko_latest.tar.gz
-          sudo tar -xf $RUNNER_TEMP/neko_latest.tar.gz -C $RUNNER_TEMP
+          sudo tar -xf $RUNNER_TEMP/neko_latest.tar.gz -C --directory=$RUNNER_TEMP
           sudo NEKOPATH=`echo $RUNNER_TEMP/neko-*-*`
           sudo mkdir -p /usr/local/bin
           sudo mkdir -p /usr/local/lib/neko
