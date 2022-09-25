@@ -259,6 +259,9 @@ jobs:
           haxelib version
           haxelib config
       - name: Test
+        uses: nanasess/setup-php@v3
+        with:
+          php-version: '7.4'
         shell: pwsh
         run: haxe RunCi.hxml
         working-directory: ${{github.workspace}}/tests
