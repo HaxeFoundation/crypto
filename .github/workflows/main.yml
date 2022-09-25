@@ -33,10 +33,10 @@ jobs:
           submodules: recursive
 
       - name: Install Neko from S3
-        shell: pwsh
+        shell: bash
         run: |
-          sudo curl -sSL https://build.haxe.org/builds/neko/$env:PLATFORM/neko_latest.tar.gz -o $env:RUNNER_TEMP/neko_latest.tar.gz
-          sudo tar -xf $env:RUNNER_TEMP/neko_latest.tar.gz -C --directory=$env:RUNNER_TEMP
+          sudo curl -sSL https://build.haxe.org/builds/neko/$PLATFORM/neko_latest.tar.gz -o $RUNNER_TEMP/neko_latest.tar.gz
+          sudo tar -xf $RUNNER_TEMP/neko_latest.tar.gz -C --directory=$RUNNER_TEMP
           sudo NEKOPATH=`echo $RUNNER_TEMP/neko-*-*`
           sudo mkdir -p /usr/local/bin
           sudo mkdir -p /usr/local/lib/neko
@@ -116,11 +116,11 @@ jobs:
           submodules: recursive
 
       - name: Install Neko from S3
-        shell: pwsh
+        shell: bash
         run: |
-          echo "curl -sSL https://build.haxe.org/builds/neko/$env:PLATFORM/neko_latest.tar.gz -o $env:RUNNER_TEMP/neko_latest.tar.gz"
-          sudo curl -sSL https://build.haxe.org/builds/neko/$env:PLATFORM/neko_latest.tar.gz -o $env:RUNNER_TEMP/neko_latest.tar.gz
-          sudo tar -xf $env:RUNNER_TEMP/neko_latest.tar.gz -C --directory=$env:RUNNER_TEMP
+          echo "curl -sSL https://build.haxe.org/builds/neko/$PLATFORM/neko_latest.tar.gz -o $RUNNER_TEMP/neko_latest.tar.gz"
+          sudo curl -sSL https://build.haxe.org/builds/neko/$PLATFORM/neko_latest.tar.gz -o $RUNNER_TEMP/neko_latest.tar.gz
+          sudo tar -xf $RUNNER_TEMP/neko_latest.tar.gz -C --directory=$RUNNER_TEMP
           sudo NEKOPATH=`echo $RUNNER_TEMP/neko-*-*`
           sudo mkdir -p /usr/local/bin
           sudo mkdir -p /usr/local/lib/neko
