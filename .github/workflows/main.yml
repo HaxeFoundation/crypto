@@ -35,7 +35,8 @@ jobs:
       - name: Install Neko from S3
         shell: bash
         run: |
-          sudo curl -sSL https://build.haxe.org/builds/neko/$PLATFORM/neko_latest.tar.gz -o $RUNNER_TEMP/neko_latest.tar.gz
+          echo "curl -sSL https://build.haxe.org/builds/neko/${{ PLATFORM }}/neko_latest.tar.gz -o ${{ RUNNER_TEMP }}/neko_latest.tar.gz"
+          sudo curl -sSL https://build.haxe.org/builds/neko/${{ PLATFORM }}/neko_latest.tar.gz -o ${{ RUNNER_TEMP }}/neko_latest.tar.gz
           sudo tar -xf $RUNNER_TEMP/neko_latest.tar.gz -C --directory=$RUNNER_TEMP
           sudo NEKOPATH=`echo $RUNNER_TEMP/neko-*-*`
           sudo mkdir -p /usr/local/bin
@@ -50,7 +51,7 @@ jobs:
       - name: Print Neko version
         run: neko -version 2>&1
       - name: Setup Haxe
-        shell: pwsh
+        shell: bash
         run: |
           set -eux
           
@@ -62,11 +63,11 @@ jobs:
           echo "/tmp/haxe/" >> $GITHUB_PATH
           echo "HAXE_STD_PATH=/tmp/haxe/std" >> $GITHUB_ENV
       - name: Print Haxe version
-        shell: pwsh
+        shell: bash
         run: haxe -version
 
       - name: "Make Python 3 be available as python3 in the cmdline"
-        shell: pwsh
+        shell: bash
         run: |
           Set-PSDebug -Trace 1
           $pypath = python -c "import sys; print(sys.executable)"
@@ -87,11 +88,11 @@ jobs:
           choco install wget
           wget --version
       - name: Setup haxelib
-        shell: pwsh
+        shell: bash
         run: |
           haxelib setup ~/haxelib
       - name: Test
-        shell: pwsh
+        shell: bash
         run: haxe RunCi.hxml
         working-directory: ${{github.workspace}}/tests
 
@@ -388,7 +389,7 @@ jobs:
         run: |
           set -eux
           
-          download_url="https://build.haxe.org/builds/haxe/${{ matrix.haxe_latest_dist }}"
+          download_url="https://build.haxe.org/builds/haxe/${{ matrix.include.haxe_latest_dist }}"
           echo "Downloading [$download_url]..."
           mkdir /tmp/haxe
           curl -fsSL --retry 3 --retry-delay 5 "$download_url" -o /tmp/haxe.tar.gz
