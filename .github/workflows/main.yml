@@ -51,7 +51,7 @@ jobs:
           echo "/usr/local/lib/" >> $GITHUB_PATH
           echo "/usr/local/lib/neko/" >> $GITHUB_PATH
           echo "NEKOPATH=$NEKOPATH" >> $GITHUB_ENV
-          echo "LD_LIBRARY_PATH=$NEKOPATH/lib" >> $GITHUB_ENV
+          echo "LD_LIBRARY_PATH=/usr/local/lib/" >> $GITHUB_ENV
       - name: Print Neko version
         run: neko -version 2>&1
       - name: Setup Haxe
@@ -134,11 +134,12 @@ jobs:
           sudo ln -s $NEKOPATH/nekotools                      /usr/local/bin/
           sudo ln -s $NEKOPATH/libneko.*                      /usr/local/lib/
           sudo ln -s $NEKOPATH/*.ndll                         /usr/local/lib/neko/
+          sudo ldconfig
           echo "$NEKOPATH" >> $GITHUB_PATH
           echo "/usr/local/lib/" >> $GITHUB_PATH
           echo "/usr/local/lib/neko/" >> $GITHUB_PATH
           echo "NEKOPATH=$NEKOPATH" >> $GITHUB_ENV
-          echo "LD_LIBRARY_PATH=$NEKOPATH/lib" >> $GITHUB_ENV
+          echo "LD_LIBRARY_PATH=$NEKOPATH" >> $GITHUB_ENV
       - name: Print Neko version
         run: neko -version 2>&1
       - name: Setup Haxe
