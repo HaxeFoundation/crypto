@@ -48,6 +48,7 @@ jobs:
           sudo ln -s $NEKOPATH/libneko.*                      /usr/local/lib/
           sudo ln -s $NEKOPATH/*.ndll                         /usr/local/lib/neko/
           echo "NEKOPATH=$NEKOPATH" >> $GITHUB_ENV
+          echo $GITHUB_ENV
       - name: Print Neko version
         run: neko -version 2>&1
       - name: Setup Haxe
@@ -133,7 +134,7 @@ jobs:
           sudo ln -s $NEKOPATH/*.ndll                         /usr/local/lib/neko/
           echo "NEKOPATH=$NEKOPATH" >> $GITHUB_ENV
       - name: Print Neko version
-        run: neko -version 2>&1
+        run: ./neko -version 2>&1
       - name: Setup Haxe
         shell: pwsh
         run: |
