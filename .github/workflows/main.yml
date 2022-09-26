@@ -49,6 +49,7 @@ jobs:
           sudo ln -s $NEKOPATH/*.ndll                         /usr/local/lib/neko/
           echo "$NEKOPATH" >> $GITHUB_PATH
           echo "NEKOPATH=$NEKOPATH" >> $GITHUB_ENV
+          export PATH=$PATH:/usr/local/lib/:/usr/local/lib/neko/
       - name: Print Neko version
         run: neko -version 2>&1
       - name: Setup Haxe
@@ -86,6 +87,10 @@ jobs:
         run: |
           choco install wget
           wget --version
+      - name: Setup haxelib
+        shell: bash
+        run: |
+          haxelib setup ~/haxelib
       - name: Test
         shell: bash
         run: haxe RunCi.hxml
@@ -165,6 +170,10 @@ jobs:
         run: |
           choco install wget
           wget --version
+      - name: Setup haxelib
+        shell: bash
+        run: |
+          haxelib setup ~/haxelib
       - name: Test
         shell: bash
         run: haxe RunCi.hxml
