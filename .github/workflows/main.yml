@@ -4,7 +4,7 @@ on: [push, pull_request]
 jobs:
   cancel:
     name: "Cancel previous runs"
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     timeout-minutes: 3
     steps:
       - uses: styfle/cancel-workflow-action@0.3.1
@@ -13,7 +13,7 @@ jobs:
           access_token: ${{ github.token }}
 
   linux-amd64:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     permissions:
       packages: write
     env:
@@ -98,7 +98,7 @@ jobs:
         working-directory: ${{github.workspace}}/tests
 
   linux-arm64:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     permissions:
       packages: write
     env:
@@ -112,13 +112,20 @@ jobs:
         # TODO enable lua after https://github.com/HaxeFoundation/haxe/issues/5024
         target: [macro, js, hl, cpp, 'java,jvm', cs, php, python, flash9, neko]
         include:
-          - arch: aarch64
-            distro: ubuntu18.04
           - haxe_latest_dist: linux-arm64/haxe_latest.tar.gz
     steps:
       - uses: actions/checkout@main
         with:
           submodules: recursive
+      - uses: uraimo/run-on-arch-action@v2
+        name: Run commands
+        id: runcmd
+        with:
+          arch: aarch64
+          distro: ubuntu-latest
+          run: |
+            uname -a
+            echo ::set-output name=uname::$(uname -a)
 
       - name: Install Neko from S3
         shell: bash
