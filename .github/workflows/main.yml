@@ -75,21 +75,17 @@ jobs:
           python3 -V
       - name: Install hererocks
         if: matrix.target == 'lua'
-        shell: cmd
+        shell: bash
         run: |
           pip install hererocks
           hererocks lua53 -l5.3 -rlatest
           call lua53/bin/activate
       - name: Install wget
         if: matrix.target == 'flash9'
-        shell: cmd
+        shell: bash
         run: |
           choco install wget
           wget --version
-      - name: Setup haxelib
-        shell: bash
-        run: |
-          haxelib setup ~/haxelib
       - name: Test
         shell: bash
         run: haxe RunCi.hxml
@@ -135,7 +131,7 @@ jobs:
       - name: Print Neko version
         run: neko -version 2>&1
       - name: Setup Haxe
-        shell: pwsh
+        shell: bash
         run: |
           set -eux
           
@@ -147,34 +143,30 @@ jobs:
           echo "/tmp/haxe/" >> $GITHUB_PATH
           echo "HAXE_STD_PATH=/tmp/haxe/std" >> $GITHUB_ENV
       - name: Print Haxe version
-        shell: pwsh
+        shell: bash
         run: haxe -version
 
       - name: "Print Python 3 version"
-        shell: pwsh
+        shell: bash
         run: |
           set -eux
           
           python3 -V
       - name: Install hererocks
         if: matrix.target == 'lua'
-        shell: cmd
+        shell: bash
         run: |
           pip install hererocks
           hererocks lua53 -l5.3 -rlatest
           call lua53/bin/activate
       - name: Install wget
         if: matrix.target == 'flash9'
-        shell: cmd
+        shell: bash
         run: |
           choco install wget
           wget --version
-      - name: Setup haxelib
-        shell: pwsh
-        run: |
-          haxelib setup ~/haxelib
       - name: Test
-        shell: pwsh
+        shell: bash
         run: haxe RunCi.hxml
         working-directory: ${{github.workspace}}/tests       
 
