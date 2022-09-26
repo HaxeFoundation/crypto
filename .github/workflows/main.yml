@@ -32,12 +32,6 @@ jobs:
       - uses: actions/checkout@main
         with:
           submodules: recursive
-      - uses: seanmiddleditch/gha-setup-ninja@master
-      - run: |
-        mkdir build
-        cd build
-        cmake -G Ninja ..
-      - run: cmake --build build
 
       - name: Install Neko from S3
         shell: bash
