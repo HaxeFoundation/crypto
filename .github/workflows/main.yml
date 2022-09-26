@@ -27,7 +27,7 @@ jobs:
         # TODO enable lua after https://github.com/HaxeFoundation/haxe/issues/5024
         target: [macro, js, hl, cpp, 'java,jvm', cs, php, python, flash9, neko]
         include:
-          - haxe_latest_dist: linux64/haxe_latest.zip
+          - haxe_latest_dist: linux64/haxe_latest.tar.gz
     steps:
       - uses: actions/checkout@main
         with:
@@ -49,9 +49,6 @@ jobs:
           sudo ln -s $NEKOPATH/*.ndll                         /usr/local/lib/neko/
           echo "$NEKOPATH" >> $GITHUB_PATH
           echo "NEKOPATH=$NEKOPATH" >> $GITHUB_ENV
-          cat $GITHUB_PATH
-          echo "$GITHUB_PATH"
-          echo "$PATH"
       - name: Print Neko version
         run: neko -version 2>&1
       - name: Setup Haxe
@@ -115,7 +112,7 @@ jobs:
         # TODO enable lua after https://github.com/HaxeFoundation/haxe/issues/5024
         target: [macro, js, hl, cpp, 'java,jvm', cs, php, python, flash9, neko]
         include:
-          - haxe_latest_dist: linux-arm64/haxe_latest.zip
+          - haxe_latest_dist: linux-arm64/haxe_latest.tar.gz
     steps:
       - uses: actions/checkout@main
         with:
