@@ -20,7 +20,7 @@ jobs:
       FORCE_COLOR: 1
       PLATFORM: linux64
       TEST: ${{matrix.target}}
-      RUNNER_TEMP: ${{ runner.temp }}
+      RUNNER_TEMP: /tmp
     strategy:
       fail-fast: false
       matrix:
