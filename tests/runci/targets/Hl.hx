@@ -35,7 +35,7 @@ class Hl {
 
 		switch (systemName) {
 			case "Linux":
-				Linux.requireAptPackages(["libturbojpeg-dev","libmbedtls-dev","libopenal-dev","libpng-dev","libsdl2-dev","libuv1-dev","libvorbis-dev","libsqlite3-dev"]);
+				Linux.requireAptPackages(["ninja-build","libturbojpeg-dev","libmbedtls-dev","libopenal-dev","libpng-dev","libsdl2-dev","libuv1-dev","libvorbis-dev","libsqlite3-dev"]);
 			case "Mac":
 				runNetworkCommand("brew", ["update", '--preinstall']);
 				runNetworkCommand("brew", ["bundle", '--file=${hlSrc}/Brewfile']);
