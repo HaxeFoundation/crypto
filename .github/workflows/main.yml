@@ -20,6 +20,7 @@ jobs:
       FORCE_COLOR: 1
       PLATFORM: linux64
       TEST: ${{matrix.target}}
+      RUNNER_TEMP: ${{ runner.temp }}
     strategy:
       fail-fast: false
       matrix:
@@ -35,9 +36,9 @@ jobs:
       - name: Install Neko from S3
         shell: bash
         run: |
-          curl -sSL https://build.haxe.org/builds/neko/${{ env.PLATFORM }}/neko_latest.tar.gz -o ${RUNNER_TEMP}/neko_latest.tar.gz
-          tar -xf ${RUNNER_TEMP}/neko_latest.tar.gz
-          sudo NEKOPATH=`echo ${RUNNER_TEMP}/neko-*-*`
+          curl -sSL https://build.haxe.org/builds/neko/${{ env.PLATFORM }}/neko_latest.tar.gz -o ${{ env.RUNNER_TEMP }}/neko_latest.tar.gz
+          tar -xf ${{ env.RUNNER_TEMP }}/neko_latest.tar.gz
+          sudo NEKOPATH=`echo ${{ env.RUNNER_TEMP }}/neko-*-*`
           sudo mkdir -p /usr/local/bin
           sudo mkdir -p /usr/local/lib/neko
           sudo ln -s $NEKOPATH/neko                           /usr/local/bin/
