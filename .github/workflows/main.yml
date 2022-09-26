@@ -37,7 +37,7 @@ jobs:
         shell: bash
         run: |
           curl -sSL https://build.haxe.org/builds/neko/${{ env.PLATFORM }}/neko_latest.tar.gz -o ${{ env.RUNNER_TEMP }}/neko_latest.tar.gz
-          tar xzvf ${{ env.RUNNER_TEMP }}/neko_latest.tar.gz -C /tmp/ --strip-components=1
+          tar xzvf ${{ env.RUNNER_TEMP }}/neko_latest.tar.gz -C /tmp/
           NEKOPATH=`echo ${{ env.RUNNER_TEMP }}/neko-*-*`
           sudo mkdir -p /usr/local/bin
           sudo mkdir -p /usr/local/lib/neko
@@ -125,7 +125,7 @@ jobs:
         shell: bash
         run: |
           curl -sSL https://build.haxe.org/builds/neko/${{ env.PLATFORM }}/neko_latest.tar.gz -o ${{ env.RUNNER_TEMP }}/neko_latest.tar.gz
-          tar xzvf ${{ env.RUNNER_TEMP }}/neko_latest.tar.gz -C /tmp/ --strip-components=1
+          tar xzvf ${{ env.RUNNER_TEMP }}/neko_latest.tar.gz -C /tmp/
           NEKOPATH=`echo ${{ env.RUNNER_TEMP }}/neko-*-*`
           sudo mkdir -p /usr/local/bin
           sudo mkdir -p /usr/local/lib/neko
