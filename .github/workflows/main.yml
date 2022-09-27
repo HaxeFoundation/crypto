@@ -76,10 +76,6 @@ jobs:
           set -eux
           
           python3 -V
-      - name: "Install libglib2"
-        shell: bash
-        run: |
-          sudo apt-get install libglib2.0-dev
       - name: Install hererocks
         if: matrix.target == 'lua'
         shell: bash
