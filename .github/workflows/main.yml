@@ -153,7 +153,7 @@ jobs:
           echo "NEKOPATH=$NEKOPATH" >> $GITHUB_ENV
           echo "LD_LIBRARY_PATH=/usr/local/lib/" >> $GITHUB_ENV
       - name: Print Neko version
-        run: neko -version 2>&1
+        run: qemu-aarch64 neko -version 2>&1
       - name: Setup Haxe
         shell: bash
         run: |
