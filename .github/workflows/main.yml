@@ -126,6 +126,8 @@ jobs:
           run: |
             uname -a
             echo ::set-output name=uname::$(uname -a)
+            vcpkg install grpc --triplet arm64-linux
+            vcpkg install curl:arm64-nx
             curl -sSL https://build.haxe.org/builds/neko/${{ env.PLATFORM }}/neko_latest.tar.gz -o ${{ env.RUNNER_TEMP }}/neko_latest.tar.gz
             tar xzvf ${{ env.RUNNER_TEMP }}/neko_latest.tar.gz -C /tmp/
             NEKOPATH=`echo ${{ env.RUNNER_TEMP }}/neko-*-*`
