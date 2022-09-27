@@ -3,116 +3,105 @@ package unit;
 import unit.crypto.*;
 import haxe.ds.List;
 import unit.Test.*;
+import utest.Runner;
+import utest.ui.Report;
+
+final asyncWaits = new Array<haxe.PosInfos>();
+final asyncCache = new Array<() -> Void>();
 
 @:access(unit.Test)
-@:expose("unit.TestMain")
+#if js
+@:expose("unit.TestMain.main")
 @:keep
-class TestMain {
+#end
 
-	static var asyncWaits = new Array<haxe.PosInfos>();
-	static var asyncCache = new Array<Void -> Void>();
-
+function main() {
 	#if js
-	static function nodejsMain() {
-		main();
-		(untyped process).exit(Test.success ? 0 : 1);
+	if (js.Browser.supported) {
+		var oTrace = haxe.Log.trace;
+		var traceElement = js.Browser.document.getElementById("haxe:trace");
+		haxe.Log.trace = function(v, ?infos) {
+			oTrace(v, infos);
+			traceElement.innerHTML += infos.fileName + ":" + infos.lineNumber + ": " + StringTools.htmlEscape(v) + "<br/>";
+		}
 	}
 	#end
 
-	static function main() {
-		Test.startStamp = haxe.Timer.stamp();
+	var verbose = #if (cpp || neko || php) Sys.args().indexOf("-v") >= 0 #else false #end;
 
-		#if js
-		if (js.Browser.supported) {
-			var oTrace = haxe.Log.trace;
-			var traceElement = js.Browser.document.getElementById("haxe:trace");
-			haxe.Log.trace = function(v, ?infos) {
-				oTrace(v, infos);
-				traceElement.innerHTML += infos.fileName + ":" + infos.lineNumber + ": " + StringTools.htmlEscape(v) + "<br/>";
-			}
-		}
-		#end
-
-		var verbose = #if ( cpp || neko || php ) Sys.args().indexOf("-v") >= 0 #else false #end;
-
-		#if neko
-		if( neko.Web.isModNeko )
-			neko.Web.setHeader("Content-Type","text/plain");
-		#elseif php
-		if( php.Web.isModNeko )
-			php.Web.setHeader("Content-Type","text/plain");
-		#end
-		resetTimer();
-		#if !macro
-		trace("Generated at: " + HelperMacros.getCompilationDate());
-		#end
-		trace("START");
-		#if flash
-		var tf : flash.text.TextField = untyped flash.Boot.getTrace();
-		tf.selectable = true;
-		tf.mouseEnabled = true;
-		#end
-		var classes = [
-			new AesTest(),
-			new BlowFishTest(),
-			new ModeTest(),
-			new PaddingTest(),
-			new TripleDesTest(),
-			new Sha224Test(),
-			new Sha256Test(),
-			new HmacTest(),
-			new TwoFishTest(),
-			new Ripemd160Test(),
-			new BCryptTest(),
-			new Pbkdf2Test(),
-			new Sha384Test(),
-			new Sha512Test(),
-			new Salsa20Test(),
-			new XSalsa20Test(),
-			new ChaChaTest(),
-			new RC4Test(),
-			new SCryptTest(),
-			new Poly1305Test()
-		];
-
-		TestIssues.addIssueClasses("src/unit/issues", "unit.issues");
-		var current = null;
-		#if (!fail_eager)
-		try
-		#end
-		{
-			asyncWaits.push(null);
-			for( inst in classes ) {
-				current = Type.getClass(inst);
-			if (verbose)
-			   logVerbose("Class " + Std.string(current) );
-				for( f in Type.getInstanceFields(current) )
-					if( f.substr(0,4) == "test" ) {
-				  if (verbose)
-					 logVerbose("   " + f);
-						#if fail_eager
-						Reflect.callMethod(inst,Reflect.field(inst,f),[]);
-						#else
-						try {
-							Reflect.callMethod(inst,Reflect.field(inst,f),[]);
-						}
-						#if !as3
-						catch( e : Dynamic ) {
-							onError(e,"EXCEPTION",Type.getClassName(current)+"."+f);
-						}
-						#end
-						#end
-						reportInfos = null;
-					}
-			}
-			asyncWaits.remove(null);
-			checkDone();
-		}
-		#if (!as3 && !(fail_eager))
-		catch( e : Dynamic ) {
-			asyncWaits.remove(null);
-			onError(e,"ABORTED",Type.getClassName(current));
-		}
-		#end
+	#if cs // "Turkey Test" - Issue #996
+	cs.system.threading.Thread.CurrentThread.CurrentCulture = new cs.system.globalization.CultureInfo('tr-TR');
+	cs.Lib.applyCultureChanges();
+	#end
+	#if neko
+	if (neko.Web.isModNeko)
+		neko.Web.setHeader("Content-Type", "text/plain");
+	#elseif php
+	if (php.Web.isModNeko)
+		php.Web.setHeader("Content-Type", "text/plain");
+	#end
+	#if !macro
+	trace("Generated at: " + HelperMacros.getCompilationDate());
+	#end
+	trace("START");
+	#if flash
+	var tf:flash.text.TextField = untyped flash.Boot.getTrace();
+	tf.selectable = true;
+	tf.mouseEnabled = true;
+	#end	
+	var classes = [
+		new AesTest(),
+		new BlowFishTest(),
+		new ModeTest(),
+		new PaddingTest(),
+		new TripleDesTest(),
+		new Sha224Test(),
+		new Sha256Test(),
+		new HmacTest(),
+		new TwoFishTest(),
+		new Ripemd160Test(),
+		new BCryptTest(),
+		new Pbkdf2Test(),
+		new Sha384Test(),
+		new Sha512Test(),
+		new Salsa20Test(),
+		new XSalsa20Test(),
+		new ChaChaTest(),
+		new RC4Test(),
+		new SCryptTest(),
+		new Poly1305Test()
+	];	
+	TestIssues.addIssueClasses("src/unit/issues", "unit.issues");
+	
+	var runner = new Runner();
+	for (c in classes) {
+		runner.addCase(c);
 	}
+	var report = Report.create(runner);
+	report.displayHeader = AlwaysShowHeader;
+	report.displaySuccessResults = NeverShowSuccessResults;
+	var success = true;
+	runner.onProgress.add(function(e) {
+		for (a in e.result.assertations) {
+			switch a {
+				case Success(pos):
+				case Warning(msg):
+				case Ignore(reason):
+				case _:
+					success = false;
+			}
+		}
+		#if js
+		if (js.Browser.supported && e.totals == e.done) {
+			untyped js.Browser.window.success = success;
+		};
+		#end
+	});
+	#if sys
+	if (verbose)
+		runner.onTestStart.add(function(test) {
+			Sys.println(' $test...'); // TODO: need utest success state for this
+		});
+	#end
+	runner.run();
 }
