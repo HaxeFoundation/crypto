@@ -126,34 +126,23 @@ jobs:
           run: |
             uname -a
             echo ::set-output name=uname::$(uname -a)
-      
-      - name: Set up QEMU
-        id: qemu
-        uses: docker/setup-qemu-action@v1
-        with:
-            image: tonistiigi/binfmt:latest
-            platforms: all
-      - name: Install Neko from S3
-        shell: bash
-        run: |
-          curl -sSL https://build.haxe.org/builds/neko/${{ env.PLATFORM }}/neko_latest.tar.gz -o ${{ env.RUNNER_TEMP }}/neko_latest.tar.gz
-          tar xzvf ${{ env.RUNNER_TEMP }}/neko_latest.tar.gz -C /tmp/
-          NEKOPATH=`echo ${{ env.RUNNER_TEMP }}/neko-*-*`
-          sudo mkdir -p /usr/local/bin
-          sudo mkdir -p /usr/local/lib/neko
-          sudo ln -s $NEKOPATH/neko                           /usr/local/bin/
-          sudo ln -s $NEKOPATH/nekoc                          /usr/local/bin/
-          sudo ln -s $NEKOPATH/nekoml                         /usr/local/bin/
-          sudo ln -s $NEKOPATH/nekotools                      /usr/local/bin/
-          sudo ln -s $NEKOPATH/libneko.*                      /usr/local/lib/
-          sudo ln -s $NEKOPATH/*.ndll                         /usr/local/lib/neko/
-          echo "$NEKOPATH" >> $GITHUB_PATH
-          echo "/usr/local/lib/" >> $GITHUB_PATH
-          echo "/usr/local/lib/neko/" >> $GITHUB_PATH
-          echo "NEKOPATH=$NEKOPATH" >> $GITHUB_ENV
-          echo "LD_LIBRARY_PATH=/usr/local/lib/" >> $GITHUB_ENV
-      - name: Print Neko version
-        run: qemu-aarch64 neko -version 2>&1
+            curl -sSL https://build.haxe.org/builds/neko/${{ env.PLATFORM }}/neko_latest.tar.gz -o ${{ env.RUNNER_TEMP }}/neko_latest.tar.gz
+            tar xzvf ${{ env.RUNNER_TEMP }}/neko_latest.tar.gz -C /tmp/
+            NEKOPATH=`echo ${{ env.RUNNER_TEMP }}/neko-*-*`
+            sudo mkdir -p /usr/local/bin
+            sudo mkdir -p /usr/local/lib/neko
+            sudo ln -s $NEKOPATH/neko                           /usr/local/bin/
+            sudo ln -s $NEKOPATH/nekoc                          /usr/local/bin/
+            sudo ln -s $NEKOPATH/nekoml                         /usr/local/bin/
+            sudo ln -s $NEKOPATH/nekotools                      /usr/local/bin/
+            sudo ln -s $NEKOPATH/libneko.*                      /usr/local/lib/
+            sudo ln -s $NEKOPATH/*.ndll                         /usr/local/lib/neko/
+            echo "$NEKOPATH" >> $GITHUB_PATH
+            echo "/usr/local/lib/" >> $GITHUB_PATH
+            echo "/usr/local/lib/neko/" >> $GITHUB_PATH
+            echo "NEKOPATH=$NEKOPATH" >> $GITHUB_ENV
+            echo "LD_LIBRARY_PATH=/usr/local/lib/" >> $GITHUB_ENV
+            neko -version 2>&1
       - name: Setup Haxe
         shell: bash
         run: |
