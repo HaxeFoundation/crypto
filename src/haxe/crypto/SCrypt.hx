@@ -43,10 +43,12 @@ class SCrypt {
 		trace(data.length+" = "+(data.length >>> 2));
 		trace("pass: "+password.toHex()+" , salt= "+salt.toHex());
 		var b = new Vector<Int>(data.length >>> 2);
+		trace("start setting ")
+		trace(b.length);
 		for (i in 0...b.length) {
 			b[i] = bytesToInt32(data, i * 4);
 		}
-		
+		trace("Set vectors");
 		var xbuf = new Vector<Int>(mfwords);
 		var vbuf = new Vector<Int>(N * mfwords);
 		var xtbuf = new Vector<Int>(16);
