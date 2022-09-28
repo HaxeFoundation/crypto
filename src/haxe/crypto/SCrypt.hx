@@ -38,7 +38,7 @@ class SCrypt {
 		var mflen:Int = 128 * r;
 		var mfwords:Int = mflen >>> 2;
 
-		trace("pbkdf2 encode , mflen="+mflen+" , mfwords="+mfwords+" , p="+p);
+		trace("pbkdf2 encode , mflen="+mflen+" , mfwords="+mfwords+" , p="+p+" , N="+N+" ,N*mfwords="+(N * mfwords));
 		var data = pbkdf2.encode(password, salt, 1, p * mflen);
 		trace(data.length+" = "+(data.length >>> 2));
 		trace("pass: "+password.toHex()+" , salt= "+salt.toHex());
