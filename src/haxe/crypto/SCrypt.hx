@@ -48,9 +48,11 @@ class SCrypt {
 		for (i in 0...b.length) {
 			b[i] = bytesToInt32(data, i * 4);
 		}
-		trace("Set vectors");
+		trace("Set vectors "+mfwords);
 		var xbuf = new Vector<Int>(mfwords);
+		trace("init xbuf success "+(N * mfwords));
 		var vbuf = new Vector<Int>(N * mfwords);
+		trace("init vbuf success");
 		var xtbuf = new Vector<Int>(16);
 		trace("start sMix");
 		for (i in 0...p) {
