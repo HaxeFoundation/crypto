@@ -1,6 +1,5 @@
 # Crypto
-[![TravisCI Build Status](https://travis-ci.org/HaxeFoundation/crypto.svg?branch=master)](https://travis-ci.org/HaxeFoundation/crypto)
-[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/HaxeFoundation/crypto?branch=master&svg=true)](https://ci.appveyor.com/project/HaxeFoundation/crypto)
+<a href="https://github.com/HaxeFoundation/crypto/actions"><img src="https://github.com/HaxeFoundation/crypto/workflows/CI/badge.svg" alt="GitHub Build Status"></a>
 
 Cross platform cryptographic functions for Haxe 4 and 3
 
