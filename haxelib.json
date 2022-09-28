@@ -5,7 +5,7 @@
   "classPath": "src",
   "tags":["crypto","utility","hash","auth","cross","web","aes","blowfish","twofish","tripledes","des","bcrypt","hmac","sha224","sha256","sha384","sha512","ripemd-160","pbkdf2","salsa20","xsalsa","chacha","ecb","cbc","pcbc","cfb","ofb","ctr","ansix923","bitpadding","iso10126","nullpadding","pkcs7","spacepadding","tbc","poly1305"],
   "description": "Cross-platform crypto library with support of : Aes, BCrypt, BlowFish, Des, TripleDes, TwoFish, Hmac, Pbkdf2, Ripemd160, Sha224, Sha256, Sha384, Sha512, Salsa20, XSalsa, ChaCha, SCrypt, RC4. Block cipher mode of operation:  cbc, cfb, ctr, ecb, ofb, pcbc",
-  "version": "0.4.0",
-  "releasenote": "Add Poly1305 and Des support. Use native sha (php). Fix Aes ctr (js). Other fixes.",
+  "version": "1.0.3",
+  "releasenote": "Faster Aes implementation",
   "contributors":["flashultra"]
 }

@@ -1,3 +1,7 @@
+1.0.3
+------------------
+Faster AES implementation
+
 0.4.0
 ------------------
 [js] Fix for AES ctr 128 bit
