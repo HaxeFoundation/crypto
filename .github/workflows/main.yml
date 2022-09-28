@@ -189,7 +189,7 @@ jobs:
 
 
   windows-test:
-    runs-on: windows-latest
+    runs-on: windows-2019
     env:
       ACTIONS_ALLOW_UNSECURE_COMMANDS: true
       PLATFORM: windows
@@ -262,15 +262,6 @@ jobs:
         run: |
           choco install wget
           wget --version
-      - name: Configure pagefile
-        uses: al-cheb/configure-pagefile-action@v1.2
-        with:
-          minimum-size: 10GB
-          maximum-size: 12GB
-
-      - name: Set up pagefile
-        run: |
-          (Get-CimInstance Win32_PageFileUsage).AllocatedBaseSize
       - name: Setup haxelib
         shell: pwsh
         run: |
