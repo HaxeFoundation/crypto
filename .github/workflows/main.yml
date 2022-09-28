@@ -189,7 +189,7 @@ jobs:
 
 
   windows-test:
-    runs-on: windows-2019
+    runs-on: windows-latest
     env:
       ACTIONS_ALLOW_UNSECURE_COMMANDS: true
       PLATFORM: windows
