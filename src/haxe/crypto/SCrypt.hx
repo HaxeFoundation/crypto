@@ -54,7 +54,7 @@ class SCrypt {
 		for (i in 0...p) {
 			sMix(vbuf, b, i * mfwords, xbuf, xtbuf, mfwords, N, r);
 		}
-
+		trace("End sMix");
 		var output = Bytes.alloc(data.length);
 		for (i in 0...b.length) {
 			int32ToBytes(b[i], output, i * 4);
@@ -65,10 +65,13 @@ class SCrypt {
 
 	private function sMix(vbuf:Vector<Int>, output:Vector<Int>, outputOffset:Int, xbuf:Vector<Int>, xtbuf:Vector<Int>, mfwords:Int, N:Int, r:Int):Void {
 		Vector.blit(output, outputOffset, vbuf, 0, mfwords);
+		trace("v blit "+N);
 		for (i in 1...N) {
 			blockMix(vbuf, (i - 1) * mfwords, vbuf, i * mfwords, mfwords, r, xtbuf);
 		}
+		trace("end / start blockMix");
 		blockMix(vbuf, (N - 1) * mfwords, output, outputOffset, mfwords, r, xtbuf);
+		trace("xor blockmix"+(N >> 1));
 		var j:Int = 0;
 		for (i in 0...(N >> 1)) {
 			j = (output.get(outputOffset + mfwords - 16) & (N - 1)) * mfwords;
