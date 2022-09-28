@@ -68,7 +68,7 @@ class RunCi {
 					case Lua:
 						runci.targets.Lua.run(args);
 					case Cpp:
-						runci.targets.Cpp.run(args, true, true);
+						runci.targets.Cpp.run(args, true, false);
 					case Cppia:
 						//runci.targets.Cpp.run(args, false, true);
 						trace("Skip Cppia test --> CallMember haxe.crypto.Hmac (01F6A5E4 00000000) 'getSize' fallback");
