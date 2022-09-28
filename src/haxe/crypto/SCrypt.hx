@@ -38,15 +38,17 @@ class SCrypt {
 		var mflen:Int = 128 * r;
 		var mfwords:Int = mflen >>> 2;
 
+		trace("pbkdf2 encode , mflen="+mflen+" , mfwords="+mfwords);
 		var data = pbkdf2.encode(password, salt, 1, p * mflen);
 		var b = new Vector<Int>(data.length >>> 2);
 		for (i in 0...b.length) {
 			b[i] = bytesToInt32(data, i * 4);
 		}
-
+		
 		var xbuf = new Vector<Int>(mfwords);
 		var vbuf = new Vector<Int>(N * mfwords);
 		var xtbuf = new Vector<Int>(16);
+		trace("start sMix");
 		for (i in 0...p) {
 			sMix(vbuf, b, i * mfwords, xbuf, xtbuf, mfwords, N, r);
 		}
@@ -55,7 +57,7 @@ class SCrypt {
 		for (i in 0...b.length) {
 			int32ToBytes(b[i], output, i * 4);
 		};
-
+		trace("encode final ");
 		return pbkdf2.encode(password, output, 1, dkLen);
 	}
 
