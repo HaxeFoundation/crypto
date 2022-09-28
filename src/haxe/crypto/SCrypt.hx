@@ -38,44 +38,33 @@ class SCrypt {
 		var mflen:Int = 128 * r;
 		var mfwords:Int = mflen >>> 2;
 
-		trace("pbkdf2 encode , mflen="+mflen+" , mfwords="+mfwords+" , p="+p+" , N="+N+" ,N*mfwords="+(N * mfwords));
 		var data = pbkdf2.encode(password, salt, 1, p * mflen);
-		trace(data.length+" = "+(data.length >>> 2));
-		trace("pass: "+password.toHex()+" , salt= "+salt.toHex());
 		var b = new Vector<Int>(data.length >>> 2);
-		trace("start setting ");
-		trace(b.length);
 		for (i in 0...b.length) {
 			b[i] = bytesToInt32(data, i * 4);
 		}
-		trace("Set vectors "+mfwords);
+
 		var xbuf = new Vector<Int>(mfwords);
-		trace("init xbuf success "+(N * mfwords));
 		var vbuf = new Vector<Int>(N * mfwords);
-		trace("init vbuf success");
 		var xtbuf = new Vector<Int>(16);
-		trace("start sMix");
 		for (i in 0...p) {
 			sMix(vbuf, b, i * mfwords, xbuf, xtbuf, mfwords, N, r);
 		}
-		trace("End sMix");
+
 		var output = Bytes.alloc(data.length);
 		for (i in 0...b.length) {
 			int32ToBytes(b[i], output, i * 4);
 		};
-		trace("encode final ");
+
 		return pbkdf2.encode(password, output, 1, dkLen);
 	}
 
 	private function sMix(vbuf:Vector<Int>, output:Vector<Int>, outputOffset:Int, xbuf:Vector<Int>, xtbuf:Vector<Int>, mfwords:Int, N:Int, r:Int):Void {
 		Vector.blit(output, outputOffset, vbuf, 0, mfwords);
-		trace("v blit "+N);
 		for (i in 1...N) {
 			blockMix(vbuf, (i - 1) * mfwords, vbuf, i * mfwords, mfwords, r, xtbuf);
 		}
-		trace("end / start blockMix");
 		blockMix(vbuf, (N - 1) * mfwords, output, outputOffset, mfwords, r, xtbuf);
-		trace("xor blockmix"+(N >> 1));
 		var j:Int = 0;
 		for (i in 0...(N >> 1)) {
 			j = (output.get(outputOffset + mfwords - 16) & (N - 1)) * mfwords;
