@@ -9,7 +9,9 @@ class SCryptTest extends Test {
 
 	var plainText = [
 		"",
-		#if ( !python )
+		#if flash
+		"70617373776F7264"
+		#elseif ( !python )
 		"70617373776F7264",
 		"706C656173656C65746D65696E",
 		#end

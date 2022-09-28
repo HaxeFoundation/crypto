@@ -5,10 +5,11 @@ import runci.System.*;
 import runci.Config.*;
 
 class Cs {
+
 	static public function getCsDependencies() {
 		switch (systemName) {
 			case "Linux":
-				if (commandSucceed("mono", ["--version"]))
+				if (!isCi() && commandSucceed("mono", ["--version"]))
 					infoMsg('mono has already been installed.');
 				else
 					Linux.requireAptPackages(["mono-devel", "mono-mcs"]);
@@ -17,16 +18,10 @@ class Cs {
 				if (commandSucceed("mono", ["--version"]))
 					infoMsg('mono has already been installed.');
 				else
-					runCommand("brew", ["install", "mono"], true);
+					runNetworkCommand("brew", ["install", "mono"]);
 				runCommand("mono", ["--version"]);
 			case "Windows":
-				switch (ci) {
-					case AppVeyor:
-						addToPATH("C:\\Program Files (x86)\\Mono\\bin");
-						runCommand("mono", ["--version"]);
-					case _:
-						//pass
-				}
+				//pass
 		}
 
 		haxelibInstallGit("HaxeFoundation", "hxcs", true);
@@ -36,7 +31,7 @@ class Cs {
 		if (args == null) args = [];
 		exe = FileSystem.fullPath(exe);
 		switch (systemName) {
-			case "Linux", "Mac":
+			case "Linux" | "Mac":
 				runCommand("mono", [exe].concat(args));
 			case "Windows":
 				runCommand(exe, args);
@@ -46,26 +41,20 @@ class Cs {
 	static public function run(args:Array<String>) {
 		getCsDependencies();
 
-		var compl = switch [ci, systemName] {
-			case [TravisCI, "Linux"]:
-				"-travis";
-			case _:
-				"";
-		};
-
 		for (fastcast in      [[], ["-D", "fast_cast"]])
 		for (noroot in        [[], ["-D", "no_root"]])
 		for (erasegenerics in [[], ["-D", "erase_generics"]])
 		{
-			var extras = fastcast.concat(erasegenerics).concat(noroot);
-			runCommand("haxe", ['compile-cs$compl.hxml'].concat(extras));
+			final extras = fastcast.concat(erasegenerics).concat(noroot);
+			runCommand("haxe", ['compile-cs.hxml'].concat(extras).concat(args));
 			runCs("bin/cs/bin/TestMain-Debug.exe");
 
-			runCommand("haxe", ['compile-cs-unsafe$compl.hxml'].concat(extras));
+			runCommand("haxe", ['compile-cs-unsafe.hxml'].concat(extras).concat(args));
 			runCs("bin/cs_unsafe/bin/TestMain-Debug.exe");
 		}
 
-		runCommand("haxe", ['compile-cs$compl.hxml','-dce','no']);
+		runCommand("haxe", ['compile-cs.hxml','-dce','no'].concat(args));
 		runCs("bin/cs/bin/TestMain-Debug.exe");
+
 	}
 }
