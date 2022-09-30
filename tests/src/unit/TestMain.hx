@@ -69,7 +69,10 @@ function main() {
 		new ChaChaTest(),
 		new RC4Test(),
 		new SCryptTest(),
+		#if (!neko)
+		// neko bug https://github.com/HaxeFoundation/haxe/issues/10806
 		new Poly1305Test()
+		#end
 	];	
 	TestIssues.addIssueClasses("src/unit/issues", "unit.issues");
 	

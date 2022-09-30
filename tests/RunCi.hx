@@ -59,8 +59,7 @@ class RunCi {
 					case Macro:
 						runci.targets.Macro.run(args);
 					case Neko:
-						//runci.targets.Neko.run(args);
-						trace("Skip Neko --> Uncaught exception - load.c(398) : Invalid module : bin/unit.n");
+						runci.targets.Neko.run(args);
 					case Php:
 						runci.targets.Php.run(args);
 					case Python:
