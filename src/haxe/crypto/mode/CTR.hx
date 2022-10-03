@@ -6,14 +6,13 @@ class CTR
 {
     public static function encrypt( src : Bytes, iv : Bytes, blockSize : Int, encryptBlock : Bytes->Int->Bytes->Int->Void) : Void
     {
-        var vector:Bytes;
+        var vector:Bytes = Bytes.alloc(iv.length);
         var vkey : Bytes = iv.sub(0,iv.length); 
         var i : Int = 0;
         var len : Int = src.length;
         while (i < len)
         {
-            vector = vkey.sub(0,vkey.length);
-            encryptBlock(vector, 0, vector , 0);
+            encryptBlock(vkey, 0, vector , 0);
             var block:Int = (i+blockSize)>len?len-i:blockSize;
             for (j in 0...block)
             {
