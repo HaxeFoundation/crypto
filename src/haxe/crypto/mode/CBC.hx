@@ -6,20 +6,21 @@ class CBC
 {
     public static function encrypt( src : Bytes, iv : Bytes, blockSize : Int, encryptBlock : Bytes->Int->Bytes->Int->Void) : Void
     {
-	var vector = iv.sub(0,iv.length);
-	var i : Int = 0;
-	var len : Int = src.length;
-	while (i < len)
-	{
-		for (j in 0...blockSize)
+		var vector = iv.getData();
+		var i : Int = 0;
+		var len : Int = src.length;
+		var ivpos : Int = 0;
+		while (i < len)
 		{
-			src.set(i + j, src.get(i + j) ^ vector.get(j) );
+			for (j in 0...blockSize)
+			{
+				src.set(i + j, src.get(i + j) ^ Bytes.fastGet(vector, ivpos + j) );
+			}
+			encryptBlock(src, i, src , i);
+			ivpos = i;
+			vector = src.getData();
+			i += blockSize;
 		}
-		encryptBlock(src, i, src , i);
-
-		vector = src.sub(i,blockSize);
-		i += blockSize;
-	}
     }
 
     public static function decrypt( src : Bytes, iv : Bytes, blockSize : Int, decryptBlock : Bytes->Int->Bytes->Int->Void) : Void
