@@ -15,7 +15,7 @@ class CFB
             var block:Int = (i+blockSize)>len?len-i:blockSize;
             for (j in 0...block)
             {
-            src.set(i + j, src.get(i + j) ^ vector.get(j) );
+                src.set(i + j, src.get(i + j) ^ vector.get(j) );
             }
             vector = src.sub(i,block);
             i += blockSize;
@@ -28,16 +28,16 @@ class CFB
         var i : Int = 0;
         var len : Int = src.length;
         var chiperText : Bytes;
+		var vectorResult = Bytes.alloc(iv.length);
         while (i < len)
         {
-            decryptBlock(vector, 0, vector , 0);
+            decryptBlock(vector, 0, vectorResult , 0);
             var block:Int = (i+blockSize)>len?len-i:blockSize;
-            chiperText = src.sub(i,block);
+            vector = src.sub(i,block);
             for (j in 0...block)
             {
-                src.set(i + j, src.get(i + j) ^ vector.get(j) );
+                src.set(i + j, src.get(i + j) ^ vectorResult.get(j) );
             }
-            vector = chiperText.sub(0,chiperText.length);
             i += blockSize;
         }
     }
