@@ -9,18 +9,18 @@ class PCBC
         var vector = iv.sub(0,iv.length);
         var i : Int = 0;
         var len : Int = src.length;
+        var plainText:Bytes = Bytes.alloc(blockSize);
         while (i < len)
         {
-            var plainText = src.sub(i,blockSize);
             for (j in 0...blockSize)
             {
+                plainText.set(j, src.get(i + j));
                 src.set(i + j, src.get(i + j) ^ vector.get(j) );
             }
             encryptBlock(src, i, src , i);
-            vector = src.sub(i,blockSize);
             for (j in 0...blockSize)
             {
-                vector.set(j, vector.get(j) ^ plainText.get(j) );
+                vector.set(j, src.get(i + j) ^ plainText.get(j));
             }
             i += blockSize;
         }
@@ -31,16 +31,16 @@ class PCBC
         var vector = iv.sub(0,iv.length);
         var i : Int = 0;
         var len : Int = src.length;
+        var cipherText:Bytes = Bytes.alloc(blockSize);
         while (i < len)
         {
-            var cipherText = src.sub(i,blockSize);
+            for (j in 0...blockSize) {
+                cipherText.set(j, src.get(i + j));
+            }
             decryptBlock(src, i, src, i);
-            for (j in 0 ... blockSize) 
+            for (j in 0 ... blockSize) {
                 src.set(i + j, src.get(i + j) ^ vector.get(j));
-            vector = src.sub(i,blockSize);
-            for (j in 0...blockSize)
-            {
-                vector.set(j, vector.get(j) ^ cipherText.get(j) );
+                vector.set(j, src.get(i + j) ^ cipherText.get(j));
             }
             i += blockSize;
         }
