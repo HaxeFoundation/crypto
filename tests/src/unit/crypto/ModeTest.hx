@@ -58,15 +58,17 @@ class ModeTest extends Test
 
     private function  encryptBlock( src:Bytes, srcIndex:Int, dst:Bytes, dstIndex:Int):Void
     {
+      dst.blit(dstIndex,src,srcIndex,src.length);
     }
 
     private function  decryptBlock( src:Bytes, srcIndex:Int, dst:Bytes, dstIndex:Int):Void
     {
+      dst.blit(dstIndex,src,srcIndex,src.length);
     }
 
     private function test_encrypt():Void
     {
-		trace("Start mode encrypt ...");
+        trace("Start mode encrypt ...");
         var src:Bytes;
         var vector:Bytes;
         for(i in 0...plainText.length) 
@@ -96,7 +98,7 @@ class ModeTest extends Test
 
     private function test_decrypt():Void
     {
-		trace("Start mode decrypt ...");
+        trace("Start mode decrypt ...");
         var src:Bytes;
         var vector:Bytes;
         for(i in 0...plainText.length) 
