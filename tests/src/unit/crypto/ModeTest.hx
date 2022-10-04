@@ -58,12 +58,12 @@ class ModeTest extends Test
 
     private function  encryptBlock( src:Bytes, srcIndex:Int, dst:Bytes, dstIndex:Int):Void
     {
-      dst.blit(dstIndex,src,srcIndex,src.length);
+      dst.blit(dstIndex,src,srcIndex,src.length-srcIndex);
     }
 
     private function  decryptBlock( src:Bytes, srcIndex:Int, dst:Bytes, dstIndex:Int):Void
     {
-      dst.blit(dstIndex,src,srcIndex,src.length);
+      dst.blit(dstIndex,src,srcIndex,src.length-srcIndex);
     }
 
     private function test_encrypt():Void
