@@ -50,8 +50,9 @@ Using this library on Haxe 3 with `-lib crypto` will overload the `haxe.crypto` 
 
 ### Usage
 
- #### AES Encryption
- ```haxe
+#### AES Encryption
+
+```haxe
    var aes : Aes = new Aes();
    
    var key = Bytes.ofHex("603DEB1015CA71BE2B73AEF0857D77811F352C073B6108D72D9810A30914DFF4");
@@ -67,10 +68,11 @@ Using this library on Haxe 3 with `-lib crypto` will overload the `haxe.crypto` 
    // Decrypt
    data = aes.decrypt(Mode.CTR,data,Padding.NoPadding);
    trace("Decrypted text: "+ data);
- ```
- 
-  #### Blowfish
- ```haxe
+```
+
+#### Blowfish
+
+```haxe
    var blowFish  : BlowFish = new BlowFish();
    
    var key = Bytes.ofHex("E0FEE0FEF1FEF1FE");
@@ -86,10 +88,11 @@ Using this library on Haxe 3 with `-lib crypto` will overload the `haxe.crypto` 
    // Decrypt
    data = blowFish.decrypt(Mode.PCBC,data,Padding.PKCS7);
    trace("Decrypted text: "+ data);
- ```
- 
-   #### Twofish
- ```haxe
+```
+
+#### Twofish
+
+```haxe
    var twoFish  : TwoFish = new TwoFish();
    
    var key = Bytes.ofHex("ff08e2dcca459835ac30c39548ae848157ba5fdcc8e4977efc26c0d1cc7a25cb");
@@ -104,10 +107,11 @@ Using this library on Haxe 3 with `-lib crypto` will overload the `haxe.crypto` 
    // Decrypt
    data = twoFish.decrypt(Mode.ECB,data,Padding.NoPadding);
    trace("Decrypted text: "+ data.toHex());
- ```
- 
-  #### Triple DES / 3Des
- ```haxe
+```
+
+#### Triple DES / 3Des
+
+```haxe
    var tdes : TripleDes = new TripleDes();
    
    var key = Bytes.ofHex("2BD6459F82C5B300952C49104881FF482BD6459F82C5B300");
@@ -123,10 +127,11 @@ Using this library on Haxe 3 with `-lib crypto` will overload the `haxe.crypto` 
    // Decrypt
    data = tdes.decrypt(Mode.OFB,data,Padding.NoPadding);
    trace("Decrypted text: "+ data);
- ```
-  
-  ####  DES 
- ```haxe
+```
+
+####  DES
+
+```haxe
    var des:Des = new Des();
    
    var key = Bytes.ofHex("9816854577667254");
@@ -142,10 +147,11 @@ Using this library on Haxe 3 with `-lib crypto` will overload the `haxe.crypto` 
    // Decrypt
    data = des.decrypt(Mode.CTR,data,Padding.NoPadding);
    trace("Decrypted text: "+ data);
- ```
- 
-  #### BCrypt
-   ```haxe
+```
+
+#### BCrypt
+
+```haxe
    var salt = BCrypt.generateSalt(10,BCrypt.Revision2B); // Example: $2b$10$xB5TcOrSHD2quBMES0W8aO
     
    var dataText = BCrypt.encode("Haxe - The Cross-platform Toolkit",salt);
@@ -153,10 +159,11 @@ Using this library on Haxe 3 with `-lib crypto` will overload the `haxe.crypto` 
    
    var match = BCrypt.verify("Haxe - The Cross-platform Toolkit",dataText);
    trace("Match: "+match);
-   ```
- 
-  #### Hmac with MD5 / SHA1 / SHA224 / SHA256 / SHA384 / SHA512
- ```haxe
+```
+
+#### Hmac with MD5 / SHA1 / SHA224 / SHA256 / SHA384 / SHA512
+
+```haxe
    var hmacMd5 = new Hmac(MD5);
    var hmacSha1 = new Hmac(SHA1);
    var hmacSha224 = new Hmac(SHA224);
@@ -184,10 +191,11 @@ Using this library on Haxe 3 with `-lib crypto` will overload the `haxe.crypto` 
    
    data = hmacSha512.make(key,text);
    trace("HMac Sha512: "+data.toHex());
- ```
- 
-   #### SHA224
-   ```haxe
+```
+
+#### SHA224
+
+```haxe
    var text = Bytes.ofString("Haxe - The Cross-platform Toolkit");
     
    var dataText = Sha224.encode("Haxe - The Cross-platform Toolkit");
@@ -195,10 +203,11 @@ Using this library on Haxe 3 with `-lib crypto` will overload the `haxe.crypto` 
    
    var dataBytes = Sha224.make(text);
    trace("Sha224: "+dataBytes.toHex());
-   ```
-   
-   #### SHA256
-   ```haxe
+```
+
+#### SHA256
+
+```haxe
    var text = Bytes.ofString("Haxe - The Cross-platform Toolkit");
     
    var dataText = Sha256.encode("Haxe - The Cross-platform Toolkit");
@@ -206,10 +215,11 @@ Using this library on Haxe 3 with `-lib crypto` will overload the `haxe.crypto` 
    
    var dataBytes = Sha256.make(text);
    trace("Sha256: "+dataBytes.toHex());
-   ```
-   
-   #### SHA384
-   ```haxe
+```
+
+#### SHA384
+
+```haxe
    var text = Bytes.ofString("Haxe - The Cross-platform Toolkit");
     
    var dataText = Sha384.encode("Haxe - The Cross-platform Toolkit");
@@ -217,10 +227,11 @@ Using this library on Haxe 3 with `-lib crypto` will overload the `haxe.crypto` 
    
    var dataBytes = Sha384.make(text);
    trace("Sha384: "+dataBytes.toHex());
-   ```
-   
-   #### SHA512
-   ```haxe
+```
+
+#### SHA512
+
+```haxe
    var text = Bytes.ofString("Haxe - The Cross-platform Toolkit");
     
    var dataText = Sha512.encode("Haxe - The Cross-platform Toolkit");
@@ -228,10 +239,11 @@ Using this library on Haxe 3 with `-lib crypto` will overload the `haxe.crypto` 
    
    var dataBytes = Sha512.make(text);
    trace("Sha512: "+dataBytes.toHex());
-   ```
+```
 
-   #### Ripemd-160
-   ```haxe
+#### Ripemd-160
+
+```haxe
    var text = Bytes.ofString("Haxe - The Cross-platform Toolkit");
    
    var rpmd = Ripemd160.encode("Haxe - The Cross-platform Toolkit");
@@ -244,10 +256,11 @@ Using this library on Haxe 3 with `-lib crypto` will overload the `haxe.crypto` 
    rpmd.addBytes(text,0,text.length);
    var rdata = rpmd.finish();
    trace("Ripemd-160: "+rdata.toHex());
-   ```
-   
-   #### PBKDF2
-   ```haxe
+```
+
+#### PBKDF2
+
+```haxe
    var text = Bytes.ofString("Haxe - The Cross-platform Toolkit");
    var salt = Bytes.ofString("salt");
    
@@ -255,10 +268,11 @@ Using this library on Haxe 3 with `-lib crypto` will overload the `haxe.crypto` 
    var pbkdf2 : Pbkdf2 = new Pbkdf2(SHA1);
    var data = pbkdf2.encode(text,salt,4096,20);
    trace("PBKDF2: "+data.toHex());
-   ```
- 
-   #### Salsa20
-   ```haxe
+```
+
+#### Salsa20
+
+```haxe
    var key = Sha256.make(Bytes.ofString("secret key"));
    var nonce = Bytes.ofHex("288FF65DC42B92F9");
    var msg = Bytes.ofString("Haxe - The Cross-platform Toolkit");
@@ -279,10 +293,11 @@ Using this library on Haxe 3 with `-lib crypto` will overload the `haxe.crypto` 
    salsa.seek(0);
    plainData = salsa.decrypt(data);
    trace("Salsa20 decrypt ( with seek position ) : "+ plainData.toString());
-   ``` 
-   
-   #### XSalsa20
-   ```haxe
+``` 
+
+#### XSalsa20
+
+```haxe
    var key = Sha256.make(Bytes.ofString("secret key"));
    var nonce = Bytes.ofHex("9E645A74E9E0A60D8243ACD9177AB51A1BEB8D5A2F5D700C");
    var msg = Bytes.ofString("Haxe - The Cross-platform Toolkit");
@@ -295,10 +310,11 @@ Using this library on Haxe 3 with `-lib crypto` will overload the `haxe.crypto` 
    xsalsaDecrypt.init(key,nonce);
    var plainData = xsalsaDecrypt.decrypt(data);
    trace("XSalsa20 decrypt: "+ plainData.toString());
-   ```   
-   
-   #### ChaCha
-   ```haxe
+```
+
+#### ChaCha
+
+```haxe
    var key = Sha256.make(Bytes.ofString("secret key"));
    var nonce = Bytes.ofHex("0F1E2D3C4B596877");
    var msg = Bytes.ofString("Haxe - The Cross-platform Toolkit");
@@ -311,10 +327,11 @@ Using this library on Haxe 3 with `-lib crypto` will overload the `haxe.crypto` 
    chaChaDecrypt.init(key,nonce);
    var plainData = chaChaDecrypt.decrypt(data);
    trace("ChaCha decrypt: "+ plainData.toString());
-   ```
-   
-   #### RC4 ( ARC4 )
-   ```haxe
+```
+
+#### RC4 ( ARC4 )
+
+```haxe
    var key = Bytes.ofHex("a99c5476d5e5d61d425c01fa29632171");
    var msg = Bytes.ofString("Haxe - The Cross-platform Toolkit");
    var rc4 = new RC4();
@@ -325,19 +342,21 @@ Using this library on Haxe 3 with `-lib crypto` will overload the `haxe.crypto` 
    rc4.init(key);
    var plainData = rc4.decrypt(data);
    trace("RC4 decrypt: "+ plainData.toString());
-   ```
-   
-   #### SCrypt
-   ```haxe
+```
+
+#### SCrypt
+
+```haxe
    var salt = Bytes.ofHex("536F6469756D43686C6F72696465");
    var password = Bytes.ofString("Haxe - The Cross-platform Toolkit");
    var scrypt:SCrypt = new SCrypt();
    var data = scrypt.hash(password, salt, 1024, 8, 1, 64);
    trace("SCrypt hash: "+data.toHex());
-   ```
+```
 
-   #### Poly1305
-   ```haxe
+#### Poly1305
+
+```haxe
    var key = Sha256.make(Bytes.ofString("secret key")); //32 bytes key
    var msg = Bytes.ofString("Haxe - The Cross-platform Toolkit");
   
@@ -357,5 +376,4 @@ Using this library on Haxe 3 with `-lib crypto` will overload the `haxe.crypto` 
    poly1305.update(msg, 0, msg.length);
    var data = poly1305.finish();
    trace("Poly1305 encrypt: "+ data.toHex());
-   ```   
-   
+```
