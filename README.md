@@ -1,4 +1,6 @@
-# Crypto
+<p align="center">
+  <img src="CryptoLogo.png" />
+</p>
 <a href="https://github.com/HaxeFoundation/crypto/actions"><img src="https://github.com/HaxeFoundation/crypto/workflows/CI/badge.svg" alt="GitHub Build Status"></a>
 
 Cross platform cryptographic functions for Haxe 4 and 3
