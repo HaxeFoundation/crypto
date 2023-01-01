@@ -12,30 +12,29 @@ class Murmur1Test extends Test
 	    trace("Murmur1 started...");
         var time = Timer.stamp();
 		
-		eq(Murmur1.hash(sb("Haxe is great!")),2449855428);
-		eq(Murmur1.hash(sb("Haxe is an open source high-level strictly-typed programming language with a fast optimizing cross-compiler."),0),714747852);
-		eq(Murmur1.hash(sb("Haxe is an open source high-level strictly-typed programming language with a fast optimizing cross-compiler."),25),595057428);
-		eq(Murmur1.hash(sb("Haxe is an open source high-level strictly-typed programming language with a fast optimizing cross-compiler."),128),3222482434);
-		eq(Murmur1.hash(sb("Haxe can build cross-platform applications.")),1292946927	);
-		eq(Murmur1.hash(sb("")),0);
-		eq(Murmur1.hash(sb("0")),1848692858);
-		eq(Murmur1.hash(sb("01")),101741802	);
-		eq(Murmur1.hash(sb("012")),562965270);
-		eq(Murmur1.hash(sb("0123")),3819071861);
-		eq(Murmur1.hash(sb("01234")),3944409);
-		eq(Murmur1.hash(sb("012345")),2155193631);
-		eq(Murmur1.hash(sb("0123456")),1865278280);
-		eq(Murmur1.hash(sb("01234567")),1775700561);
-		eq(Murmur1.hash(sb("012345678")),591739721);
-		eq(Murmur1.hash(sb("0123456789")),3910874116);
-		eq(Murmur1.hash(sb("0123456789a")),4271325040);
-		eq(Murmur1.hash(sb("0123456789ab")),1322551924);
-		eq(Murmur1.hash(sb("0123456789abc")),1209254348);
-		eq(Murmur1.hash(sb("0123456789abcd")),2870758001);
-		eq(Murmur1.hash(sb("0123456789abcde")),1816712782);
-		eq(Murmur1.hash(sb("0123456789abcdef")),3967912037);
-		eq(Murmur1.hash(sb(""),1),2405076323);
-		
+		eq(hex(Murmur1.hash(sb("Haxe is great!"))),"9205D3C4");
+		eq(hex(Murmur1.hash(sb("Haxe is an open source high-level strictly-typed programming language with a fast optimizing cross-compiler."),0)),"2A9A2FCC");
+		eq(hex(Murmur1.hash(sb("Haxe is an open source high-level strictly-typed programming language with a fast optimizing cross-compiler."),25)),"2377DB14");
+		eq(hex(Murmur1.hash(sb("Haxe is an open source high-level strictly-typed programming language with a fast optimizing cross-compiler."),128)),"C0132E02");
+		eq(hex(Murmur1.hash(sb("Haxe can build cross-platform applications."))),"4D10CDEF");
+		eq(hex(Murmur1.hash(sb(""))),"00000000");
+		eq(hex(Murmur1.hash(sb("0"))),"6E30D07A");
+		eq(hex(Murmur1.hash(sb("01"))),"061074EA");
+		eq(hex(Murmur1.hash(sb("012"))),"218E2B16");
+		eq(hex(Murmur1.hash(sb("0123"))),"E3A26975");
+		eq(hex(Murmur1.hash(sb("01234"))),"003C2FD9");
+		eq(hex(Murmur1.hash(sb("012345"))),"8075A51F");
+		eq(hex(Murmur1.hash(sb("0123456"))),"6F2DE348");
+		eq(hex(Murmur1.hash(sb("01234567"))),"69D70A51");
+		eq(hex(Murmur1.hash(sb("012345678"))),"23453B49");
+		eq(hex(Murmur1.hash(sb("0123456789"))),"E91B3404");
+		eq(hex(Murmur1.hash(sb("0123456789a"))),"FE973F70");
+		eq(hex(Murmur1.hash(sb("0123456789ab"))),"4ED48A74");
+		eq(hex(Murmur1.hash(sb("0123456789abc"))),"4813C1CC");
+		eq(hex(Murmur1.hash(sb("0123456789abcd"))),"AB1C4A71");
+		eq(hex(Murmur1.hash(sb("0123456789abcde"))),"6C48D64E");
+		eq(hex(Murmur1.hash(sb("0123456789abcdef"))),"EC818865");
+		eq(hex(Murmur1.hash(sb(""),1)),"8F5A8D63");
 		
 		time = Timer.stamp()-time;
         trace("Finished : "+time+" seconds");
@@ -44,5 +43,10 @@ class Murmur1Test extends Test
 	public function sb(s:String):Bytes
 	{
 		return Bytes.ofString(s);
+	}
+	
+	public function hex(v:UInt):String
+	{
+		return StringTools.hex(v,8);
 	}
 }

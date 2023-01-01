@@ -26,7 +26,7 @@ class Murmur3 {
 		this.reset(seed);
 	}
 
-	public function reset(seed:Int):Murmur3 
+	public function reset(seed:Int=0):Murmur3 
     {
 		this.seed = seed;
 		h1 = seed;
