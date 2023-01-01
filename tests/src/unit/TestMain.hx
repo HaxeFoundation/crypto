@@ -69,6 +69,9 @@ function main() {
 		new ChaChaTest(),
 		new RC4Test(),
 		new SCryptTest(),
+		new Murmur1Test(),
+		new Murmur2Test(),
+		new Murmur3Test(),
 		#if (!neko)
 		// neko bug https://github.com/HaxeFoundation/haxe/issues/10806
 		new Poly1305Test()
