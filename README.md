@@ -14,25 +14,28 @@ Using this library on Haxe 3 with `-lib crypto` will overload the `haxe.crypto` 
 
 ### Supported algorithms
 
-  * Aes
-  * Blowfish
-  * Twofish
-  * TripleDes
-  * Des 
-  * BCrypt
-  * Hmac
-  * Sha224
-  * Sha256
-  * Sha384
-  * Sha512
-  * Ripemd-160
-  * PBKDF2
-  * Salsa20
-  * XSalsa20
-  * ChaCha
-  * RC4
-  * SCrypt
-  * Poly1305
+  * [`Aes`](#aes-encryption)
+  * [`Blowfish`](#blowfish)
+  * [`Twofish`](#twofish)
+  * [`TripleDes`](#triple-des--3des)
+  * [`Des`](#des)
+  * [`BCrypt`](#bcrypt)
+  * [`Hmac`](#hmac-with-md5--sha1--sha224--sha256--sha384--sha512)
+  * [`Sha224`](#sha224)
+  * [`Sha256`](#sha256)
+  * [`Sha384`](#sha384)
+  * [`Sha512`](#sha512)
+  * [`Ripemd-160`](#ripemd-160)
+  * [`PBKDF2`](#pbkdf2)
+  * [`Salsa20`](#salsa20)
+  * [`XSalsa20`](#xsalsa20)
+  * [`ChaCha`](#chacha)
+  * [`RC4`](#rc4--arc4-)
+  * [`SCrypt`](#scrypt)
+  * [`Poly1305`](#poly1305)
+  * Murmur1 (32-bit)
+  * Murmur2 (32-bit/64-bit)
+  * Murmur3 (32-bit/128-bit(x86)/128-bit(x64) and incremental implementation 32-bit)
    
 ### Block cipher mode of operation
   * ECB
@@ -380,4 +383,9 @@ Using this library on Haxe 3 with `-lib crypto` will overload the `haxe.crypto` 
    poly1305.update(msg, 0, msg.length);
    var data = poly1305.finish();
    trace("Poly1305 encrypt: "+ data.toHex());
+```
+
+#### Murmur hash
+
+```haxe
 ```
