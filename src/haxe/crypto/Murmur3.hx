@@ -412,11 +412,11 @@ class Murmur3 {
 
 	private static inline function fmix32(k:UInt):UInt 
     {
-		k ^= (k >> 16);
+		k ^= (k >>> 16);
 		k = (k * 0x85ebca6b);
-		k ^= (k >> 13);
+		k ^= (k >>> 13);
 		k = (k * 0xc2b2ae35);
-		k ^= (k >> 16);
+		k ^= (k >>> 16);
 		return k;
 	}
 
