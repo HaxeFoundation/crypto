@@ -4,7 +4,7 @@ import unit.Test;
 import haxe.Timer;
 import haxe.crypto.Murmur3;
 
-class Murmur3 extends Test
+class Murmur3Test extends Test
 {
 	public function test():Void
     {
