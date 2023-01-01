@@ -2,6 +2,7 @@ package unit.crypto;
 
 import unit.Test;
 import haxe.Timer;
+import haxe.io.Bytes;
 import haxe.crypto.Murmur1;
 
 class Murmur1Test extends Test

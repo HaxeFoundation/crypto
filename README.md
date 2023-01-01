@@ -33,9 +33,10 @@ Using this library on Haxe 3 with `-lib crypto` will overload the `haxe.crypto` 
   * [`RC4`](#rc4--arc4-)
   * [`SCrypt`](#scrypt)
   * [`Poly1305`](#poly1305)
-  * Murmur1 (32-bit)
-  * Murmur2 (32-bit/64-bit)
-  * Murmur3 (32-bit/128-bit(x86)/128-bit(x64) and incremental implementation 32-bit)
+  * [`Murmur Hash`](#murmur-hash)
+    * Murmur1 (32-bit)
+    * Murmur2 (32-bit/64-bit)
+    * Murmur3 (32-bit/128-bit(x86)/128-bit(x64) and incremental implementation 32-bit)
    
 ### Block cipher mode of operation
   * ECB
@@ -385,7 +386,7 @@ Using this library on Haxe 3 with `-lib crypto` will overload the `haxe.crypto` 
    trace("Poly1305 encrypt: "+ data.toHex());
 ```
 
-#### Murmur hash
+#### Murmur Hash
 
 ```haxe
 ```
