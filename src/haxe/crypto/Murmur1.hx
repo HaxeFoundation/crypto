@@ -4,17 +4,13 @@ import haxe.Int64;
 import haxe.io.Bytes;
 
 class Murmur1 {
-	inline static final UNSIGNED_MASK:Int = 0xFF;
-	inline static final UINT_MASK:Int = 0xFFFFFFFF;
-	static final LONG_MASK:Int64 = Int64.make(0xFFFFFFFF, 0xFFFFFFFF);
-	inline static final m:Int = 0xc6a4a793;
-	inline static final r:Int = 16;
+	inline static final m:Int32 = 0xc6a4a793;
 
 	public function new() {}
 
 	public static function hash(b:haxe.io.Bytes, seed:Int = 0):UInt {
 		var length = b.length;
-		var h:UInt = seed ^ (length * m);
+		var h:Int32 = seed ^ (length * m);
 		var quarterLength = length >> 2;
 		for (i in 0...quarterLength) {
 			var pos = i << 2;
@@ -24,7 +20,7 @@ class Murmur1 {
 			k |= b.get(pos + 3) << 24;
 			h += k;
 			h *= m;
-			h ^= h >> 16;
+			h ^= h >>> 16;
 		}
 		var offset = quarterLength << 2;
 		var rlen = length & 3;
@@ -37,12 +33,12 @@ class Murmur1 {
 		if (rlen >= 1) {
 			h += b.get(offset);
 			h *= m;
-			h ^= (h >> r);
+			h ^= (h >>> 16);
 		}
 		h *= m;
-		h ^= h >> 10;
+		h ^= h >>> 10;
 		h *= m;
-		h ^= h >> 17;
+		h ^= h >>> 17;
 		return h;
 	}
 }

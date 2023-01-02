@@ -5,8 +5,8 @@ import haxe.io.Bytes;
 import haxe.Int64;
 
 class Murmur3 {
-	private static final C1_32:Int = 0xcc9e2d51;
-	private static final C2_32:Int = 0x1b873593;
+	private static final C1_32:Int32 = 0xcc9e2d51;
+	private static final C2_32:Int32 = 0x1b873593;
 	private static final C1_128_x64:Int64 = Int64.make(0x87c37b91, 0x114253d5);
 	private static final C2_128_x64:Int64 = Int64.make(0x4cf5ad43, 0x2745937f);
 	private static final C1_128_x86:Int = 0x239b961b;
@@ -120,11 +120,11 @@ class Murmur3 {
 		return h;
 	}
 
-	public static function hash(b:Bytes, seed:Int = 0):UInt 
+	public static function hash(b:Bytes, seed:Int32 = 0):UInt 
     {
 		var length = b.length;
 		var nblocks = length >> 2;
-		var h:UInt = seed;
+		var h:Int32 = seed;
 		for (i in 0...nblocks) {
 			var pos:Int = i << 2;
 			var k:Int32 = b.get(pos);
@@ -255,7 +255,7 @@ class Murmur3 {
 		return result;
 	}
 
-	public static function hash128_x86(b:haxe.io.Bytes, seed:Int = 0):String 
+	public static function hash128_x86(b:haxe.io.Bytes, seed:Int32 = 0):String 
     {
 		var length = b.length;
 		var h1 = seed;
@@ -311,7 +311,7 @@ class Murmur3 {
 		}
 
 		if (blen > 0) {
-			var k1 = 0, k2 = 0, k3 = 0, k4 = 0;
+			var k1:Int32 = 0, k2:Int32 = 0, k3:Int32 = 0, k4:Int32 = 0;
 			var mpos:Int = length - blen;
 			if (blen == 15) {
 				k4 ^= b.get(mpos + 14) << 16;
@@ -410,7 +410,7 @@ class Murmur3 {
 		return ((k << shift) | (k >>> (32 - shift)));
 	}
 
-	private static inline function fmix32(k:UInt):UInt 
+	private static inline function fmix32(k:Int32):Int32 
     {
 		k ^= (k >>> 16);
 		k = (k * 0x85ebca6b);

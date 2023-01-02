@@ -3,11 +3,7 @@ package haxe.crypto;
 import haxe.Int64;
 
 class Murmur2 {
-	inline static final UNSIGNED_MASK:Int = 0xFF;
-	inline static final UINT_MASK:Int = 0xFFFFFFFF;
-	static final LONG_MASK:Int64 = Int64.make(0xFFFFFFFF, 0xFFFFFFFF);
-
-	inline static final m:Int = 0x5bd1e995;
+	inline static final m:Int32 = 0x5bd1e995;
 	inline static final r:Int = 24;
 	static final m64:Int64 = Int64.make(0xc6a4a793, 0x5bd1e995);
 	inline static final r64:Int = 47;
@@ -17,7 +13,7 @@ class Murmur2 {
 	public static function hash(b:haxe.io.Bytes, seed:Int = 0):UInt 
     {
 		var length = b.length;
-		var h:Int = seed ^ length;
+		var h:Int32 = seed ^ length;
 		var length4 = length >>> 2;
 		for (i in 0...length4) {
 			var i4 = i << 2;
