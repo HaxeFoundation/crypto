@@ -1,5 +1,9 @@
-# Crypto
+<p align="center">
+  <img src="https://raw.githubusercontent.com/HaxeFoundation/crypto/master/CryptoLogo.png" />
+</p>
+<p align="center">
 <a href="https://github.com/HaxeFoundation/crypto/actions"><img src="https://github.com/HaxeFoundation/crypto/workflows/CI/badge.svg" alt="GitHub Build Status"></a>
+</p>
 
 Cross platform cryptographic functions for Haxe 4 and 3
 
@@ -10,25 +14,25 @@ Using this library on Haxe 3 with `-lib crypto` will overload the `haxe.crypto` 
 
 ### Supported algorithms
 
-  * Aes
-  * Blowfish
-  * Twofish
-  * TripleDes
-  * Des 
-  * BCrypt
-  * Hmac
-  * Sha224
-  * Sha256
-  * Sha384
-  * Sha512
-  * Ripemd-160
-  * PBKDF2
-  * Salsa20
-  * XSalsa20
-  * ChaCha
-  * RC4
-  * SCrypt
-  * Poly1305
+  * [`Aes`](#aes-encryption)
+  * [`Blowfish`](#blowfish)
+  * [`Twofish`](#twofish)
+  * [`TripleDes`](#triple-des--3des)
+  * [`Des`](#des)
+  * [`BCrypt`](#bcrypt)
+  * [`Hmac`](#hmac-with-md5--sha1--sha224--sha256--sha384--sha512)
+  * [`Sha224`](#sha224)
+  * [`Sha256`](#sha256)
+  * [`Sha384`](#sha384)
+  * [`Sha512`](#sha512)
+  * [`Ripemd-160`](#ripemd-160)
+  * [`PBKDF2`](#pbkdf2)
+  * [`Salsa20`](#salsa20)
+  * [`XSalsa20`](#xsalsa20)
+  * [`ChaCha`](#chacha)
+  * [`RC4`](#rc4--arc4-)
+  * [`SCrypt`](#scrypt)
+  * [`Poly1305`](#poly1305)
    
 ### Block cipher mode of operation
   * ECB
