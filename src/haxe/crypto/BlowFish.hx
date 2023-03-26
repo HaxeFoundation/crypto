@@ -298,6 +298,11 @@ class BlowFish
 
         var keyLength = key.length;
         var keyIndex = 0;
+	    
+        if (key.length < 4 || key.length > 56)
+        {
+            throw "Key length must be between 32 bits and 448 bits";
+        }
 
         for (i in 0...P_SZ)
         {
