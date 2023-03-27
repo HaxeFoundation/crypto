@@ -5,6 +5,27 @@ import haxe.io.Bytes;
 
 class ChaCha extends Salsa20
 {
+	private var nonceLength:Int;
+
+	override public function init(key:Bytes, nonce:Bytes):Void
+	{
+		nonceLength = nonce.length;
+	
+		if (nonce == null || (nonceLength != 8 && nonceLength != 12))
+			throw "Nonce must be exactly 8 or 12 bytes";
+		if (key == null)
+			throw "Key must be 16 or 32 bytes";
+		if (key.length != 16 && key.length != 32)
+			throw "Wrong key size";
+		if ( nonceLength == 12 && key.length != 32)
+			throw "Key must be 32 bytes for nonce length of 12 bytes";
+		
+		setConstant(key);
+		setNonce(nonce);
+		setKey(key);
+		reset();
+	}
+	
 	override private function setConstant(key:Bytes):Void
 	{
 		var sigmaOffset:Int =  (key.length == 16)?0:4;
@@ -17,13 +38,15 @@ class ChaCha extends Salsa20
 	override public function resetCounter():Void
 	{
 		counter = 0;
-		state[12] = state[13] = 0;
+		state[12] = 0;
+		if ( nonceLength == 8 ) state[13] = 0;
 	}
 
 	override private function updateCounterState():Void
 	{
+		if ( nonceLength == 12 && ( counter.high > 0 )) throw "Increase of counter past 2^32";
 		state[12] = counter.low;
-		state[13] = counter.high;
+		if ( nonceLength == 8 ) state[13] = counter.high;
 	}
 
 	override public function setKey(key:Bytes):Void
@@ -42,8 +65,14 @@ class ChaCha extends Salsa20
 
 	override public function setNonce(nonce:Bytes):Void
 	{
-		state[14] = bytesToInt32(nonce,0);
-		state[15] = bytesToInt32(nonce,4);
+		if ( nonce.length == 8 ) {
+			state[14] = bytesToInt32(nonce, 0);
+			state[15] = bytesToInt32(nonce, 4);
+		} else {
+			state[13] = bytesToInt32(nonce, 0);
+			state[14] = bytesToInt32(nonce, 4);
+			state[15] = bytesToInt32(nonce, 8);
+		}
 	}
 
 	override public function generateBlock(input:Vector<Int>, output:Vector<Int>, rounds:Int = 20, offset:Int = 0):Void 
