@@ -9,7 +9,12 @@ class ChaCha extends Salsa20
 
 	override public function init(key:Bytes, nonce:Bytes):Void
 	{
-		if (nonce == null || (nonceLength != 8 && nonceLength != 12))
+		if (nonce == null)
+			throw "A nonce cannot be null";
+		
+		nonceLength = nonce.length;
+		
+		if (nonceLength != 8 && nonceLength != 12)
 			throw "Nonce must be exactly 8 or 12 bytes";
 		if (key == null)
 			throw "Key must be 16 or 32 bytes";
@@ -18,7 +23,6 @@ class ChaCha extends Salsa20
 		if ( nonceLength == 12 && key.length != 32)
 			throw "Key must be 32 bytes for nonce length of 12 bytes";
 			
-		nonceLength = nonce.length;
 		
 		setConstant(key);
 		setNonce(nonce);
