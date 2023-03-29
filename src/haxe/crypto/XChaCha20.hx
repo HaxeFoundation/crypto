@@ -3,7 +3,7 @@ package haxe.crypto;
 import haxe.ds.Vector;
 import haxe.io.Bytes;
 
-class XChaCha20 extends ChaCha20 {
+class XChaCha20 extends ChaCha {
 	override public function init(key:Bytes, nonce:Bytes,?counter:Int64):Void {
 		if (nonce == null || nonce.length < 16)
 			throw "Nonce must be at least 16 bytes";

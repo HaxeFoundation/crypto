@@ -3,7 +3,7 @@ package haxe.crypto;
 import haxe.ds.Vector;
 import haxe.io.Bytes;
 
-class ChaCha20 extends Salsa20
+class ChaCha extends Salsa20
 {
 	private var nonceLength:Int;
 
