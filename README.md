@@ -64,7 +64,7 @@ When using this library please keep the following in mind:
 - Be careful about the source from which you download the library.
 - Use "native" functionality where possible. This can be critical when dealing with performance and security.
 - Understand possible attacks against cryptographic systems. For instance side channel and timing attacks may be possible due to the difficulty in implementing constant time algorithms in different algorithms and for different targets.
-- Certain features within this library may have a lower vulnerability to attacks, with particular regard to data format manipulation or those features that do not play a role in communication
+- Certain features within this library may have a lower vulnerability to attacks, this could includes features that deal with data format manipulation or those features that do not play a role in communication.
 
 ### Usage
 
