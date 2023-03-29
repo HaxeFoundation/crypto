@@ -49,12 +49,14 @@ class ChaCha extends Salsa20
 
 	override private function updateCounterState():Void
 	{
-		// Recreate the same behaviour as Botan and libsodium libs .  RFC 7539 does not say what should happen for counter - 0xfffffffe
+		//  RFC 7539 does not say what should happen for counter - 0xfffffffe
 		// ChaChaTLS uses one 32-bit word for a block counter
-		//if ( nonceLength == 12 && ( counter.high > 0 )) throw "Increase of counter past 2^32";
+		if ( nonceLength == 12 && ( counter.high > 0 ))  {
+			counter = 0; // Match with Java11 ChaCha20 implementation
+			//throw "Increase of counter past 2^32";
+		}
 		state[12] = counter.low;
-		//if ( nonceLength == 8 ) state[13] = counter.high;
-		state[13] = counter.high;
+		if ( nonceLength == 8 ) state[13] = counter.high;
 	}
 
 	override public function setKey(key:Bytes):Void
