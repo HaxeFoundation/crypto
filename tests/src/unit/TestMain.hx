@@ -66,7 +66,7 @@ function main() {
 		new Sha512Test(),
 		new Salsa20Test(),
 		new XSalsa20Test(),
-		new ChaChaTest(),
+		new ChaCha20Test(),
 		new RC4Test(),
 		new SCryptTest(),
 		new XChaCha20Test(),

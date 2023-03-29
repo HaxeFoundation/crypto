@@ -3,11 +3,11 @@ package haxe.crypto;
 import haxe.ds.Vector;
 import haxe.io.Bytes;
 
-class ChaCha extends Salsa20
+class ChaCha20 extends Salsa20
 {
 	private var nonceLength:Int;
 
-	override public function init(key:Bytes, nonce:Bytes):Void
+	override public function init(key:Bytes, nonce:Bytes,?counter:Int64):Void
 	{
 		if (nonce == null)
 			throw "A nonce cannot be null";
@@ -28,6 +28,7 @@ class ChaCha extends Salsa20
 		setNonce(nonce);
 		setKey(key);
 		reset();
+		if (counter != null ) setCounter(counter);
 	}
 	
 	override private function setConstant(key:Bytes):Void

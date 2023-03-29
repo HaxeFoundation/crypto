@@ -26,7 +26,7 @@ class Salsa20 {
 		this.rounds = rounds;
 	}
 
-	public function init(key:Bytes,nonce:Bytes):Void
+	public function init(key:Bytes,nonce:Bytes,?counter:Int64):Void
 	{
 		if ( nonce == null || nonce.length != 8 ) 
 			throw "Nonce must be exactly 8 bytes";
@@ -39,6 +39,7 @@ class Salsa20 {
 		setNonce(nonce);
 		setKey(key);
 		reset();
+		if (counter != null ) setCounter(counter);
 	}
 
 	private function setConstant(key:Bytes):Void
@@ -151,6 +152,14 @@ class Salsa20 {
 	public function getCounter():Int64
 	{
 		return counter;
+	}
+	
+	public function setCounter(counter:Int64):Void
+	{
+		index = 0;
+		this.counter = counter;
+		updateCounterState();
+		generateExpandBlock();
 	}
 
 	public function encrypt(data:Bytes, rounds:Int = 20):Bytes 

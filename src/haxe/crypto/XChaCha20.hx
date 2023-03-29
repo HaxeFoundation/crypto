@@ -3,8 +3,8 @@ package haxe.crypto;
 import haxe.ds.Vector;
 import haxe.io.Bytes;
 
-class XChaCha20 extends ChaCha {
-	override public function init(key:Bytes, nonce:Bytes):Void {
+class XChaCha20 extends ChaCha20 {
+	override public function init(key:Bytes, nonce:Bytes,?counter:Int64):Void {
 		if (nonce == null || nonce.length < 16)
 			throw "Nonce must be at least 16 bytes";
 		if (key == null || key.length != 32)
@@ -22,6 +22,7 @@ class XChaCha20 extends ChaCha {
 		state[15] = bytesToInt32(nonce, 20);
 
 		reset();
+		if (counter != null ) setCounter(counter);
 	}
 
 	private function getSubKey(key:Bytes, nonce:Bytes):Vector<Int> {

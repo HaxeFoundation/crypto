@@ -3,9 +3,9 @@ package unit.crypto;
 import unit.Test;
 import haxe.Timer;
 import haxe.io.Bytes;
-import haxe.crypto.ChaCha;
+import haxe.crypto.ChaCha20;
 
-class ChaChaTest extends Test
+class ChaCha20Test extends Test
 {
 	var keys = [
 		"00112233445566778899AABBCCDDEEFF",
@@ -31,21 +31,21 @@ class ChaChaTest extends Test
 		"826ABDD84460E2E9349F0EF4AF5B179B426E4B2D109A9C5BB44000AE51BEA90A496BEEEF62A76850FF3F0402C4DDC99F6DB07F151C1C0DFAC2E56565D6289625"
 	];
 
-	public function test_chacha():Void
+	public function test_chacha20():Void
 	{
-		trace("ChaCha for "+keys.length+" keys");
+		trace("ChaCha20 for "+keys.length+" keys");
 		var time = Timer.stamp();
 		for(i in 0...keys.length)
 		{
 			var key = Bytes.ofHex(keys[i]);
 			var nonce = Bytes.ofHex(nonces[i]);
 			var text = Bytes.ofHex(plainText[i]);
-			var chaCha = new ChaCha();
-			chaCha.init(key,nonce);
-			var enc = chaCha.encrypt(text);
+			var chaCha20 = new ChaCha20();
+			chaCha20.init(key,nonce);
+			var enc = chaCha20.encrypt(text);
 			eq( enc.toHex().toUpperCase(), ciphers[i] );
-			chaCha.reset();
-			var decr = chaCha.decrypt(enc);
+			chaCha20.reset();
+			var decr = chaCha20.decrypt(enc);
 			eq( decr.toHex().toUpperCase(), plainText[i] );
 			}
 		time = Timer.stamp()-time;

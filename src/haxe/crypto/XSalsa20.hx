@@ -7,7 +7,7 @@ class XSalsa20 extends Salsa20
 {
     private var nonce:Bytes;
 
-    public override function init(key:Bytes,nonce:Bytes):Void
+    public override function init(key:Bytes,nonce:Bytes,?counter:Int64):Void
 	{
         if ( nonce == null || nonce.length != 24 ) 
 			throw "Nonce must be exactly 24 bytes";
@@ -20,6 +20,7 @@ class XSalsa20 extends Salsa20
 		setNonce(nonce);
 		setKey(key);
 		reset();
+		if (counter != null ) setCounter(counter);
 	}
 
     public override function setNonce(nonce:Bytes):Void
