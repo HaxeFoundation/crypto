@@ -52,6 +52,20 @@ Using this library on Haxe 3 with `-lib crypto` will overload the `haxe.crypto` 
   * SpacePadding
   * TBC ( Trailing-Bit-Compliment padding )
 
+Security Considerations
+-----------------------
+
+This code has not been subjected to a formal, paid, security audit. This library can be use  with a degree of safety equivalent to any other encryption library  written in pure Haxe.
+
+When using this library please keep the following in mind:
+
+- Cryptography is hard. Please review and test this code before depending on it for critical functionality.
+- Haxe can compile to different languages , so the execution of this code depends on trusting a very large set of tools and systems.
+- Be careful about the source from which you download the library.
+- Use "native" functionality where possible. This can be critical when dealing with performance and security.
+- Understand possible attacks against cryptographic systems. For instance side channel and timing attacks may be possible due to the difficulty in implementing constant time algorithms in different algorithms and for different targets.
+- Certain features within this library may have a lower vulnerability to attacks, with particular regard to data format manipulation or those features that do not play a role in communication
+
 ### Usage
 
 #### AES Encryption
