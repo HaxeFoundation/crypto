@@ -30,8 +30,10 @@ jobs:
           - haxe_latest_dist: linux64/haxe_latest.tar.gz
           - target: lua
             APT_PACKAGES: ncurses-dev
+            haxe_latest_dist: linux64/haxe_latest.tar.gz
           - target: flash
             APT_PACKAGES: libglib2.0-0 libgtk2.0-0 libfreetype6 xvfb
+            haxe_latest_dist: linux64/haxe_latest.tar.gz
     steps:
       - uses: actions/checkout@main
         with:

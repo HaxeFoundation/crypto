@@ -1,4 +1,0 @@
-compile-each.hxml
---main unit.TestMain
---swf-version 11
--swf bin/unit9.swf
