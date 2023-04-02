@@ -2,17 +2,7 @@ name: CI
 on: [push, pull_request]
 
 jobs:
-  cancel:
-    name: "Cancel previous runs"
-    runs-on: ubuntu-latest
-    timeout-minutes: 3
-    steps:
-      - uses: styfle/cancel-workflow-action@0.3.1
-        with:
-          workflow_id: 1447568
-          access_token: ${{ github.token }}
-
-  linux-amd64:
+  linux-test:
     runs-on: ubuntu-20.04
     permissions:
       packages: write
@@ -25,7 +15,7 @@ jobs:
       fail-fast: false
       matrix:
         # TODO enable lua after https://github.com/HaxeFoundation/haxe/issues/5024
-        target: [macro, js, hl, cpp, 'java,jvm', cs, php, python, flash, neko]
+        target: [macro, js, hl, cpp, 'java,jvm', cs, php, python, lua, flash, neko]
         include:
           - haxe_latest_dist: linux64/haxe_latest.tar.gz
           - target: lua
@@ -82,13 +72,6 @@ jobs:
           set -eux
           
           python3 -V
-      - name: Install hererocks
-        if: matrix.target == 'lua'
-        shell: bash
-        run: |
-          pip install hererocks
-          hererocks lua53 -l5.3 -rlatest
-          call lua53/bin/activate
       - name: Install wget
         if: matrix.target == 'flash'
         shell: bash
@@ -285,7 +268,7 @@ jobs:
            haxelib config
       - name: Test
         shell: pwsh
-        run: haxe RunCi.hxml
+        run: haxe RunCi.hxml -D win32
         working-directory: ${{github.workspace}}/tests
 
 

@@ -60,7 +60,9 @@ function main() {
 		new HmacTest(),
 		new TwoFishTest(),
 		new Ripemd160Test(),
+		#if (!flash)
 		new BCryptTest(),
+		#end
 		new Pbkdf2Test(),
 		new Sha384Test(),
 		new Sha512Test(),
@@ -68,7 +70,9 @@ function main() {
 		new XSalsa20Test(),
 		new ChaChaTest(),
 		new RC4Test(),
+		#if (!win32 && !flash)
 		new SCryptTest(),
+		#end
 		new XChaCha20Test(),
 		#if (!neko)
 		// neko bug https://github.com/HaxeFoundation/haxe/issues/10806
