@@ -51,7 +51,6 @@ function main() {
 	#end	
 	var classes = [
 		new AesTest(),
-		#if (!flash)
 		new BlowFishTest(),
 		new ModeTest(),
 		new PaddingTest(),
@@ -70,11 +69,10 @@ function main() {
 		new ChaChaTest(),
 		new RC4Test(),
 		new XChaCha20Test(),
-		#end
-		#if (!win32 && !flash)
+		#if (!win32 )
 		new SCryptTest(),
 		#end
-		#if (!neko && !flash)
+		#if (!neko)
 		// neko bug https://github.com/HaxeFoundation/haxe/issues/10806
 		new Poly1305Test()
 		#end
