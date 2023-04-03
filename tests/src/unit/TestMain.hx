@@ -69,7 +69,7 @@ function main() {
 		new ChaChaTest(),
 		new RC4Test(),
 		new XChaCha20Test(),
-		#if (!macro )
+		#if (!eval )
 		new SCryptTest(),
 		#end
 		#if (!neko)
