@@ -82,7 +82,7 @@ class Lua {
 			}
 
 			installLib("hx-lua-simdjson", "0.0.1-1");
-			runCommand("printenv",["LUA_LIBDIR"]);
+		
 			changeDirectory(unitDir);
 			runCommand("haxe", ["compile-lua.hxml"].concat(args));
 			runCommand("lua", ["bin/unit.lua"]);
