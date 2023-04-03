@@ -68,8 +68,10 @@ function main() {
 		new XSalsa20Test(),
 		new ChaChaTest(),
 		new RC4Test(),
-		new SCryptTest(),
 		new XChaCha20Test(),
+		#if (!eval )
+		new SCryptTest(),
+		#end
 		#if (!neko)
 		// neko bug https://github.com/HaxeFoundation/haxe/issues/10806
 		new Poly1305Test()
@@ -108,4 +110,8 @@ function main() {
 		});
 	#end
 	runner.run();
+	
+	#if (flash && fdb)
+	flash.Lib.fscommand("quit");
+	#end
 }
