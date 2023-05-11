@@ -175,48 +175,39 @@ class Sha256 {
 		return blks;
 	}
 
-	@:extern
-	inline function S(X, n) {
+	extern inline function S(X, n) {
 		return ( X >>> n ) | (X << (32 - n));
 	}
 
-	@:extern
-	inline function R(X, n) {
+	extern inline function R(X, n) {
 		return ( X >>> n );
 	}
 
-	@:extern
-	inline function Ch(x, y, z) {
+	extern inline function Ch(x, y, z) {
 		return ((x & y) ^ ((~x) & z));
 	}
 
-	@:extern
-	inline function Maj(x, y, z) {
+	extern inline function Maj(x, y, z) {
 		return ((x & y) ^ (x & z) ^ (y & z));
 	}
 
-	@:extern
-	inline function Sigma0256(x) {
+	extern inline function Sigma0256(x) {
 		return (S(x, 2) ^ S(x, 13) ^ S(x, 22));
 	}
 
-	@:extern
-	inline function Sigma1256(x) {
+	extern inline function Sigma1256(x) {
 		return (S(x, 6) ^ S(x, 11) ^ S(x, 25));
 	}
 
-	@:extern
-	inline function Gamma0256(x) {
+	extern inline function Gamma0256(x) {
 		return (S(x, 7) ^ S(x, 18) ^ R(x, 3));
 	}
 
-	@:extern
-	inline function Gamma1256(x) {
+	extern inline function Gamma1256(x) {
 		return (S(x, 17) ^ S(x, 19) ^ R(x, 10));
 	}
 
-	@:extern
-	inline function safeAdd(x, y) {
+	extern inline function safeAdd(x, y) {
 		var lsw = (x & 0xFFFF) + (y & 0xFFFF);
 		var msw = (x >> 16) + (y >> 16) + (lsw >> 16);
 		return (msw << 16) | (lsw & 0xFFFF);

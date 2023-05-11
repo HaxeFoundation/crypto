@@ -1,7 +1,6 @@
 package haxe.crypto.mode;
 
-@:enum
-abstract Mode(String)
+enum abstract Mode(String)
 {
     var CBC = "cbc";
     var CFB = "cfb";
