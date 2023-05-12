@@ -1,7 +1,6 @@
 package haxe.crypto.padding;
 
-@:enum
-abstract Padding(String)
+enum abstract Padding(String)
 {
     var PKCS7 = "PKCS7";
     var NoPadding = "NoPadding";
