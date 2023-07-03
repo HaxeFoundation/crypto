@@ -66,6 +66,23 @@ When using this library please keep the following in mind:
 - Understand possible attacks against cryptographic systems. For instance side channel and timing attacks may be possible due to the difficulty in implementing constant time algorithms in different algorithms and for different targets.
 - Certain features within this library may have a lower vulnerability to attacks, this could includes features that deal with data format manipulation or those features that do not play a role in communication.
 
+Questions
+-----------------------
+#### Should I be using Haxe Crypto for something that actually needs to be secured?
+- Yes, you can use it for different tasks. Just because this library doesn't have an formal, paid, security audit check doesn't mean it's insecure. Some algorithms can be	susceptible on side channels and timing attacks when the attacker generates millions of combinations (encryption and decryption) and tries to guess the password, but this does not mean, firstly, that it is an easy task to hack an algorithm, and secondly, not for all algorithms here such attacks can be used. The hacking process is still not that easy task, especially if you use advanced algorithms and long encryption , decryption keys and passwords.
+   Just an example, obfuscation is also a process for protection. Is it 100% hack protected? No. Is it widely used for protection? Yes
+ 
+#### Where is it safe to use this library?
+- Well, if you are protecting financial and banking transactions, I will recommend you to use audited cryptographic software . In other cases (such as game resources, game communication (not financial) and even login forms, this library should give you enough protection. But for this, you should always use long keys and proven algorithms Don't use old unsecure algorithms like DES or RC4 (it's here for backwards compatibility)
+ 
+#### Are OpenSSL, Nacl 100% bug free and secured?
+- Various bugs are found in them over time, as in most, if not all, security libraries.
+    So are they 100% secure/bug free? I don't think so. Bugs will likely appear over time. Should I use them then? Of course, you should definitely use it if you need them.
+  
+#### Is this library not maintained at all ?
+- This is not true. There is a regular updates that brings better performance and new algorithms. All  pull request a  timely review and merged. Also all algorithms are properly implemented and include many tests for all platforms (check here https://github.com/HaxeFoundation/crypto/tree/master/tests/src/unit/crypto)
+   If you wish, you could add more test by opening pull request
+   
 ### Usage
 
 #### AES Encryption
