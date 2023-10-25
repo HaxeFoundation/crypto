@@ -22,10 +22,49 @@
 
 package haxe.crypto;
 
+import haxe.io.Bytes;
+#if java
+import java.security.MessageDigest;
+import java.nio.charset.StandardCharsets;
+#end
+
 /**
 	Creates a Sha1 of a String.
 **/
 class Sha1 {
+	#if hl
+	public static function encode(s:String):String {
+		var out = haxe.io.Bytes.alloc(20);
+		@:privateAccess hl.Format.digest(out.b, s.bytes, s.length, 256 | 1);
+		return out.toHex();
+	}
+
+	public static function make(b:haxe.io.Bytes):haxe.io.Bytes {
+		var out = haxe.io.Bytes.alloc(20);
+		@:privateAccess hl.Format.digest(out.b, b.b, b.length, 1);
+		return out;
+	}
+	#elseif java
+	public static function encode(s:String):String {
+		return Bytes.ofData(digest((cast s : java.NativeString).getBytes(StandardCharsets.UTF_8))).toHex();
+	}
+
+	public static function make(b:haxe.io.Bytes):haxe.io.Bytes {
+		return Bytes.ofData(digest(b.getData()));
+	}
+
+	inline static function digest(b:BytesData):BytesData {
+		return MessageDigest.getInstance("SHA-1").digest(b);
+	}
+	#elseif php
+	public static inline function encode(s:String):String {
+		return php.Global.sha1(s);
+	}
+
+	public static inline function make(b:haxe.io.Bytes):haxe.io.Bytes {
+		return Bytes.ofData(php.Global.sha1(b.getData(), true));
+	}
+	#else
 	public static function encode(s:String):String {
 		var sh = new Sha1();
 		var h = sh.doEncode(str2blks(s));
@@ -169,4 +208,5 @@ class Sha1 {
 		}
 		return str.toLowerCase();
 	}
+	#end
 }

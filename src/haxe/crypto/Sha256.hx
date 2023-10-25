@@ -22,11 +22,20 @@
 package haxe.crypto;
 
 import haxe.ds.Vector;
-
+import haxe.io.Bytes;
+#if java
+import java.security.MessageDigest;
+import java.nio.charset.StandardCharsets;
+#end
 /**
 	Creates a Sha256 of a String.
 */
 class Sha256 {
+	#if java
+	inline static function digest(b:BytesData):BytesData {
+		return MessageDigest.getInstance("SHA-256").digest(b);
+	}
+	#else
 
 	public static function encode( s:String #if haxe4 , ?encoding : haxe.io.Encoding #end ) : String {
 		#if php
@@ -35,6 +44,8 @@ class Sha256 {
 			#else
 			return untyped __php__("hash('sha256', {0})", s);
 			#end
+		#elseif java
+		return Bytes.ofData(digest((cast s : java.NativeString).getBytes(StandardCharsets.UTF_8))).toHex();
 		#else
 		var sh = new Sha256();
 		var data = haxe.io.Bytes.ofString(s #if haxe4 , encoding #end );
@@ -51,6 +62,8 @@ class Sha256 {
 			#else
 			return haxe.io.Bytes.ofData(untyped __php__("hash('sha256', {0}, true)", b.getData()));
 			#end
+		#elseif java
+		return Bytes.ofData(digest(b.getData()));
 		#else
 		var h = new Sha256().doEncode(bytes2blks(b), b.length*8);
 		var out = haxe.io.Bytes.alloc(32);

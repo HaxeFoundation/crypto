@@ -22,10 +22,61 @@
 
 package haxe.crypto;
 
+import haxe.io.Bytes;
+
+#if java
+import java.security.MessageDigest;
+import java.nio.charset.StandardCharsets;
+#end
+
 /**
 	Creates a MD5 of a String.
 **/
 class Md5 {
+	#if neko
+	public static function encode(s:String):String {
+		return untyped new String(base_encode(make_md5(s.__s), "0123456789abcdef".__s));
+	}
+
+	public static function make(b:haxe.io.Bytes):haxe.io.Bytes {
+		return haxe.io.Bytes.ofData(make_md5(b.getData()));
+	}
+
+	static var base_encode = neko.Lib.load("std", "base_encode", 2);
+	static var make_md5 = neko.Lib.load("std", "make_md5", 1);
+	#elseif hl
+	public static function encode(s:String):String {
+		var out = haxe.io.Bytes.alloc(16);
+		@:privateAccess hl.Format.digest(out.b, s.bytes, s.length, 256);
+		return out.toHex();
+	}
+
+	public static function make(b:haxe.io.Bytes):haxe.io.Bytes {
+		var out = haxe.io.Bytes.alloc(16);
+		@:privateAccess hl.Format.digest(out.b, b.b, b.length, 0);
+		return out;
+	}
+	#elseif php
+	public static inline function encode(s:String):String {
+		return php.Global.md5(s);
+	}
+
+	public static inline function make(b:haxe.io.Bytes):haxe.io.Bytes {
+		return Bytes.ofData(php.Global.md5(b.getData(), true));
+	}
+	#elseif java
+	public static function encode(s:String):String {
+		return Bytes.ofData(digest((cast s : java.NativeString).getBytes(StandardCharsets.UTF_8))).toHex();
+	}
+
+	public static function make(b:haxe.io.Bytes):haxe.io.Bytes {
+		return Bytes.ofData(digest(b.getData()));
+	}
+
+	inline static function digest(b:BytesData):BytesData {
+		return MessageDigest.getInstance("MD5").digest(b);
+	}
+	#else
 	public static function encode(s:String):String {
 		var m = new Md5();
 		var h = m.doEncode(str2blks(s));
@@ -265,4 +316,5 @@ class Md5 {
 		}
 		return [a, b, c, d];
 	}
+	#end
 }
