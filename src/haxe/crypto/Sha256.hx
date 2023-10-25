@@ -35,7 +35,7 @@ class Sha256 {
 	inline static function digest(b:BytesData):BytesData {
 		return MessageDigest.getInstance("SHA-256").digest(b);
 	}
-	#else
+	#end
 
 	public static function encode( s:String #if haxe4 , ?encoding : haxe.io.Encoding #end ) : String {
 		#if php
