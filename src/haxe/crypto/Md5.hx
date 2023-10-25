@@ -73,7 +73,7 @@ class Md5 {
 		return Bytes.ofData(digest(b.getData()));
 	}
 
-	inline static function digest(b:BytesData):BytesData {
+	inline static function digest(b:haxe.io.BytesData):haxe.io.BytesData {
 		return MessageDigest.getInstance("MD5").digest(b);
 	}
 	#else

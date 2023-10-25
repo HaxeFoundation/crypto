@@ -32,7 +32,7 @@ import java.nio.charset.StandardCharsets;
 */
 class Sha256 {
 	#if java
-	inline static function digest(b:BytesData):BytesData {
+	inline static function digest(b:haxe.io.BytesData):haxe.io.BytesData {
 		return MessageDigest.getInstance("SHA-256").digest(b);
 	}
 	#end
