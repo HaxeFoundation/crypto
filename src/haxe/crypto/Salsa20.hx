@@ -271,7 +271,7 @@ class Salsa20 {
 		output[offset+15] = x15 + input[15];
 	}
 
-	private static inline function rol32(x:Int, n:Int):Int {
+	private static inline function rol32(x:Int, n:Int):Int32 {
 		return ((x << n) | (x >>> (32 - n)));
 	}
 
@@ -282,8 +282,8 @@ class Salsa20 {
 		bs.set(++off, (n >>> 24));
 	}
 
-	private function bytesToInt32(bs:Bytes, off:Int):Int {
-		var n:Int = (bs.get(off));
+	private function bytesToInt32(bs:Bytes, off:Int):Int32 {
+		var n:Int32 = (bs.get(off));
 		n |= (bs.get(++off)) << 8;
 		n |= (bs.get(++off)) << 16;
 		n |= bs.get(++off) << 24;

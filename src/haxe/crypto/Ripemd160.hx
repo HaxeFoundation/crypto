@@ -184,7 +184,7 @@ class Ripemd160
 		return x ^ (y | ~z);
 	}
 
-    private function rol32(x:Int, n:Int):Int {
+    private function rol32(x:Int, n:Int):Int32 {
         return ( (x << n) | (x >>> (32 - n)) );
     }
 
@@ -196,9 +196,9 @@ class Ripemd160
 		bs.set(++off, (n >>> 24));
 	}
 
-    private function bytesToInt32(bs:Bytes, off:Int):Int
+    private function bytesToInt32(bs:Bytes, off:Int):Int32
 	{
-		var n:Int = ( bs.get(off) );
+		var n:Int32 = ( bs.get(off) );
 		n |= ( bs.get(++off) ) << 8;
 		n |= ( bs.get(++off) ) << 16;
 		n |= bs.get(++off)   << 24;

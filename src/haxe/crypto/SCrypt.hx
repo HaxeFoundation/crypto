@@ -104,8 +104,8 @@ class SCrypt {
 		bs.set(++off, (n >>> 24));
 	}
 
-	private function bytesToInt32(bs:Bytes, off:Int):Int {
-		var n:Int = (bs.get(off));
+	private function bytesToInt32(bs:Bytes, off:Int):Int32 {
+		var n:Int32 = (bs.get(off));
 		n |= (bs.get(++off)) << 8;
 		n |= (bs.get(++off)) << 16;
 		n |= bs.get(++off) << 24;
