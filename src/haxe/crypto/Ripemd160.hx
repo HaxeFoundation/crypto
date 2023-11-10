@@ -47,7 +47,7 @@ class Ripemd160
 		15,  5,  8, 11, 14, 14,  6, 14,  6,  9, 12,  9, 12,  5, 15,  8,
 		 8,  5, 12,  9, 12,  5, 14,  6,  8, 13,  6,  5, 15, 13, 11, 11];
 
-    private var state : Vector<Int>;
+    private var state : Vector<Int32>;
     public var bytesBuffer : BytesBuffer;
 
     public static function encode( s : String ) : String
@@ -176,7 +176,7 @@ class Ripemd160
 		state[0] = t;
     }
 
-    private function fn(i:Int, x:Int, y:Int, z:Int) {
+    private function fn(i:Int, x:Int, y:Int, z:Int):Int32 {
 		if (i < 16) return x ^ y ^ z;
 		if (i < 32) return (x & y) | (~x & z);
 		if (i < 48) return (x | ~y) ^ z;
