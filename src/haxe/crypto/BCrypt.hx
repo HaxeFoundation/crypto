@@ -298,7 +298,7 @@ class BCrypt
             i += 2;
         }
     }
-    private static inline function f(x:Int):Int {
+    private static inline function f(x:Int):Int32 {
         return (((sBox[(x >>> 24)] + sBox[0x100 | ((x >>> 16) & 0xff)]) ^ sBox[0x200 | ((x >>> 8) & 0xff)]) + sBox[0x300 | (x & 0xff)]);
     }
 
