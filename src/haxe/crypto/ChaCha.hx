@@ -93,22 +93,22 @@ class ChaCha extends Salsa20
 		if ((output.length != 16) || input.length != 16) {
 			 throw "Invalid buffer size";
 		}
-		var x0:Int = input[0];
-		var x1:Int = input[1];
-		var x2:Int = input[2];
-		var x3:Int = input[3];
-		var x4:Int = input[4];
-		var x5:Int = input[5];
-		var x6:Int = input[6];
-		var x7:Int = input[7];
-		var x8:Int = input[8];
-		var x9:Int = input[9];
-		var x10:Int = input[10];
-		var x11:Int = input[11];
-		var x12:Int = input[12];
-		var x13:Int = input[13];
-		var x14:Int = input[14];
-		var x15:Int = input[15];
+		var x0:Int32 = input[0];
+		var x1:Int32 = input[1];
+		var x2:Int32 = input[2];
+		var x3:Int32 = input[3];
+		var x4:Int32 = input[4];
+		var x5:Int32 = input[5];
+		var x6:Int32 = input[6];
+		var x7:Int32 = input[7];
+		var x8:Int32 = input[8];
+		var x9:Int32 = input[9];
+		var x10:Int32 = input[10];
+		var x11:Int32 = input[11];
+		var x12:Int32 = input[12];
+		var x13:Int32 = input[13];
+		var x14:Int32 = input[14];
+		var x15:Int32 = input[15];
 
 		var h = rounds>>1;
 		for(i in 0...h) {
