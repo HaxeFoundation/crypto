@@ -163,7 +163,7 @@ class ChaCha extends Salsa20
 		output[15] = x15 + input[15];
 	}
 
-	private static inline function rol32(x:Int, n:Int):Int {
+	private static inline function rol32(x:Int, n:Int):Int32 {
 		return ((x << n) | (x >>> (32 - n)));
 	}
 }
