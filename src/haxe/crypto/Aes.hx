@@ -80,7 +80,7 @@ class Aes
 		var x:Int = 0;
 		var xi:Int = 0;
 		for (i in 0...256) {
-			var sx:Int = xi ^ (xi << 1) ^ (xi << 2) ^ (xi << 3) ^ (xi << 4);
+			var sx:Int32 = xi ^ (xi << 1) ^ (xi << 2) ^ (xi << 3) ^ (xi << 4);
 			sx = (sx >>> 8) ^ (sx & 0xff) ^ 0x63;
 			SBOX[x] = sx;
 			RSBOX[sx] = x;
@@ -89,7 +89,7 @@ class Aes
 			var x4:Int = d[x2];
 			var x8:Int = d[x4];
 
-			var t:Int = (d[sx] * 0x101) ^ (sx * 0x1010100);
+			var t:Int32 = (d[sx] * 0x101) ^ (sx * 0x1010100);
 			SUB_BYTES_MIX_COLUMN_0[x] = (t << 24) | (t >>> 8);
 			SUB_BYTES_MIX_COLUMN_1[x] = (t << 16) | (t >>> 16);
 			SUB_BYTES_MIX_COLUMN_2[x] = (t << 8) | (t >>> 24);
@@ -126,7 +126,7 @@ class Aes
 			if (ksRow < Nk) {
 				roundKey[ksRow] = bytesToInt32(key, ksRow << 2);
 			} else {
-				var t:Int = roundKey[ksRow - 1];
+				var t:Int32 = roundKey[ksRow - 1];
 				if ((ksRow % Nk) == 0) {
 					t = (t << 8) | (t >>> 24);
 					t = (SBOX[t >>> 24] << 24) | (SBOX[(t >>> 16) & 0xff] << 16) | (SBOX[(t >>> 8) & 0xff] << 8) | SBOX[t & 0xff];
