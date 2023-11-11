@@ -1,5 +1,5 @@
 /*
- * Copyright (C)2005-2018 Haxe Foundation
+ * Copyright (C)2005-2023 Haxe Foundation
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
@@ -19,11 +19,14 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
+
 package haxe.crypto;
 
+import haxe.io.Bytes;
+
 /**
-    Hash methods for Hmac calculation.
-*/
+	Hash methods for Hmac calculation.
+ */
 enum HashMethod {
 	MD5;
 	SHA1;
@@ -35,43 +38,41 @@ enum HashMethod {
 }
 
 /**
-    Calculates a Hmac of the given Bytes using a HashMethod.
-*/
+	Calculates a Hmac of the given Bytes using a HashMethod.
+ */
 class Hmac {
-	
-	var method : HashMethod;
-	var blockSize : Int;
-	var length : Int;
-	
-	public function new( hashMethod : HashMethod ) 
-	{
-		if ( hashMethod != null) init(hashMethod);
+	var method:HashMethod;
+	var blockSize:Int;
+	var length:Int;
+
+	public function new(hashMethod:HashMethod) {
+		if (hashMethod != null)
+			init(hashMethod);
 	}
-	
+
 	public function getSize():Int {
-        return length;
-    }
-	
-	public function init(hashMethod : HashMethod ):Void
-    {
-        method = hashMethod;
-		blockSize = switch ( hashMethod ) {
+		return length;
+	}
+
+	public function init(hashMethod:HashMethod):Void {
+		method = hashMethod;
+		blockSize = switch (hashMethod) {
 			case MD5, SHA1, SHA224, SHA256, RIPEMD160: 64;
-			case  SHA384, SHA512: 128;
+			case SHA384, SHA512: 128;
 		}
-		length = switch ( hashMethod ) {
+		length = switch (hashMethod) {
 			case MD5: 16;
 			case SHA1: 20;
 			case SHA224: 28;
 			case SHA256: 32;
 			case SHA384: 48;
 			case SHA512: 64;
-            case RIPEMD160: 20;
+			case RIPEMD160: 20;
 		}
-    }
-	
-	inline function doHash( b : haxe.io.Bytes ) : haxe.io.Bytes {
-		return switch ( method ) {
+	}
+
+	inline function doHash(b:haxe.io.Bytes):haxe.io.Bytes {
+		return switch (method) {
 			case MD5: Md5.make(b);
 			case SHA1: Sha1.make(b);
 			case SHA224: Sha224.make(b);
@@ -81,34 +82,35 @@ class Hmac {
 			case RIPEMD160: Ripemd160.make(b);
 		}
 	}
-	
-	function nullPad( s : haxe.io.Bytes, chunkLen : Int ) : haxe.io.Bytes {
+
+	function nullPad(s:haxe.io.Bytes, chunkLen:Int):haxe.io.Bytes {
 		var r = chunkLen - (s.length % chunkLen);
-		if(r == chunkLen && s.length != 0)
+		if (r == chunkLen && s.length != 0)
 			return s;
-		var sb = new haxe.io.BytesBuffer();
-		sb.add(s);
-		for(x in 0...r)
-			sb.addByte(0);
-		return sb.getBytes();
+		var sb = Bytes.alloc(s.length + r);
+		new haxe.io.BytesBuffer();
+		var pos = s.length;
+		sb.blit(0, s, 0, pos);
+		for (x in 0...r)
+			sb.set(pos + x, 0);
+		return sb;
 	}
-	
-	public function make( key : haxe.io.Bytes, msg : haxe.io.Bytes ) : haxe.io.Bytes {
-		if(key.length > blockSize) {
+
+	public function make(key:haxe.io.Bytes, msg:haxe.io.Bytes):haxe.io.Bytes {
+		if (key.length > blockSize) {
 			key = doHash(key);
 		}
 		key = nullPad(key, blockSize);
 
-		var Ki = new haxe.io.BytesBuffer();
-		var Ko = new haxe.io.BytesBuffer();
+		var Ki = Bytes.alloc(key.length + msg.length);
+		var Ko = Bytes.alloc(key.length + length);
 		for (i in 0...key.length) {
-			Ko.addByte(key.get(i) ^ 0x5c);
-			Ki.addByte(key.get(i) ^ 0x36);
+			Ko.set(i, key.get(i) ^ 0x5c);
+			Ki.set(i, key.get(i) ^ 0x36);
 		}
 		// hash(Ko + hash(Ki + message))
-		Ki.add(msg);
-		Ko.add(doHash(Ki.getBytes()));
-		return doHash(Ko.getBytes());
+		Ki.blit(key.length, msg, 0, msg.length);
+		Ko.blit(key.length, doHash(Ki), 0, length);
+		return doHash(Ko);
 	}
-	
 }
