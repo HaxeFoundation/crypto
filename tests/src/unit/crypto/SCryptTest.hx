@@ -54,6 +54,7 @@ class SCryptTest extends Test {
 			var data = scrypt.hash(Bytes.ofHex(plainText[i]), Bytes.ofHex(salts[i]), costParams[i], blockSizes[i], parallelizationParams[i], dkLen[i]);
 			eq(data.toHex().toUpperCase(), derivedKeys[i]);
 		}
+		haxe.crypto.Hmac.debug = false;
 		time = Timer.stamp() - time;
 		trace("Finished : " + time + " seconds");
 	}

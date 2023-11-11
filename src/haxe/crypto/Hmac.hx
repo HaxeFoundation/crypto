@@ -125,7 +125,6 @@ class Hmac {
 		Ko.blit(key.length, doHash(Ki), 0, length);
 		if (debug) {
 			trace("2) " + Ko.toHex());
-			debug = false;
 		}
 		return doHash(Ko);
 	}
