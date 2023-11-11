@@ -47,14 +47,12 @@ class SCryptTest extends Test {
 
 	public function test():Void {
 		trace("SCrypt with " + plainText.length + " keys");
-		haxe.crypto.Hmac.debug = true;
 		var time = Timer.stamp();
 		var scrypt:SCrypt = new SCrypt();
 		for (i in 0...plainText.length) {
 			var data = scrypt.hash(Bytes.ofHex(plainText[i]), Bytes.ofHex(salts[i]), costParams[i], blockSizes[i], parallelizationParams[i], dkLen[i]);
 			eq(data.toHex().toUpperCase(), derivedKeys[i]);
 		}
-		haxe.crypto.Hmac.debug = false;
 		time = Timer.stamp() - time;
 		trace("Finished : " + time + " seconds");
 	}

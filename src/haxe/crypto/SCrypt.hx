@@ -23,7 +23,7 @@ class SCrypt {
 	 * @param dkLen - output size
 	 * @return the generated key
 	 */
-	public function hash(password:Bytes, salt:Bytes, N:Int, r:Int, p:Int, dkLen:Int):Bytes {
+	public function hash(password:Bytes, salt:Bytes, N:Int32, r:Int32, p:Int32, dkLen:Int):Bytes {
 		if (password == null)
 			throw "Password must not be null";
 		if (salt == null)
@@ -35,18 +35,18 @@ class SCrypt {
 		if (dkLen < 1)
 			throw "dKlen must be > 0";
 
-		var mflen:Int = 128 * r;
-		var mfwords:Int = mflen >>> 2;
+		var mflen:Int32 = 128 * r;
+		var mfwords:Int32 = mflen >>> 2;
 
 		var data = pbkdf2.encode(password, salt, 1, p * mflen);
-		var b = new Vector<Int>(data.length >>> 2);
+		var b = new Vector<Int32>(data.length >>> 2);
 		for (i in 0...b.length) {
 			b[i] = bytesToInt32(data, i * 4);
 		}
 
-		var xbuf = new Vector<Int>(mfwords);
-		var vbuf = new Vector<Int>(N * mfwords);
-		var xtbuf = new Vector<Int>(16);
+		var xbuf = new Vector<Int32>(mfwords);
+		var vbuf = new Vector<Int32>(N * mfwords);
+		var xtbuf = new Vector<Int32>(16);
 		for (i in 0...p) {
 			sMix(vbuf, b, i * mfwords, xbuf, xtbuf, mfwords, N, r);
 		}
@@ -59,13 +59,13 @@ class SCrypt {
 		return pbkdf2.encode(password, output, 1, dkLen);
 	}
 
-	private function sMix(vbuf:Vector<Int>, output:Vector<Int>, outputOffset:Int, xbuf:Vector<Int>, xtbuf:Vector<Int>, mfwords:Int, N:Int, r:Int):Void {
+	private function sMix(vbuf:Vector<Int32>, output:Vector<Int32>, outputOffset:Int32, xbuf:Vector<Int32>, xtbuf:Vector<Int32>, mfwords:Int32, N:Int32, r:Int32):Void {
 		Vector.blit(output, outputOffset, vbuf, 0, mfwords);
 		for (i in 1...N) {
 			blockMix(vbuf, (i - 1) * mfwords, vbuf, i * mfwords, mfwords, r, xtbuf);
 		}
 		blockMix(vbuf, (N - 1) * mfwords, output, outputOffset, mfwords, r, xtbuf);
-		var j:Int = 0;
+		var j:Int32 = 0;
 		for (i in 0...(N >> 1)) {
 			j = (output.get(outputOffset + mfwords - 16) & (N - 1)) * mfwords;
 			xor(output, outputOffset, vbuf, j, output, outputOffset, mfwords);
@@ -76,9 +76,9 @@ class SCrypt {
 		}
 	}
 
-	private function blockMix(b:Vector<Int>, bOffset:Int, output:Vector<Int>, outputOffset:Int, mfwords:Int, r:Int, xtbuf:Vector<Int>):Void {
+	private function blockMix(b:Vector<Int32>, bOffset:Int32, output:Vector<Int32>, outputOffset:Int32, mfwords:Int32, r:Int32, xtbuf:Vector<Int32>):Void {
 		var x = b;
-		var offset = bOffset + mfwords - 16;
+		var offset:Int32 = bOffset + mfwords - 16;
 		for (i in 0...(r << 1)) {
 			xor(x, offset, b, bOffset + i * 16, xtbuf, 0, 16);
 			offset = outputOffset + ((i & 1) * r + (i >> 1)) * 16;
@@ -87,13 +87,13 @@ class SCrypt {
 		}
 	}
 
-	private static inline function xor(a:Vector<Int>, aOffset:Int, b:Vector<Int>, bOffset:Int, output:Vector<Int>, outputOffset:Int, outputLength:Int):Void {
+	private static inline function xor(a:Vector<Int32>, aOffset:Int32, b:Vector<Int32>, bOffset:Int32, output:Vector<Int32>, outputOffset:Int32, outputLength:Int32):Void {
 		for (i in 0...outputLength) {
 			output.set(outputOffset + i, a.get(aOffset + i) ^ b.get(bOffset + i));
 		}
 	}
 
-	public static inline function isPowerOf2(x:Int):Bool {
+	public static inline function isPowerOf2(x:Int32):Bool {
 		return ((x & (x - 1)) == 0);
 	}
 
