@@ -101,7 +101,8 @@ class Hmac {
 			key = doHash(key);
 		}
 		key = nullPad(key, blockSize);
-
+		trace("key:  "+key.toHex());
+		trace("msg:  "+msg.toHex());
 		var Ki = Bytes.alloc(key.length + msg.length);
 		var Ko = Bytes.alloc(key.length + length);
 		for (i in 0...key.length) {
@@ -109,8 +110,12 @@ class Hmac {
 			Ki.set(i, key.get(i) ^ 0x36);
 		}
 		// hash(Ko + hash(Ki + message))
+		trace("1) "+Ki.toHex());
+		trace("1) "+Ko.toHex());
 		Ki.blit(key.length, msg, 0, msg.length);
+		trace("2) "+Ki.toHex());
 		Ko.blit(key.length, doHash(Ki), 0, length);
+		trace("2) "+Ko.toHex());
 		return doHash(Ko);
 	}
 }
