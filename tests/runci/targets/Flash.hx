@@ -6,7 +6,6 @@ import sys.io.Process;
 import haxe.Json;
 import haxe.Http;
 import haxe.io.Path;
-
 import runci.System.*;
 import runci.System.CommandFailure;
 import runci.Config.*;
@@ -32,7 +31,12 @@ class Flash {
 		final apacheMirror = getPreferredApacheMirror();
 		final archiveExtension = if (systemName == "Windows") "zip" else "tar.gz";
 		final archiveName = 'apache-flex-sdk-${version}-bin.$archiveExtension';
-		runNetworkCommand("wget", ["-nv", '${apacheMirror}/flex/${version}/binaries/$archiveName', "-O", getDownloadPath() + '/$archiveName']);
+		runNetworkCommand("wget", [
+			"-nv",
+			'${apacheMirror}/flex/${version}/binaries/$archiveName',
+			"-O",
+			getDownloadPath() + '/$archiveName'
+		]);
 
 		if (systemName == "Windows") {
 			runCommand("7z", ["x", getDownloadPath() + '/$archiveName', "-o" + sdkPath, "-y"]);
@@ -124,7 +128,7 @@ class Flash {
 		if (Sys.command("type", [playerName]) == 0) {
 			playerLocation = playerName;
 			infoMsg('Using $playerName from PATH');
-		} else if(FileSystem.exists(playerLocation)) {
+		} else if (FileSystem.exists(playerLocation)) {
 			infoMsg('Flash player found at $playerLocation');
 		} else {
 			Linux.requireAptPackages(["libglib2.0-0", "libfreetype6"]);
@@ -166,7 +170,7 @@ class Flash {
 		}
 	}
 
-	static function readUntil(stdout:haxe.io.Input, expected:String, ?unexpectedStrings:Map<String, ()->Void>) {
+	static function readUntil(stdout:haxe.io.Input, expected:String, ?unexpectedStrings:Map<String, () -> Void>) {
 		final possibleStrings = unexpectedStrings?.copy() ?? [];
 		possibleStrings[expected] = function() {};
 		var output = "";
@@ -191,7 +195,7 @@ class Flash {
 	/**
 		Run a Flash swf file.
 		Throws `CommandFailure` if unsuccessful.
-	*/
+	 */
 	static function runFlash(swf:String):Void {
 		swf = FileSystem.fullPath(swf);
 		infoMsg('Running .swf file: $swf');
@@ -230,7 +234,9 @@ class Flash {
 		var success = true;
 		readUntil(debuggerProcess.stdout, "(success: true)", [
 			FDB_PROMPT => onUnexpectedPrompt,
-			"(success: false)" => () -> { success = false; }
+			"(success: false)" => () -> {
+				success = false;
+			}
 		]);
 
 		runDebuggerCommand("quit");
@@ -248,10 +254,18 @@ class Flash {
 		setupFlashPlayer();
 		setupFlexSdk();
 		for (flashVersion in ["11", "32"]) {
-			runCommand("haxe", ["compile-flash.hxml", "-D", "fdb", "-D", "dump", "-D", "dump_ignore_var_ids", "--swf-version", flashVersion].concat(args));
+			runCommand("haxe", [
+				"compile-flash.hxml",
+				"-D",
+				"fdb",
+				"-D",
+				"dump",
+				"-D",
+				"dump_ignore_var_ids",
+				"--swf-version",
+				flashVersion
+			].concat(args));
 			runFlash("bin/unit.swf");
 		}
-
 	}
-
 }

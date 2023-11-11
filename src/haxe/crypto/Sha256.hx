@@ -19,6 +19,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
+
 package haxe.crypto;
 
 import haxe.ds.Vector;
@@ -27,9 +28,10 @@ import haxe.io.Bytes;
 import java.security.MessageDigest;
 import java.nio.charset.StandardCharsets;
 #end
+
 /**
 	Creates a Sha256 of a String.
-*/
+ */
 class Sha256 {
 	#if java
 	inline static function digest(b:haxe.io.BytesData):haxe.io.BytesData {
@@ -37,88 +39,94 @@ class Sha256 {
 	}
 	#end
 
-	public static function encode( s:String #if haxe4 , ?encoding : haxe.io.Encoding #end ) : String {
+	public static function encode(s:String #if haxe4, ?encoding:haxe.io.Encoding #end):String {
 		#if php
-			#if haxe4
-			return php.Global.hash('sha256', s);
-			#else
-			return untyped __php__("hash('sha256', {0})", s);
-			#end
+		#if haxe4
+		return php.Global.hash('sha256', s);
+		#else
+		return untyped __php__("hash('sha256', {0})", s);
+		#end
 		#elseif java
 		return Bytes.ofData(digest((cast s : java.NativeString).getBytes(StandardCharsets.UTF_8))).toHex();
 		#else
 		var sh = new Sha256();
-		var data = haxe.io.Bytes.ofString(s #if haxe4 , encoding #end );
-		var nblk = data.length*8;
+		var data = haxe.io.Bytes.ofString(s #if haxe4, encoding #end);
+		var nblk = data.length * 8;
 		var h = sh.doEncode(str2blks(data), nblk);
 		return sh.hex(h);
 		#end
 	}
 
-	public static function make( b : haxe.io.Bytes ) : haxe.io.Bytes {
+	public static function make(b:haxe.io.Bytes):haxe.io.Bytes {
 		#if php
-			#if haxe4
-			return haxe.io.Bytes.ofData(php.Global.hash('sha256', b.getData(), true));
-			#else
-			return haxe.io.Bytes.ofData(untyped __php__("hash('sha256', {0}, true)", b.getData()));
-			#end
+		#if haxe4
+		return haxe.io.Bytes.ofData(php.Global.hash('sha256', b.getData(), true));
+		#else
+		return haxe.io.Bytes.ofData(untyped __php__("hash('sha256', {0}, true)", b.getData()));
+		#end
 		#elseif java
 		return Bytes.ofData(digest(b.getData()));
 		#else
-		var h = new Sha256().doEncode(bytes2blks(b), b.length*8);
+		var h = new Sha256().doEncode(bytes2blks(b), b.length * 8);
 		var out = haxe.io.Bytes.alloc(32);
 		var p = 0;
-		for( i in 0...8 ) {
-			out.set(p++,h[i]>>>24);
-			out.set(p++,(h[i]>>16)&0xFF);
-			out.set(p++,(h[i]>>8)&0xFF);
-			out.set(p++,h[i]&0xFF);
+		for (i in 0...8) {
+			out.set(p++, h[i] >>> 24);
+			out.set(p++, (h[i] >> 16) & 0xFF);
+			out.set(p++, (h[i] >> 8) & 0xFF);
+			out.set(p++, h[i] & 0xFF);
 		}
 		return out;
 		#end
 	}
 
-	public function new() {
-	}
+	public function new() {}
 
-	function doEncode( m : Vector<Int>, l : Int ) : Vector<Int> {
-		var K : Vector<Int> = Vector.fromArrayCopy([
-			0x428A2F98,0x71374491,0xB5C0FBCF,0xE9B5DBA5,0x3956C25B,
-			0x59F111F1,0x923F82A4,0xAB1C5ED5,0xD807AA98,0x12835B01,
-			0x243185BE,0x550C7DC3,0x72BE5D74,0x80DEB1FE,0x9BDC06A7,
-			0xC19BF174,0xE49B69C1,0xEFBE4786,0xFC19DC6,0x240CA1CC,
-			0x2DE92C6F,0x4A7484AA,0x5CB0A9DC,0x76F988DA,0x983E5152,
-			0xA831C66D,0xB00327C8,0xBF597FC7,0xC6E00BF3,0xD5A79147,
-			0x6CA6351,0x14292967,0x27B70A85,0x2E1B2138,0x4D2C6DFC,
-			0x53380D13,0x650A7354,0x766A0ABB,0x81C2C92E,0x92722C85,
-			0xA2BFE8A1,0xA81A664B,0xC24B8B70,0xC76C51A3,0xD192E819,
-			0xD6990624,0xF40E3585,0x106AA070,0x19A4C116,0x1E376C08,
-			0x2748774C,0x34B0BCB5,0x391C0CB3,0x4ED8AA4A,0x5B9CCA4F,
-			0x682E6FF3,0x748F82EE,0x78A5636F,0x84C87814,0x8CC70208,
-			0x90BEFFFA,0xA4506CEB,0xBEF9A3F7,0xC67178F2
+	function doEncode(m:Vector<Int>, l:Int):Vector<Int> {
+		var K:Vector<Int> = Vector.fromArrayCopy([
+			0x428A2F98, 0x71374491, 0xB5C0FBCF, 0xE9B5DBA5, 0x3956C25B, 0x59F111F1, 0x923F82A4, 0xAB1C5ED5, 0xD807AA98, 0x12835B01, 0x243185BE, 0x550C7DC3,
+			0x72BE5D74, 0x80DEB1FE, 0x9BDC06A7, 0xC19BF174, 0xE49B69C1, 0xEFBE4786, 0xFC19DC6, 0x240CA1CC, 0x2DE92C6F, 0x4A7484AA, 0x5CB0A9DC, 0x76F988DA,
+			0x983E5152, 0xA831C66D, 0xB00327C8, 0xBF597FC7, 0xC6E00BF3, 0xD5A79147, 0x6CA6351, 0x14292967, 0x27B70A85, 0x2E1B2138, 0x4D2C6DFC, 0x53380D13,
+			0x650A7354, 0x766A0ABB, 0x81C2C92E, 0x92722C85, 0xA2BFE8A1, 0xA81A664B, 0xC24B8B70, 0xC76C51A3, 0xD192E819, 0xD6990624, 0xF40E3585, 0x106AA070,
+			0x19A4C116, 0x1E376C08, 0x2748774C, 0x34B0BCB5, 0x391C0CB3, 0x4ED8AA4A, 0x5B9CCA4F, 0x682E6FF3, 0x748F82EE, 0x78A5636F, 0x84C87814, 0x8CC70208,
+			0x90BEFFFA, 0xA4506CEB, 0xBEF9A3F7, 0xC67178F2
 		]);
-		var HASH : Vector<Int> = Vector.fromArrayCopy([
-			0x6A09E667,0xBB67AE85,0x3C6EF372,0xA54FF53A,
-			0x510E527F,0x9B05688C,0x1F83D9AB,0x5BE0CD19
+		var HASH:Vector<Int> = Vector.fromArrayCopy([
+			0x6A09E667, 0xBB67AE85, 0x3C6EF372, 0xA54FF53A,
+			0x510E527F, 0x9B05688C, 0x1F83D9AB, 0x5BE0CD19
 		]);
 
 		var W = new Vector<Int>(65);
 		W[64] = 0;
-		var a:Int,b:Int,c:Int,d:Int,e:Int,f:Int,g:Int,h:Int;
+		var a:Int, b:Int, c:Int, d:Int, e:Int, f:Int, g:Int, h:Int;
 		var T1, T2;
 		m[l >> 5] |= 0x80 << (24 - l % 32);
 		m[((l + 64 >> 9) << 4) + 15] = l;
-		var i : Int = 0;
-		while ( i < m.length ) {
-			a = HASH[0]; b = HASH[1]; c = HASH[2]; d = HASH[3]; e = HASH[4]; f = HASH[5]; g = HASH[6]; h = HASH[7];
-			for ( j in 0...64 ) {
+		var i:Int = 0;
+		while (i < m.length) {
+			a = HASH[0];
+			b = HASH[1];
+			c = HASH[2];
+			d = HASH[3];
+			e = HASH[4];
+			f = HASH[5];
+			g = HASH[6];
+			h = HASH[7];
+			for (j in 0...64) {
 				if (j < 16)
 					W[j] = m[j + i];
 				else
 					W[j] = safeAdd(safeAdd(safeAdd(Gamma1256(W[j - 2]), W[j - 7]), Gamma0256(W[j - 15])), W[j - 16]);
 				T1 = safeAdd(safeAdd(safeAdd(safeAdd(h, Sigma1256(e)), Ch(e, f, g)), K[j]), W[j]);
 				T2 = safeAdd(Sigma0256(a), Maj(a, b, c));
-				h = g; g = f; f = e; e = safeAdd(d, T1); d = c; c = b; b = a; a = safeAdd(T1, T2);
+				h = g;
+				g = f;
+				f = e;
+				e = safeAdd(d, T1);
+				d = c;
+				c = b;
+				b = a;
+				a = safeAdd(T1, T2);
 			}
 			HASH[0] = safeAdd(a, HASH[0]);
 			HASH[1] = safeAdd(b, HASH[1]);
@@ -137,47 +145,45 @@ class Sha256 {
 		Convert a string to a sequence of 16-word blocks, stored as an array.
 		Append padding bits and the length, as described in the SHA1 standard.
 	 */
-	static function str2blks( data : haxe.io.Bytes ) : Vector<Int>
-	{
+	static function str2blks(data:haxe.io.Bytes):Vector<Int> {
 		var nblk:Int = data.length;
-		data = haxe.crypto.padding.BitPadding.pad(data,8);
-		var blksLenght = (data.length>>2);
-		blksLenght +=  16 - blksLenght % 16;
+		data = haxe.crypto.padding.BitPadding.pad(data, 8);
+		var blksLenght = (data.length >> 2);
+		blksLenght += 16 - blksLenght % 16;
 		var blks = new Vector<Int>(blksLenght);
 		var i = 0;
 		var pos = 0;
-		while ( i < data.length) {
-			blks[pos] = bytesToInt(data,i);
-			i +=4;
+		while (i < data.length) {
+			blks[pos] = bytesToInt(data, i);
+			i += 4;
 			pos++;
-   		}
+		}
 		var padding:Int = 16 - pos % 16;
-		for(j in 0...padding ) {
+		for (j in 0...padding) {
 			blks[pos] = 0;
 			pos++;
 		}
 
-		blks[blks.length-1] = nblk*8;
+		blks[blks.length - 1] = nblk * 8;
 
 		return blks;
 	}
 
-	private static function bytesToInt(bs:haxe.io.Bytes, off:Int):Int
-	{
-		var n:Int = ( bs.get(off) ) << 24;
-		n |= ( bs.get(++off) ) << 16;
-		n |= ( bs.get(++off) ) << 8;
-		n |= bs.get(++off)  ;
+	private static function bytesToInt(bs:haxe.io.Bytes, off:Int):Int {
+		var n:Int = (bs.get(off)) << 24;
+		n |= (bs.get(++off)) << 16;
+		n |= (bs.get(++off)) << 8;
+		n |= bs.get(++off);
 		return n;
 	}
 
-	static function bytes2blks( b : haxe.io.Bytes ) : Vector<Int> {
+	static function bytes2blks(b:haxe.io.Bytes):Vector<Int> {
 		var nblk = ((b.length + 8) >> 6) + 1;
-		var blks = new Vector<Int>(nblk*16);
+		var blks = new Vector<Int>(nblk * 16);
 
-		for (i in 0...nblk*16)
+		for (i in 0...nblk * 16)
 			blks[i] = 0;
-		for (i in 0...b.length){
+		for (i in 0...b.length) {
 			var p = i >> 2;
 			blks[p] |= b.get(i) << (24 - ((i & 3) << 3));
 		}
@@ -189,11 +195,11 @@ class Sha256 {
 	}
 
 	extern inline function S(X, n) {
-		return ( X >>> n ) | (X << (32 - n));
+		return (X >>> n) | (X << (32 - n));
 	}
 
 	extern inline function R(X, n) {
-		return ( X >>> n );
+		return (X >>> n);
 	}
 
 	extern inline function Ch(x, y, z) {
@@ -226,12 +232,11 @@ class Sha256 {
 		return (msw << 16) | (lsw & 0xFFFF);
 	}
 
-	function hex( a : Vector<Int> ){
+	function hex(a:Vector<Int>) {
 		var str = "";
-		for( num in a ) {
+		for (num in a) {
 			str += StringTools.hex(num, 8);
 		}
 		return str.toLowerCase();
 	}
-
 }

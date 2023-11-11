@@ -25,20 +25,16 @@ class Config {
 	static public function getMiscSubDir(...subDir:String)
 		return Path.join([cwd, "misc"].concat(subDir.toArray()));
 
-	static public final ci:Null<Ci> =
-		if (Sys.getEnv("GITHUB_ACTIONS") == "true")
-			GithubActions;
-		else
-			null;
+	static public final ci:Null<Ci> = if (Sys.getEnv("GITHUB_ACTIONS") == "true") GithubActions; else null;
 
 	static public macro function isCi() {
 		return macro $v{ci != null};
 	}
 
 	static public final colorSupported = switch [ci, systemName] {
-		case [GithubActions, _]: true;
-		case [_, "Linux" | "Mac"]: true;
-		case [_, "Windows"]: false;
-		case _: false;
-	}
+			case [GithubActions, _]: true;
+			case [_, "Linux" | "Mac"]: true;
+			case [_, "Windows"]: false;
+			case _: false;
+		}
 }

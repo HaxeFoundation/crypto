@@ -14,7 +14,6 @@ final asyncCache = new Array<() -> Void>();
 @:expose("unit.TestMain.main")
 @:keep
 #end
-
 function main() {
 	#if js
 	if (js.Browser.supported) {
@@ -48,7 +47,7 @@ function main() {
 	var tf:flash.text.TextField = untyped flash.Boot.getTrace();
 	tf.selectable = true;
 	tf.mouseEnabled = true;
-	#end	
+	#end
 	var classes = [
 		new AesTest(),
 		new BlowFishTest(),
@@ -69,16 +68,16 @@ function main() {
 		new ChaChaTest(),
 		new RC4Test(),
 		new XChaCha20Test(),
-		#if (!eval )
+		#if (!eval)
 		new SCryptTest(),
 		#end
 		#if (!neko)
 		// neko bug https://github.com/HaxeFoundation/haxe/issues/10806
 		new Poly1305Test()
 		#end
-	];	
+	];
 	TestIssues.addIssueClasses("src/unit/issues", "unit.issues");
-	
+
 	var runner = new Runner();
 	for (c in classes) {
 		runner.addCase(c);
@@ -110,7 +109,7 @@ function main() {
 		});
 	#end
 	runner.run();
-	
+
 	#if (flash && fdb)
 	flash.Lib.fscommand("quit");
 	#end

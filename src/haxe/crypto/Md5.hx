@@ -23,7 +23,6 @@
 package haxe.crypto;
 
 import haxe.io.Bytes;
-
 #if java
 import java.security.MessageDigest;
 import java.nio.charset.StandardCharsets;

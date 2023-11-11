@@ -12,7 +12,7 @@ class RunCi {
 		Sys.putEnv("OCAMLRUNPARAM", "b");
 
 		var args = Sys.args();
-		var tests:Array<TestTarget> = switch (args.length==1 ? args[0] : Sys.getEnv("TEST")) {
+		var tests:Array<TestTarget> = switch (args.length == 1 ? args[0] : Sys.getEnv("TEST")) {
 			case null:
 				[Macro];
 			case env:
@@ -37,10 +37,10 @@ class RunCi {
 					// change codepage to UTF-8
 					runCommand("chcp", ["65001"]);
 				case _:
-					//pass
+					// pass
 			}
 
-			//run neko-based http echo server
+			// run neko-based http echo server
 			var echoServer = new sys.io.Process('nekotools', ['server', '-d', 'echoServer/www/', '-p', '20200']);
 
 			infoMsg('test $test');
@@ -52,7 +52,7 @@ class RunCi {
 					case null:
 						[];
 					case GithubActions:
-						["-D","github"];
+						["-D", "github"];
 				}
 				args = args.concat(["-D", systemName]);
 				switch (test) {
@@ -69,7 +69,7 @@ class RunCi {
 					case Cpp:
 						runci.targets.Cpp.run(args, true, false);
 					case Cppia:
-						//runci.targets.Cpp.run(args, false, true);
+						// runci.targets.Cpp.run(args, false, true);
 						trace("Skip Cppia test --> CallMember haxe.crypto.Hmac (01F6A5E4 00000000) 'getSize' fallback");
 					case Js:
 						runci.targets.Js.run(args);
@@ -86,7 +86,7 @@ class RunCi {
 					case t:
 						throw new Exception("unknown target: " + t);
 				}
-			} catch(f:CommandFailure) {
+			} catch (f:CommandFailure) {
 				failMsg('test ${test} failed');
 				Sys.exit(f.exitCode);
 			}

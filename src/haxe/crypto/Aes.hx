@@ -2,12 +2,10 @@ package haxe.crypto;
 
 import haxe.ds.Vector;
 import haxe.io.Bytes;
-
 import haxe.crypto.mode.*;
 import haxe.crypto.padding.*;
 
-class Aes
-{
+class Aes {
 	private static var SBOX:Vector<Int>;
 	private static var RSBOX:Vector<Int>;
 	private static var SUB_BYTES_MIX_COLUMN_0:Vector<Int>;

@@ -5,42 +5,44 @@ import runci.System.*;
 import sys.io.File;
 import sys.FileSystem;
 import haxe.*;
+
 using StringTools;
 
 class Deployment {
 	static var S3_HXBUILDS_ADDR(default, null) = 's3://hxbuilds/builds/haxe';
 
-	static var gitInfo(get, null):{repo:String, branch:String, commit:String, timestamp:Float, date:String};
+	static var gitInfo(get, null):{
+		repo:String,
+		branch:String,
+		commit:String,
+		timestamp:Float,
+		date:String
+	};
 
-	static function get_gitInfo() return if (gitInfo != null) gitInfo else gitInfo = {
-		repo: commandResult("git", ["config", "--get", "remote.origin.url"]).stdout.trim(),
-		branch: commandResult("git", ["rev-parse", "--abbrev-ref", "HEAD"]).stdout.trim(),
-		commit: commandResult("git", ["rev-parse", "HEAD"]).stdout.trim(),
-		timestamp: Std.parseFloat(commandResult("git", ["show", "-s", "--format=%ct", "HEAD"]).stdout),
-		date: {
-			var gitTime = commandResult("git", ["show", "-s", "--format=%ct", "HEAD"]).stdout;
-			var tzd = {
-				var z = Date.fromTime(0);
-				z.getHours() * 60 * 60 * 1000 + z.getMinutes() * 60 * 1000;
+	static function get_gitInfo()
+		return if (gitInfo != null) gitInfo else gitInfo = {
+			repo: commandResult("git", ["config", "--get", "remote.origin.url"]).stdout.trim(),
+			branch: commandResult("git", ["rev-parse", "--abbrev-ref", "HEAD"]).stdout.trim(),
+			commit: commandResult("git", ["rev-parse", "HEAD"]).stdout.trim(),
+			timestamp: Std.parseFloat(commandResult("git", ["show", "-s", "--format=%ct", "HEAD"]).stdout),
+			date: {
+				var gitTime = commandResult("git", ["show", "-s", "--format=%ct", "HEAD"]).stdout;
+				var tzd = {
+					var z = Date.fromTime(0);
+					z.getHours() * 60 * 60 * 1000 + z.getMinutes() * 60 * 1000;
+				}
+				// make time in the UTC time zone
+				var time = Date.fromTime(Std.parseFloat(gitTime) * 1000 - tzd);
+				DateTools.format(time, "%Y-%m-%dT%H:%M:%SZ");
 			}
-			// make time in the UTC time zone
-			var time = Date.fromTime(Std.parseFloat(gitTime) * 1000 - tzd);
-			DateTools.format(time, "%Y-%m-%dT%H:%M:%SZ");
 		}
-	}
 
 	static function isDeployNightlies() {
-		return
-			Sys.getEnv("DEPLOY_NIGHTLIES") != null &&
-			(gitInfo.branch == "development" || gitInfo.branch == "master");
+		return Sys.getEnv("DEPLOY_NIGHTLIES") != null && (gitInfo.branch == "development" || gitInfo.branch == "master");
 	}
 
 	static function deployBintray():Void {
-		if (
-			Sys.getEnv("BINTRAY") != null &&
-			Sys.getEnv("BINTRAY_USERNAME") != null &&
-			Sys.getEnv("BINTRAY_API_KEY") != null
-		) {
+		if (Sys.getEnv("BINTRAY") != null && Sys.getEnv("BINTRAY_USERNAME") != null && Sys.getEnv("BINTRAY_API_KEY") != null) {
 			// generate bintray config
 			var tpl = new Template(File.getContent("extra/bintray.tpl.json"));
 			var compatDate = ~/[^0-9]/g.replace(gitInfo.date, "");
@@ -50,7 +52,7 @@ class Deployment {
 					sub != null ? sub : Sys.getEnv("BINTRAY_USERNAME");
 				},
 				os: systemName.toLowerCase(),
-				versionName: '${haxeVer}+${compatDate}.${gitInfo.commit.substr(0,7)}',
+				versionName: '${haxeVer}+${compatDate}.${gitInfo.commit.substr(0, 7)}',
 				versionDesc: "Automated CI build.",
 				gitRepo: gitInfo.repo,
 				gitBranch: gitInfo.branch,
@@ -65,23 +67,19 @@ class Deployment {
 	}
 
 	static function isDeployApiDocsRequired() {
-		return
-			Sys.getEnv("DEPLOY_API_DOCS") != null &&
-			(
-				gitInfo.branch == "development" ||
-				switch(Sys.getEnv("TRAVIS_TAG")) { // TODO: there's no Travis anymore, we might want to change this for GH actions
+		return Sys.getEnv("DEPLOY_API_DOCS") != null
+			&& (gitInfo.branch == "development"
+				|| switch (Sys.getEnv("TRAVIS_TAG")) { // TODO: there's no Travis anymore, we might want to change this for GH actions
 					case null, _.trim() => "":
 						false;
 					case tag:
 						true;
-				}
-			);
+				});
 	}
 
 	/**
 		Deploy doc to api.haxe.org.
-	*/
-
+	 */
 	static function deployApiDoc():Void {
 		changeDirectory(repoDir);
 		runCommand("make", ["xmldoc"]);
@@ -99,25 +97,20 @@ class Deployment {
 		}
 	}
 
-	static function cleanup32BitDlls()
-	{
+	static function cleanup32BitDlls() {
 		infoMsg('Cleaning up the 32-bit DLLS');
 		cleanup32BitDll('zlib1.dll');
 	}
 
-	static function cleanup32BitDll(name:String)
-	{
+	static function cleanup32BitDll(name:String) {
 		var cygRoot = Sys.getEnv("CYG_ROOT");
 		if (cygRoot != null) {
-			while (true)
-			{
+			while (true) {
 				var proc = new sys.io.Process('$cygRoot/bin/bash', ['-lc', '/usr/bin/cygpath -w "`which $name`"']);
 				var out = proc.stdout.readAll().toString().trim();
 				var err = proc.stderr.readAll().toString().trim();
-				if (proc.exitCode() == 0)
-				{
-					if (!is64BitDll(out))
-					{
+				if (proc.exitCode() == 0) {
+					if (!is64BitDll(out)) {
 						infoMsg('Deleting the file $out because it is a 32-bit DLL');
 						sys.FileSystem.deleteFile(out);
 					} else {
@@ -130,11 +123,9 @@ class Deployment {
 			}
 		} else {
 			var path = Sys.getEnv('PATH').split(';');
-			for (base in path)
-			{
+			for (base in path) {
 				var fullPath = '$base/$name';
-				if (sys.FileSystem.exists(fullPath) && !is64BitDll(fullPath))
-				{
+				if (sys.FileSystem.exists(fullPath) && !is64BitDll(fullPath)) {
 					infoMsg('Deleting the file $fullPath because it is a 32-bit DLL');
 					sys.FileSystem.deleteFile(fullPath);
 				}
@@ -142,23 +133,19 @@ class Deployment {
 		}
 	}
 
-	static function is64BitDll(path:String)
-	{
-		if (!sys.FileSystem.exists(path))
-		{
+	static function is64BitDll(path:String) {
+		if (!sys.FileSystem.exists(path)) {
 			throw 'The DLL at path $path was not found';
 		}
 
 		var file = sys.io.File.read(path);
-		if (file.readByte() != 'M'.code || file.readByte() != 'Z'.code)
-		{
+		if (file.readByte() != 'M'.code || file.readByte() != 'Z'.code) {
 			throw 'The DLL at path $path is invalid: Invalid MZ magic header';
 		}
 		file.seek(0x3c, SeekBegin);
 		var peSigOffset = file.readInt32();
 		file.seek(peSigOffset, SeekBegin);
-		if (file.readByte() != 'P'.code || file.readByte() != 'E'.code || file.readByte() != 0 || file.readByte() != 0)
-		{
+		if (file.readByte() != 'P'.code || file.readByte() != 'E'.code || file.readByte() != 0 || file.readByte() != 0) {
 			throw 'Invalid PE header signature: PE expected';
 		}
 		// coff header
@@ -166,8 +153,7 @@ class Deployment {
 		// pe header
 		var peKind = file.readUInt16();
 		file.close();
-		switch(peKind)
-		{
+		switch (peKind) {
 			case 0x20b: // 64 bit
 				return true;
 			case 0x10b: // 32 bit
@@ -191,13 +177,9 @@ class Deployment {
 
 	/**
 		Deploy source package to ppa:haxe/snapshots.
-	*/
+	 */
 	static function deployPPA():Void {
-		if (
-			gitInfo.branch == "development" &&
-			Sys.getEnv("DEPLOY") != null &&
-			Sys.getEnv("haxeci_decrypt") != null
-		) {
+		if (gitInfo.branch == "development" && Sys.getEnv("DEPLOY") != null && Sys.getEnv("haxeci_decrypt") != null) {
 			// setup deb info
 			runCommand("git config --global user.name \"${DEBFULLNAME}\"");
 			runCommand("git config --global user.email \"${DEBEMAIL}\"");
@@ -210,7 +192,7 @@ class Deployment {
 			runCommand("gpg --allow-secret-key-import --import extra/haxeci_sec.gpg");
 			runCommand("sudo apt-get install devscripts git-buildpackage ubuntu-dev-tools dh-make -y");
 			var compatDate = ~/[^0-9]/g.replace(gitInfo.date, "");
-			var SNAPSHOT_VERSION = '${haxeVerFull}+1SNAPSHOT${compatDate}+${gitInfo.commit.substr(0,7)}';
+			var SNAPSHOT_VERSION = '${haxeVerFull}+1SNAPSHOT${compatDate}+${gitInfo.commit.substr(0, 7)}';
 			runCommand('cp out/haxe*_src.tar.gz "../haxe_${SNAPSHOT_VERSION}.orig.tar.gz"');
 			changeDirectory("..");
 			runCommand("git clone https://github.com/HaxeFoundation/haxe-debian.git");

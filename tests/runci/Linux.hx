@@ -8,7 +8,7 @@ class Linux {
 	static public var arch(get, null):Arch;
 
 	static function get_arch() {
-		if(arch == null)
+		if (arch == null)
 			arch = switch commandResult('arch', []).stdout.replace('\n', '') {
 				case 'arm64' | 'aarch64': Arm64;
 				case _: Amd64;
@@ -26,7 +26,7 @@ class Linux {
 	}
 
 	static public function requireAptPackages(packages:Array<String>):Void {
-		if (!hasAptGet()){
+		if (!hasAptGet()) {
 			infoMsg("System does not have apt-get installed.");
 			return;
 		}

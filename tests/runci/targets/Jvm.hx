@@ -13,9 +13,8 @@ class Jvm {
 			runCommand("haxe", ["compile-jvm.hxml"].concat(args));
 			runCommand("java", ["-jar", "bin/unit.jar"]);
 
-			runCommand("haxe", ["compile-jvm.hxml","-dce","no"].concat(args));
+			runCommand("haxe", ["compile-jvm.hxml", "-dce", "no"].concat(args));
 			runCommand("java", ["-jar", "bin/unit.jar"]);
 		}
-
 	}
 }

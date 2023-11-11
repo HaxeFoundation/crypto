@@ -5,8 +5,7 @@ import haxe.Timer;
 import haxe.io.Bytes;
 import haxe.crypto.RC4;
 
-class RC4Test extends Test
-{
+class RC4Test extends Test {
 	var keys = [
 		"676F6F646E657373",
 		"736563726574206B6579",
@@ -25,23 +24,21 @@ class RC4Test extends Test
 		"78FB7BD417EB961227133F20A8E744E3DE52FB873370D6599524111CBA1552842095AC3F91FFF1B813218AE8E1F9C64F1E66A8B3AFC4AE44FCC2CBCE00177EB41CDC4ECCF0EBCA35C7F081C06093C11F20CFD65AC5D801C538760FC871B3946076C7CDF47F46087FCEF8B7BED95EA078E5863FC078F5DEE195E9D2A8A52374285134B49E39270EBDA08E0991972A848822CCBC4D0CCC02B6F3DE0B9BEC4184AFF2C0914584AE15682F4CB8405E92A8EE73EBD5A54F8253EBE4E1C86C2D40EAAD8BD88B6104E3B654B17B8FF977E11B2B2CADB894B285D21642D5C2BAFBE4763E8A4F418ACEEBA1677C3EF0AEAD9E9BD239E93587F63CD2"
 	];
 
-	public function test_rc4():Void
-	{
-		trace("RC4 for "+keys.length+" keys");
+	public function test_rc4():Void {
+		trace("RC4 for " + keys.length + " keys");
 		var time = Timer.stamp();
-		for(i in 0...keys.length)
-		{
+		for (i in 0...keys.length) {
 			var key = Bytes.ofHex(keys[i]);
 			var text = Bytes.ofHex(plainText[i]);
 			var rc4 = new RC4();
 			rc4.init(key);
 			var enc = rc4.encrypt(text);
-			eq( enc.toHex().toUpperCase(), ciphers[i] );
+			eq(enc.toHex().toUpperCase(), ciphers[i]);
 			rc4.init(key);
 			var decr = rc4.decrypt(enc);
-			eq( decr.toHex().toUpperCase(), plainText[i] );
-			}
-		time = Timer.stamp()-time;
-		trace("Finished : "+time+" seconds");
+			eq(decr.toHex().toUpperCase(), plainText[i]);
+		}
+		time = Timer.stamp() - time;
+		trace("Finished : " + time + " seconds");
 	}
 }

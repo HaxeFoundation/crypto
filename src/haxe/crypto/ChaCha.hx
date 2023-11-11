@@ -3,79 +3,74 @@ package haxe.crypto;
 import haxe.ds.Vector;
 import haxe.io.Bytes;
 
-class ChaCha extends Salsa20
-{
+class ChaCha extends Salsa20 {
 	private var nonceLength:Int;
 
-	override public function init(key:Bytes, nonce:Bytes,?counter:Int64):Void
-	{
+	override public function init(key:Bytes, nonce:Bytes, ?counter:Int64):Void {
 		if (nonce == null)
 			throw "A nonce cannot be null";
-		
+
 		nonceLength = nonce.length;
-		
+
 		if (nonceLength != 8 && nonceLength != 12)
 			throw "Nonce must be exactly 8 or 12 bytes";
 		if (key == null)
 			throw "Key must be 16 or 32 bytes";
 		if (key.length != 16 && key.length != 32)
 			throw "Wrong key size";
-		if ( nonceLength == 12 && key.length != 32)
+		if (nonceLength == 12 && key.length != 32)
 			throw "Key must be 32 bytes for nonce length of 12 bytes";
-			
-		
+
 		setConstant(key);
 		setNonce(nonce);
 		setKey(key);
 		reset();
-		if (counter != null ) setCounter(counter);
-	}
-	
-	override private function setConstant(key:Bytes):Void
-	{
-		var sigmaOffset:Int =  (key.length == 16)?0:4;
-		state[0] = sigmas[sigmaOffset];
-		state[1] = sigmas[sigmaOffset+1];
-		state[2] = sigmas[sigmaOffset+2];
-		state[3] = sigmas[sigmaOffset+3];
+		if (counter != null)
+			setCounter(counter);
 	}
 
-	override public function resetCounter():Void
-	{
+	override private function setConstant(key:Bytes):Void {
+		var sigmaOffset:Int = (key.length == 16) ? 0 : 4;
+		state[0] = sigmas[sigmaOffset];
+		state[1] = sigmas[sigmaOffset + 1];
+		state[2] = sigmas[sigmaOffset + 2];
+		state[3] = sigmas[sigmaOffset + 3];
+	}
+
+	override public function resetCounter():Void {
 		counter = 0;
 		state[12] = 0;
-		if ( nonceLength == 8 ) state[13] = 0;
+		if (nonceLength == 8)
+			state[13] = 0;
 	}
 
-	override private function updateCounterState():Void
-	{
+	override private function updateCounterState():Void {
 		//  RFC 7539 does not say what should happen for counter - 0xfffffffe
 		// ChaChaTLS uses one 32-bit word for a block counter
-		if ( nonceLength == 12 && ( counter.high > 0 ))  {
+		if (nonceLength == 12 && (counter.high > 0)) {
 			counter = 0; // Match with Java11 ChaCha20 implementation
-			//throw "Increase of counter past 2^32";
+			// throw "Increase of counter past 2^32";
 		}
 		state[12] = counter.low;
-		if ( nonceLength == 8 ) state[13] = counter.high;
+		if (nonceLength == 8)
+			state[13] = counter.high;
 	}
 
-	override public function setKey(key:Bytes):Void
-	{
-		if ( key.length == 16 ) {
-			for(i in 0...4) {
-				state[i+4] = state[i+8] = bytesToInt32(key,i*4);
+	override public function setKey(key:Bytes):Void {
+		if (key.length == 16) {
+			for (i in 0...4) {
+				state[i + 4] = state[i + 8] = bytesToInt32(key, i * 4);
 			}
 		} else {
-			for(i in 0...4) {
-				state[i+4] = bytesToInt32(key,i*4);
-				state[i+8] = bytesToInt32(key,i*4+16);
+			for (i in 0...4) {
+				state[i + 4] = bytesToInt32(key, i * 4);
+				state[i + 8] = bytesToInt32(key, i * 4 + 16);
 			}
 		}
 	}
 
-	override public function setNonce(nonce:Bytes):Void
-	{
-		if ( nonce.length == 8 ) {
+	override public function setNonce(nonce:Bytes):Void {
+		if (nonce.length == 8) {
 			state[14] = bytesToInt32(nonce, 0);
 			state[15] = bytesToInt32(nonce, 4);
 		} else {
@@ -85,13 +80,12 @@ class ChaCha extends Salsa20
 		}
 	}
 
-	override public function generateBlock(input:Vector<Int>, output:Vector<Int>, rounds:Int = 20, offset:Int = 0):Void 
-	{
+	override public function generateBlock(input:Vector<Int>, output:Vector<Int>, rounds:Int = 20, offset:Int = 0):Void {
 		if ((rounds & 1) != 0) {
 			throw "Rounds should be a positive, even number";
 		}
 		if ((output.length != 16) || input.length != 16) {
-			 throw "Invalid buffer size";
+			throw "Invalid buffer size";
 		}
 		var x0:Int32 = input[0];
 		var x1:Int32 = input[1];
@@ -110,40 +104,72 @@ class ChaCha extends Salsa20
 		var x14:Int32 = input[14];
 		var x15:Int32 = input[15];
 
-		var h = rounds>>1;
-		for(i in 0...h) {
-			x0 += x4; x12 = rol32(x12 ^ x0, 16);
-			x8 += x12; x4 = rol32(x4 ^ x8, 12);
-			x0 += x4; x12 = rol32(x12 ^ x0, 8);
-			x8 += x12; x4 = rol32(x4 ^ x8, 7);
-			x1 += x5; x13 = rol32(x13 ^ x1, 16);
-			x9 += x13; x5 = rol32(x5 ^ x9, 12);
-			x1 += x5; x13 = rol32(x13 ^ x1, 8);
-			x9 += x13; x5 = rol32(x5 ^ x9, 7);
-			x2 += x6; x14 = rol32(x14 ^ x2, 16);
-			x10 += x14; x6 = rol32(x6 ^ x10, 12);
-			x2 += x6; x14 = rol32(x14 ^ x2, 8);
-			x10 += x14; x6 = rol32(x6 ^ x10, 7);
-			x3 += x7; x15 = rol32(x15 ^ x3, 16);
-			x11 += x15; x7 = rol32(x7 ^ x11, 12);
-			x3 += x7; x15 = rol32(x15 ^ x3, 8);
-			x11 += x15; x7 = rol32(x7 ^ x11, 7);
-			x0 += x5; x15 = rol32(x15 ^ x0, 16);
-			x10 += x15; x5 = rol32(x5 ^ x10, 12);
-			x0 += x5; x15 = rol32(x15 ^ x0, 8);
-			x10 += x15; x5 = rol32(x5 ^ x10, 7);
-			x1 += x6; x12 = rol32(x12 ^ x1, 16);
-			x11 += x12; x6 = rol32(x6 ^ x11, 12);
-			x1 += x6; x12 = rol32(x12 ^ x1, 8);
-			x11 += x12; x6 = rol32(x6 ^ x11, 7);
-			x2 += x7; x13 = rol32(x13 ^ x2, 16);
-			x8 += x13; x7 = rol32(x7 ^ x8, 12);
-			x2 += x7; x13 = rol32(x13 ^ x2, 8);
-			x8 += x13; x7 = rol32(x7 ^ x8, 7);
-			x3 += x4; x14 = rol32(x14 ^ x3, 16);
-			x9 += x14; x4 = rol32(x4 ^ x9, 12);
-			x3 += x4; x14 = rol32(x14 ^ x3, 8);
-			x9 += x14; x4 = rol32(x4 ^ x9, 7);
+		var h = rounds >> 1;
+		for (i in 0...h) {
+			x0 += x4;
+			x12 = rol32(x12 ^ x0, 16);
+			x8 += x12;
+			x4 = rol32(x4 ^ x8, 12);
+			x0 += x4;
+			x12 = rol32(x12 ^ x0, 8);
+			x8 += x12;
+			x4 = rol32(x4 ^ x8, 7);
+			x1 += x5;
+			x13 = rol32(x13 ^ x1, 16);
+			x9 += x13;
+			x5 = rol32(x5 ^ x9, 12);
+			x1 += x5;
+			x13 = rol32(x13 ^ x1, 8);
+			x9 += x13;
+			x5 = rol32(x5 ^ x9, 7);
+			x2 += x6;
+			x14 = rol32(x14 ^ x2, 16);
+			x10 += x14;
+			x6 = rol32(x6 ^ x10, 12);
+			x2 += x6;
+			x14 = rol32(x14 ^ x2, 8);
+			x10 += x14;
+			x6 = rol32(x6 ^ x10, 7);
+			x3 += x7;
+			x15 = rol32(x15 ^ x3, 16);
+			x11 += x15;
+			x7 = rol32(x7 ^ x11, 12);
+			x3 += x7;
+			x15 = rol32(x15 ^ x3, 8);
+			x11 += x15;
+			x7 = rol32(x7 ^ x11, 7);
+			x0 += x5;
+			x15 = rol32(x15 ^ x0, 16);
+			x10 += x15;
+			x5 = rol32(x5 ^ x10, 12);
+			x0 += x5;
+			x15 = rol32(x15 ^ x0, 8);
+			x10 += x15;
+			x5 = rol32(x5 ^ x10, 7);
+			x1 += x6;
+			x12 = rol32(x12 ^ x1, 16);
+			x11 += x12;
+			x6 = rol32(x6 ^ x11, 12);
+			x1 += x6;
+			x12 = rol32(x12 ^ x1, 8);
+			x11 += x12;
+			x6 = rol32(x6 ^ x11, 7);
+			x2 += x7;
+			x13 = rol32(x13 ^ x2, 16);
+			x8 += x13;
+			x7 = rol32(x7 ^ x8, 12);
+			x2 += x7;
+			x13 = rol32(x13 ^ x2, 8);
+			x8 += x13;
+			x7 = rol32(x7 ^ x8, 7);
+			x3 += x4;
+			x14 = rol32(x14 ^ x3, 16);
+			x9 += x14;
+			x4 = rol32(x4 ^ x9, 12);
+			x3 += x4;
+			x14 = rol32(x14 ^ x3, 8);
+			x9 += x14;
+			x4 = rol32(x4 ^ x9, 7);
 		}
 		output[0] = x0 + input[0];
 		output[1] = x1 + input[1];

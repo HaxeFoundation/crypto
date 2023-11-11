@@ -4,6 +4,7 @@ import sys.FileSystem;
 import haxe.io.Path;
 import runci.System.*;
 import runci.Config.*;
+
 using StringTools;
 
 class Java {
@@ -21,7 +22,7 @@ class Java {
 		runCommand("haxe", ["compile-java.hxml"].concat(args));
 		runCommand("java", ["-jar", "bin/java/TestMain-Debug.jar"]);
 
-		runCommand("haxe", ["compile-java.hxml","-dce","no"].concat(args));
+		runCommand("haxe", ["compile-java.hxml", "-dce", "no"].concat(args));
 		runCommand("java", ["-jar", "bin/java/TestMain-Debug.jar"]);
 	}
 }
