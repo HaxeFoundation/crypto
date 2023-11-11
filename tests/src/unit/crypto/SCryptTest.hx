@@ -47,6 +47,7 @@ class SCryptTest extends Test {
 
 	public function test():Void {
 		trace("SCrypt with " + plainText.length + " keys");
+		haxe.crypto.Hmac.debug = true;
 		var time = Timer.stamp();
 		var scrypt:SCrypt = new SCrypt();
 		for (i in 0...plainText.length) {

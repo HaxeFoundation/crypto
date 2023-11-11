@@ -44,6 +44,8 @@ class Hmac {
 	var method:HashMethod;
 	var blockSize:Int;
 	var length:Int;
+	
+	public static var debug:Bool = false;
 
 	public function new(hashMethod:HashMethod) {
 		if (hashMethod != null)
@@ -101,7 +103,10 @@ class Hmac {
 			key = doHash(key);
 		}
 		key = nullPad(key, blockSize);
-
+		if (debug) {
+			trace("key:  " + key.toHex());
+			trace("msg:  " + msg.toHex());
+		}
 		var Ki = Bytes.alloc(key.length + msg.length);
 		var Ko = Bytes.alloc(key.length + length);
 		for (i in 0...key.length) {
@@ -109,8 +114,19 @@ class Hmac {
 			Ki.set(i, key.get(i) ^ 0x36);
 		}
 		// hash(Ko + hash(Ki + message))
+		if (debug) {
+			trace("1) " + Ki.toHex());
+			trace("1) " + Ko.toHex());
+		}
 		Ki.blit(key.length, msg, 0, msg.length);
+		if (debug) {
+			trace("2) " + Ki.toHex());
+		}
 		Ko.blit(key.length, doHash(Ki), 0, length);
+		if (debug) {
+			trace("2) " + Ko.toHex());
+			debug = false;
+		}
 		return doHash(Ko);
 	}
 }
