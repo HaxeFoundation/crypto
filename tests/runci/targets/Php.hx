@@ -27,8 +27,6 @@ class Php {
 			"-c",
 			windowsPhpIni,
 			"-d",
-			'extension_dir=$windowsPhpExtPath',
-			"-d",
 			"memory_limit=-1",
 			file
 		];
