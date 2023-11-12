@@ -24,10 +24,6 @@ class Php {
 		if (systemName != "Windows")
 			return ["-d", "memory_limit=-1", file];
 		return [
-			"-c",
-			windowsPhpIni,
-			"-d",
-			'extension_dir=$windowsPhpExtPath',
 			"-d",
 			"memory_limit=-1",
 			file
