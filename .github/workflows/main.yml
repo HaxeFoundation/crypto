@@ -90,6 +90,11 @@ jobs:
       - name: Flash setup
         if: matrix.target == 'flash'
         run: export DISPLAY=:99.0
+      - name: Update Linux packages
+        run: |
+          set -ex
+          sudo apt update -qqy
+          sudo apt install -qqy
       - name: Test
         shell: bash
         run: haxe RunCi.hxml
@@ -114,10 +119,6 @@ jobs:
       - uses: actions/checkout@main
         with:
           submodules: recursive
-      - uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.1'
-          extensions: mbstring
 
       - name: Install Neko from S3
         shell: pwsh
@@ -129,9 +130,6 @@ jobs:
           echo "NEKOPATH=$NEKOPATH" >> $env:GITHUB_ENV
       - name: Print Neko version
         run: neko -version 2>&1
-
-      - name: Print PHP extension
-        run: php -i | grep mbstring
       # - name: Quick test
       #   shell: pwsh
       #   run: |

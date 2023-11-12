@@ -23,7 +23,7 @@ class Python {
 						case Amd64: "linux64";
 					});
 					final file = '${pypyVersion}.tar.bz2';
-					if(!FileSystem.exists(file)) {
+					if (!FileSystem.exists(file)) {
 						runNetworkCommand("wget", ["-nv", 'https://downloads.python.org/pypy/$file']);
 					}
 					runCommand("tar", ["-xf", file]);

@@ -14,11 +14,10 @@ class Hl {
 
 	static final hlBuildBinDir = Path.join([getInstallPath(), "hashlink_build", "bin"]);
 
-	static final hlBinary =
-		if (isCi() || !commandSucceed("hl", ["--version"])){
+	static final hlBinary = if (isCi() || !commandSucceed("hl", ["--version"])) {
 			Path.join([hlBuildBinDir, "hl"]) + ((systemName == "Windows") ? ".exe" : "");
 		} else {
-			commandResult(if(systemName == "Windows") "where" else "which", ["hl"]).stdout.trim();
+			commandResult(if (systemName == "Windows") "where" else "which", ["hl"]).stdout.trim();
 		};
 
 	static final miscHlDir = getMiscSubDir('hl');
@@ -35,33 +34,31 @@ class Hl {
 
 		switch (systemName) {
 			case "Linux":
-				Linux.requireAptPackages(["libturbojpeg-dev","libmbedtls-dev","libopenal-dev","libpng-dev","libsdl2-dev","libuv1-dev","libvorbis-dev","libsqlite3-dev","ninja-build"]);
+				Linux.requireAptPackages([
+					"libturbojpeg-dev",
+					"libmbedtls-dev",
+					"libopenal-dev",
+					"libpng-dev",
+					"libsdl2-dev",
+					"libuv1-dev",
+					"libvorbis-dev",
+					"libsqlite3-dev",
+					"ninja-build"
+				]);
 			case "Mac":
 				runNetworkCommand("brew", ["update", '--preinstall']);
 				runNetworkCommand("brew", ["bundle", '--file=${hlSrc}/Brewfile']);
 			case "Windows":
-				//pass
+				// pass
 		}
 
 		FileSystem.createDirectory(hlBuild);
 		final generator = systemName == "Windows" ? ["-DCMAKE_SYSTEM_VERSION=10.0.19041.0"] : ["-GNinja"];
 		runCommand("cmake", generator.concat([
-			"-DBUILD_TESTING=OFF",
-			"-DWITH_DIRECTX=OFF",
-			"-DWITH_FMT=ON",
-			"-DWITH_OPENAL=OFF",
-			"-DWITH_SDL=OFF",
-			"-DWITH_SQLITE=ON",
-			"-DWITH_SSL=OFF",
-			"-DWITH_UI=OFF",
-			"-DWITH_UV=OFF",
-			"-DWITH_VIDEO=OFF",
-			"-B" + hlBuild,
-			"-H" + hlSrc
+			"-DBUILD_TESTING=OFF", "-DWITH_DIRECTX=OFF", "-DWITH_FMT=ON", "-DWITH_OPENAL=OFF", "-DWITH_SDL=OFF", "-DWITH_SQLITE=ON", "-DWITH_SSL=OFF",
+			"-DWITH_UI=OFF", "-DWITH_UV=OFF", "-DWITH_VIDEO=OFF", "-B" + hlBuild, "-H" + hlSrc
 		]));
-		runCommand("cmake", [
-			"--build", hlBuild
-		]);
+		runCommand("cmake", ["--build", hlBuild]);
 
 		runCommand(hlBinary, ["--version"]);
 		addToPATH(hlBuildBinDir);
@@ -76,9 +73,7 @@ class Hl {
 			case "Windows":
 				runCommand("haxe", ["compile-hl.hxml"].concat(args));
 			case _:
-				runCommand("haxe", [
-					"compile-hl.hxml",
-					"-D", "no_http", // hl's ssl.hdll is only built on Windows
+				runCommand("haxe", ["compile-hl.hxml", "-D", "no_http", // hl's ssl.hdll is only built on Windows
 				].concat(args));
 		}
 		runCommand(hlBinary, ["bin/unit.hl"]);

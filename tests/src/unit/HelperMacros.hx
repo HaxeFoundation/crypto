@@ -7,7 +7,7 @@ import haxe.macro.MacroStringTools.*;
 
 class HelperMacros {
 	static public macro function getCompilationDate() {
-		return macro $v { Std.string(Date.now()) };
+		return macro $v{Std.string(Date.now())};
 	}
 
 	static public macro function typeString(e) {
@@ -19,7 +19,7 @@ class HelperMacros {
 	static public macro function typedAs(actual:haxe.macro.Expr, expected:haxe.macro.Expr) {
 		var tExpected = typeof(expected);
 		var tActual = typeof(actual);
-		return parse("eq('" +Std.string(tActual) + "', '" +Std.string(tExpected) + "')", currentPos());
+		return parse("eq('" + Std.string(tActual) + "', '" + Std.string(tExpected) + "')", currentPos());
 	}
 
 	static public macro function isNullable(expr:haxe.macro.Expr) {
@@ -45,7 +45,7 @@ class HelperMacros {
 			typeof(e);
 			"false";
 		} catch (e:Dynamic) "true";
-		return { pos: currentPos(), expr: haxe.macro.Expr.ExprDef.EConst(haxe.macro.Expr.Constant.CIdent(result)) };
+		return {pos: currentPos(), expr: haxe.macro.Expr.ExprDef.EConst(haxe.macro.Expr.Constant.CIdent(result))};
 	}
 
 	static public macro function typeErrorText(e:haxe.macro.Expr) {
@@ -55,17 +55,15 @@ class HelperMacros {
 		} catch (e:haxe.macro.Expr.Error) e.message;
 		return {
 			pos: currentPos(),
-			expr: if (result == null)
-					haxe.macro.Expr.ExprDef.EConst(haxe.macro.Expr.Constant.CIdent("null"))
-				else
-					haxe.macro.Expr.ExprDef.EConst(haxe.macro.Expr.Constant.CString(result))
+			expr: if (result == null) haxe.macro.Expr.ExprDef.EConst(haxe.macro.Expr.Constant.CIdent("null")) else
+				haxe.macro.Expr.ExprDef.EConst(haxe.macro.Expr.Constant.CString(result))
 		};
 	}
 
 	static public macro function getMeta(e) {
-		switch(e.expr) {
+		switch (e.expr) {
 			case EMeta(m, _):
-				return macro { name: $v{m.name}, args: $a{m.params} };
+				return macro {name: $v{m.name}, args: $a{m.params}};
 			default:
 				return macro report("Metadata expected");
 		}
@@ -88,9 +86,9 @@ class HelperMacros {
 	static public macro function pipeMarkupLiteral(e:Expr) {
 		function loop(e:Expr) {
 			return switch (e) {
-				case macro @:markup $v{(s:String)}:
+				case macro @:markup $v{(s : String)} :
 					formatString(s, e.pos);
-				case macro $b{el}:
+				case macro $b{el} :
 					el = el.map(loop);
 					macro $a{el}.join("");
 				case _:
@@ -102,7 +100,7 @@ class HelperMacros {
 
 	static public macro function pipeMarkupLiteralUnprocessed(e:Expr) {
 		return switch (e) {
-			case macro @:markup $v{(s:String)}:
+			case macro @:markup $v{(s : String)} :
 				macro $v{s};
 			case _:
 				error("Markup literal expected", e.pos);

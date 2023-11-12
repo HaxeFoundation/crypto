@@ -20,7 +20,7 @@ class Js {
 					Linux.requireAptPackages(["nodejs"]);
 				}
 			case _:
-				//pass
+				// pass
 		}
 
 		runCommand("node", ["-v"]);
@@ -30,7 +30,7 @@ class Js {
 		final required = if (isCi()) {
 			packages;
 		} else {
-			final filtered = packages.filter( (lib) -> {
+			final filtered = packages.filter((lib) -> {
 				final isInstalled = commandSucceed("npm", ["list", lib]);
 				if (isInstalled)
 					infoMsg('npm package `$lib` has already been installed.');
@@ -47,40 +47,35 @@ class Js {
 		getJSDependencies();
 
 		final jsOutputs = [
-			for (es_ver in    [[], ["-D", "js-es=3"], ["-D", "js-es=6"]])
-			for (unflatten in [[], ["-D", "js-unflatten"]])
-			for (classic in   [[], ["-D", "js-classic"]])
-			for (enums_as_objects in [[], ["-D", "js-enums-as-arrays"]])
-			{
-				final extras = args.concat(es_ver).concat(unflatten).concat(classic).concat(enums_as_objects);
+			for (es_ver in [[], ["-D", "js-es=3"], ["-D", "js-es=6"]])
+				for (unflatten in [[], ["-D", "js-unflatten"]])
+					for (classic in [[], ["-D", "js-classic"]])
+						for (enums_as_objects in [[], ["-D", "js-enums-as-arrays"]]) {
+							final extras = args.concat(es_ver).concat(unflatten).concat(classic).concat(enums_as_objects);
 
-				runCommand("haxe", ["compile-js.hxml"].concat(extras));
+							runCommand("haxe", ["compile-js.hxml"].concat(extras));
 
-				final output = if (extras.length > 0) {
-					"bin/js/" + extras.join("") + "/unit.js";
-				} else {
-					"bin/js/default/unit.js";
-				}
-				final outputDir = Path.directory(output);
-				if (!FileSystem.exists(outputDir))
-					FileSystem.createDirectory(outputDir);
+							final output = if (extras.length > 0) {
+								"bin/js/" + extras.join("") + "/unit.js";
+							} else {
+								"bin/js/default/unit.js";
+							}
+							final outputDir = Path.directory(output);
+							if (!FileSystem.exists(outputDir))
+								FileSystem.createDirectory(outputDir);
 
-				FileSystem.rename("bin/unit.js", output);
-				FileSystem.rename("bin/unit.js.map", output + ".map");
-				runCommand("node", ["-e", "require('./" + output + "').unit.TestMain.main();"]);
-				output;
-			}
+							FileSystem.rename("bin/unit.js", output);
+							FileSystem.rename("bin/unit.js.map", output + ".map");
+							runCommand("node", ["-e", "require('./" + output + "').unit.TestMain.main();"]);
+							output;
+						}
 		];
 
 		infoMsg("Test ES6:");
 
 		haxelibInstallGit("HaxeFoundation", "hxnodejs");
 		final env = Sys.environment();
-		if (
-			env.exists("SAUCE") &&
-			env.exists("SAUCE_USERNAME") &&
-			env.exists("SAUCE_ACCESS_KEY")
-		) {
+		if (env.exists("SAUCE") && env.exists("SAUCE_USERNAME") && env.exists("SAUCE_ACCESS_KEY")) {
 			final sc = switch (ci) {
 				// TODO: figure out SauceConnect for GitHub Actions
 				// case AzurePipelines:
@@ -114,6 +109,5 @@ class Js {
 			if (sc != null)
 				sc.close();
 		}
-
 	}
 }

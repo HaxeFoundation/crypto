@@ -11,6 +11,7 @@ class Php {
 	static final windowsPhpIni = cwd + 'PHP.ini';
 
 	static var windowsPhpExtPath(get, null) = null;
+
 	static function get_windowsPhpExtPath() {
 		if (windowsPhpExtPath != null)
 			return windowsPhpExtPath;
@@ -19,15 +20,12 @@ class Php {
 		return windowsPhpExtPath = Path.join([phpPath.directory(), "ext"]);
 	}
 
-
 	static function generateArgs(file:String) {
 		if (systemName != "Windows")
-			return [file];
+			return ["-d", "memory_limit=-1", file];
 		return [
-			"-c",
-			windowsPhpIni,
 			"-d",
-			'extension_dir=$windowsPhpExtPath',
+			"memory_limit=-1",
 			file
 		];
 	}
@@ -35,16 +33,13 @@ class Php {
 	static public function getPhpDependencies() {
 		final phpCmd = commandResult("php", ["-v"]);
 		final phpVerReg = ~/PHP ([0-9]+\.[0-9]+)/i;
-		final phpVer = if (phpVerReg.match(phpCmd.stdout))
-			Std.parseFloat(phpVerReg.matched(1));
-		else
-			null;
+		final phpVer = if (phpVerReg.match(phpCmd.stdout)) Std.parseFloat(phpVerReg.matched(1)); else null;
 
 		if (phpCmd.exitCode == 0 && phpVer != null && phpVer >= 7.0) {
 			switch systemName {
 				case "Linux":
 					var phpInfo = commandResult("php", ["-i"]).stdout;
-					if(phpInfo.indexOf("mbstring => enabled") < 0) {
+					if (phpInfo.indexOf("mbstring => enabled") < 0) {
 						Linux.requireAptPackages(["php-mbstring"]);
 					}
 				case _:
@@ -71,19 +66,18 @@ class Php {
 		final binDir = "bin/php";
 
 		final prefixes = [[]];
-		if(isCi()) {
+		if (isCi()) {
 			prefixes.push(['-D', 'php-prefix=haxe']);
 			prefixes.push(['-D', 'php-prefix=my.pack']);
 		}
 
-		for(prefix in prefixes) {
+		for (prefix in prefixes) {
 			changeDirectory(cwd);
-			if(isCi())
+			if (isCi())
 				deleteDirectoryRecursively(binDir);
 
 			runCommand("haxe", ["compile-php.hxml"].concat(prefix).concat(args));
 			runCommand("php", generateArgs(binDir + "/index.php"));
-
 		}
 	}
 }

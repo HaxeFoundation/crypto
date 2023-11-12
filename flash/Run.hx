@@ -6,15 +6,16 @@ import haxe.io.*;
 class Run {
 	// https://helpx.adobe.com/flash-player/kb/configure-debugger-version-flash-player.html
 	static var flashlog(default, never) = switch (systemName()) {
-		case "Linux":
-			Path.join([getEnv("HOME"), ".macromedia/Flash_Player/Logs/flashlog.txt"]);
-		case "Mac":
-			Path.join([getEnv("HOME"), "Library/Preferences/Macromedia/Flash Player/Logs/flashlog.txt"]);
-		case "Windows":
-			Path.join([getEnv("APPDATA"), "Macromedia", "Flash Player", "Logs", "flashlog.txt"]);
-		case _:
-			throw "unsupported system";
-	}
+			case "Linux":
+				Path.join([getEnv("HOME"), ".macromedia/Flash_Player/Logs/flashlog.txt"]);
+			case "Mac":
+				Path.join([getEnv("HOME"), "Library/Preferences/Macromedia/Flash Player/Logs/flashlog.txt"]);
+			case "Windows":
+				Path.join([getEnv("APPDATA"), "Macromedia", "Flash Player", "Logs", "flashlog.txt"]);
+			case _:
+				throw "unsupported system";
+		}
+
 	static function main() {
 		var args = args();
 		var swf = args[0];
@@ -26,7 +27,7 @@ class Run {
 				for (i in 0...16) {
 					if ((c = command("xvfb-run", ["-a", "flash/flashplayerdebugger", swf])) == 0)
 						break;
-					println('retry... (${i+1})');
+					println('retry... (${i + 1})');
 					sleep(1.5);
 				}
 				c;
@@ -43,8 +44,8 @@ class Run {
 			println('does not exist: $flashlog');
 			var parts = Path.normalize(flashlog).split("/");
 			println(parts);
-			for (i in 0...parts.length-1) {
-				var path = parts.splice(0, i+1).join("/");
+			for (i in 0...parts.length - 1) {
+				var path = parts.splice(0, i + 1).join("/");
 				println('ls $path');
 				command("ls", [path]);
 			}

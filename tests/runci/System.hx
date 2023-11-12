@@ -8,6 +8,7 @@ using StringTools;
 
 class CommandFailure extends haxe.Exception {
 	public final exitCode:Int;
+
 	public function new(exitCode:Int = 1) {
 		super("Command failed: " + Std.string(exitCode));
 		this.exitCode = exitCode;
@@ -18,9 +19,11 @@ class System {
 	static public function successMsg(msg:String):Void {
 		Sys.println(colorSupported ? '\x1b[32m' + msg + '\x1b[0m' : msg);
 	}
+
 	static public function failMsg(msg:String):Void {
 		Sys.println(colorSupported ? '\x1b[31m' + msg + '\x1b[0m' : msg);
 	}
+
 	static public function infoMsg(msg:String):Void {
 		Sys.println(colorSupported ? '\x1b[36m' + msg + '\x1b[0m' : msg);
 	}
@@ -31,7 +34,7 @@ class System {
 			final succeed = p.exitCode() == 0;
 			p.close();
 			succeed;
-		} catch(e:Dynamic) false;
+		} catch (e:Dynamic) false;
 	}
 
 	static public function commandResult(cmd:String, args:Array<String>):{
@@ -56,7 +59,7 @@ class System {
 	/**
 		Run a command using `Sys.command()`.
 		If the command exits with non-zero code, throws `CommandFailure` with the same code.
-	*/
+	 */
 	static public function runCommand(cmd:String, ?args:Array<String>):Void {
 		final exitCode = showAndRunCommand(cmd, args);
 
@@ -90,8 +93,8 @@ class System {
 		return exitCode;
 	}
 
-
 	static final TRIALS = 3;
+
 	/**
 		Run a command using `Sys.command()` with up to three attempts. Useful for running network-dependent commands.
 
@@ -100,7 +103,7 @@ class System {
 	static public function runNetworkCommand(cmd:String, ?args:Array<String>) {
 		final cmdStr = getDisplayCmd(cmd, args);
 
-		for (trial in 1...TRIALS+1){
+		for (trial in 1...TRIALS + 1) {
 			final exitCode = showAndRunCommand(cmd, args, cmdStr);
 			if (exitCode == 0)
 				return;
@@ -188,7 +191,7 @@ class System {
 			if (!result.startsWith("-L")) {
 				break;
 			}
-		} while(true);
+		} while (true);
 		proc.close();
 		if (code != 0) {
 			throw 'Failed to get haxelib path ($result)';
@@ -229,10 +232,7 @@ class System {
 			throw new CommandFailure(exitCode);
 	}
 
-	static final installPath = if (systemName == "Windows")
-			Sys.getEnv("USERPROFILE") + "/haxe-ci";
-		else
-			Sys.getEnv("HOME") + "/haxe-ci";
+	static final installPath = if (systemName == "Windows") Sys.getEnv("USERPROFILE") + "/haxe-ci"; else Sys.getEnv("HOME") + "/haxe-ci";
 
 	/** Returns path where packages should be installed. **/
 	public static inline function getInstallPath():String {
@@ -243,5 +243,4 @@ class System {
 	public static inline function getDownloadPath():String {
 		return installPath + "/downloads";
 	}
-
 }
