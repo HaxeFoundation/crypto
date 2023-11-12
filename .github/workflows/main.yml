@@ -86,7 +86,7 @@ jobs:
         run: |
           set -ex
           sudo apt update -qqy
-          sudo apt install -qqy ${{matrix.APT_PACKAGES}}
+          sudo apt install -qqy ${{matrix.APT_PACKAGES}} --fix-missing
       - name: Flash setup
         if: matrix.target == 'flash'
         run: export DISPLAY=:99.0
@@ -114,10 +114,6 @@ jobs:
       - uses: actions/checkout@main
         with:
           submodules: recursive
-      - uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.2'
-          extensions: mbstring
 
       - name: Install Neko from S3
         shell: pwsh
@@ -129,12 +125,6 @@ jobs:
           echo "NEKOPATH=$NEKOPATH" >> $env:GITHUB_ENV
       - name: Print Neko version
         run: neko -version 2>&1
-      - name: Testing PHP version
-        run: php -v
-      - name: Print PHP extension
-        run: |
-         php -m
-         php -r "if(! extension_loaded('mbstring')) {throw new Exception('mbstring not found');}"
       # - name: Quick test
       #   shell: pwsh
       #   run: |
@@ -220,12 +210,6 @@ jobs:
           echo "NEKOPATH=$NEKOPATH" >> $env:GITHUB_ENV
       - name: Print Neko version
         run: neko -version 2>&1
-      - name: Testing PHP version
-        run: php -v
-      - name: Print PHP extension
-        run: |
-         php -m
-         php -r "if(! extension_loaded('mbstring')) {throw new Exception('mbstring not found');}"
 
       # - name: Quick test
       #   shell: pwsh
