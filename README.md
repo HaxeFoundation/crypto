@@ -2,7 +2,7 @@
   <img src="https://raw.githubusercontent.com/HaxeFoundation/crypto/master/CryptoLogo.png" />
 </p>
 <p align="center">
-<a href="https://github.com/HaxeFoundation/crypto/actions"><img src="https://github.com/HaxeFoundation/crypto/workflows/CI/badge.svg" alt="GitHub Build Status"></a>
+<a href="https://github.com/HaxeFoundation/crypto/actions/workflows/main.yml"><img src="https://github.com/HaxeFoundation/crypto/actions/workflows/main.yml/badge.svg" alt="GitHub Build Status"></a>
 </p>
 
 Cross platform cryptographic functions for Haxe 4 and 3
