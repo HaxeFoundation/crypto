@@ -35,6 +35,7 @@ class Hl {
 		switch (systemName) {
 			case "Linux":
 				Linux.requireAptPackages([
+					"libsndfile1-dev",
 					"libturbojpeg-dev",
 					"libmbedtls-dev",
 					"libopenal-dev",
