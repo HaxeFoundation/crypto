@@ -35,7 +35,12 @@ class Adler32 {
 	}
 
 	public function get() {
+		#if (php || python)
+		var t:Int32 = a2 << 16;
+		return t  | a1;
+		#else
 		return (a2 << 16) | a1;
+		#end
 	}
 
 	public function update(b:haxe.io.Bytes, pos, len) {
