@@ -49,6 +49,10 @@ function main() {
 	tf.mouseEnabled = true;
 	#end
 	var classes = [
+		new Adler32Test(),
+		new Crc32Test(),
+		new Md5Test(),
+		new Sha1Test(),
 		new AesTest(),
 		new BlowFishTest(),
 		new ModeTest(),
