@@ -21,6 +21,7 @@ Using this library on Haxe 3 with `-lib crypto` will overload the `haxe.crypto` 
   * [`Des`](#des)
   * [`BCrypt`](#bcrypt)
   * [`Hmac`](#hmac-with-md5--sha1--sha224--sha256--sha384--sha512)
+  * [`Sha1`](#sha1)
   * [`Sha224`](#sha224)
   * [`Sha256`](#sha256)
   * [`Sha384`](#sha384)
@@ -33,7 +34,12 @@ Using this library on Haxe 3 with `-lib crypto` will overload the `haxe.crypto` 
   * [`RC4`](#rc4--arc4-)
   * [`SCrypt`](#scrypt)
   * [`Poly1305`](#poly1305)
+  * [`Md5`](#md5)
    
+### Other algorithms
+  * [`Adler32`](#adler32)
+  * [`Crc32`](#crc32)
+
 ### Block cipher mode of operation
   * ECB
   * CBC
@@ -228,6 +234,18 @@ Questions
    trace("HMac Sha512: "+data.toHex());
 ```
 
+#### SHA1
+
+```haxe
+   var text = Bytes.ofString("Haxe - The Cross-platform Toolkit");
+    
+   var dataText = Sha1.encode("Haxe - The Cross-platform Toolkit");
+   trace("Sha1: "+dataText);
+   
+   var dataBytes = Sha1.make(text);
+   trace("Sha1: "+dataBytes.toHex());
+```
+
 #### SHA224
 
 ```haxe
@@ -411,4 +429,32 @@ Questions
    poly1305.update(msg, 0, msg.length);
    var data = poly1305.finish();
    trace("Poly1305 encrypt: "+ data.toHex());
+```
+
+#### Md5
+
+```haxe
+   var text = Bytes.ofString("Haxe - The Cross-platform Toolkit");
+    
+   var dataText = Md5.encode("Haxe - The Cross-platform Toolkit");
+   trace("Md5: "+dataText);
+   
+   var dataBytes = Md5.make(text);
+   trace("Md5: "+dataBytes.toHex());
+```
+
+#### Adler32
+
+```haxe
+   var text = Bytes.ofString("Haxe - The Cross-platform Toolkit");
+   var data = Adler32.make(text);
+   trace("Adler32: "+data);
+```
+
+#### Crc32
+
+```haxe
+   var text = Bytes.ofString("Haxe - The Cross-platform Toolkit");
+   var data = Crc32.make(text);
+   trace("Crc32: "+data);
 ```
