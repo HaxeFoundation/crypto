@@ -33,10 +33,6 @@ class Aes {
 
 	function set_iv(vector) {
 		iv = vector;
-		if (iv == null) {
-			iv = Bytes.alloc(BLOCK_SIZE);
-			iv.fill(0, BLOCK_SIZE, 0x00);
-		}
 		return iv;
 	}
 
@@ -194,6 +190,14 @@ class Aes {
 				CFB.encrypt(out, iv, BLOCK_SIZE, encryptBlock);
 			case Mode.OFB:
 				OFB.encrypt(out, iv, BLOCK_SIZE, encryptBlock);
+			case Mode.CCM:
+				return CCM.encrypt(out, iv, aad, tagLen, BLOCK_SIZE, encryptBlock);
+			case Mode.GCM:
+				return GCM.encrypt(out, iv, aad, tagLen, BLOCK_SIZE, encryptBlock);
+			case Mode.SIV:
+				return SIV.encrypt(key, out, iv, sivAad, encryptBlock, init);
+			case Mode.GCMSIV:
+				return GCMSIV.encrypt(key, iv, out, aad, encryptBlock, init);
 		}
 
 		return out;
@@ -215,6 +219,14 @@ class Aes {
 				CFB.decrypt(out, iv, BLOCK_SIZE, encryptBlock);
 			case Mode.OFB:
 				OFB.decrypt(out, iv, BLOCK_SIZE, encryptBlock);
+			case Mode.CCM:
+				return CCM.decrypt(out, iv, aad, tagLen, BLOCK_SIZE, encryptBlock);
+			case Mode.GCM:
+				return GCM.decrypt(out,iv,aad,tagLen,BLOCK_SIZE, encryptBlock);
+			case Mode.SIV:
+				return SIV.decrypt(key, out, iv, sivAad, encryptBlock, init);
+			case Mode.GCMSIV:
+				return GCMSIV.decrypt(key, iv, out, aad, encryptBlock, init);
 		}
 
 		switch (padding) {

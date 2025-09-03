@@ -161,6 +161,8 @@ class TwoFish {
 				CFB.encrypt(out, iv, BLOCK_SIZE, encryptBlock);
 			case Mode.OFB:
 				OFB.encrypt(out, iv, BLOCK_SIZE, encryptBlock);
+			case Mode.CCM | Mode.GCM | Mode.SIV | Mode.GCMSIV: 
+				throw "Unsupported mode";
 		}
 
 		return out;
@@ -182,6 +184,8 @@ class TwoFish {
 				CFB.decrypt(out, iv, BLOCK_SIZE, encryptBlock);
 			case Mode.OFB:
 				OFB.decrypt(out, iv, BLOCK_SIZE, encryptBlock);
+			case Mode.CCM | Mode.GCM | Mode.SIV | Mode.GCMSIV: 
+				throw "Unsupported mode";
 		}
 
 		switch (padding) {
