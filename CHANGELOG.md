@@ -1,5 +1,8 @@
 # Changelog
 
+### 1.1.0 - September 3, 2025
+- Add CMAC,CCM,GCM,SIV and GCM-SIV AES modes
+
 ### 1.0.4 - October 4, 2022
 - Better performance for block cipher mode of operations
 

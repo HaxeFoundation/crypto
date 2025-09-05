@@ -73,7 +73,7 @@ class GCM {
 	}
 
 	/**
-	 * Calculates initial counter value
+	 * Calculates initial counter value according to NIST SP 800-38D
 	 */
 	static function calculateJ0(H:Bytes, iv:Bytes):Bytes {
 		if (iv.length == 12) {
@@ -82,25 +82,20 @@ class GCM {
 			J0.set(15, 1);
 			return J0;
 		} else {
-			var ivBlocks = (iv.length + 15) >>> 4;
-			var paddedIVLen = ivBlocks << 4;
-
-			var paddedIV = Bytes.alloc(paddedIVLen + 16);
-			paddedIV.blit(0, iv, 0, iv.length);
-
-			var ivBitLen = iv.length << 3;
-			paddedIV.set(paddedIVLen + 12, ivBitLen >>> 24);
-			paddedIV.set(paddedIVLen + 13, (ivBitLen >>> 16) & 0xFF);
-			paddedIV.set(paddedIVLen + 14, (ivBitLen >>> 8) & 0xFF);
-			paddedIV.set(paddedIVLen + 15, ivBitLen & 0xFF);
-
-			return ghash(H, Bytes.alloc(0), paddedIV);
+			var J0 = Bytes.alloc(16); // Initialize to zeros
+			J0 = ghashUpdate(H, J0, iv);
+			var lenBlock = Bytes.alloc(16);
+			var ivBitLen = iv.length * 8;
+			lenBlock.set(12, (ivBitLen >>> 24) & 0xFF);
+			lenBlock.set(13, (ivBitLen >>> 16) & 0xFF);
+			lenBlock.set(14, (ivBitLen >>> 8) & 0xFF);
+			lenBlock.set(15, ivBitLen & 0xFF);
+			J0 = ghashUpdate(H, J0, lenBlock);
+			
+			return J0;
 		}
 	}
 
-	/**
-	 * Increments the GCM counter by 1 (only the rightmost 32 bits)
-	 */
 	static function incrementCounter(counter:Bytes):Bytes {
 		var result = counter.sub(0, counter.length);
 		var carry = 1;
@@ -129,58 +124,20 @@ class GCM {
 
 	static function ghash(H:Bytes, aad:Bytes, ciphertext:Bytes):Bytes {
 		var X = Bytes.alloc(16);
-		var aadLen = aad.length;
-		if (aadLen > 0) {
-			var pos = 0;
-			var remaining = aadLen;
-			var blockNum = 0;
-
-			while (remaining > 0) {
-				var block = Bytes.alloc(16);
-				var bytesToCopy = remaining < 16 ? remaining : 16;
-
-				block.blit(0, aad, pos, bytesToCopy);
-				for (j in 0...16) {
-					X.set(j, X.get(j) ^ block.get(j));
-				}
-				X = gmult(X, H);
-				pos += 16;
-				remaining -= 16;
-				blockNum++;
-			}
+		if (aad.length > 0) {
+			X = ghashUpdate(H, X, aad);
 		}
-
-		var cipherLen = ciphertext.length;
-		if (cipherLen > 0) {
-			var pos = 0;
-			var remaining = cipherLen;
-			var blockNum = 0;
-
-			while (remaining > 0) {
-				var block = Bytes.alloc(16);
-				var bytesToCopy = remaining < 16 ? remaining : 16;
-
-				block.blit(0, ciphertext, pos, bytesToCopy);
-				for (j in 0...16) {
-					X.set(j, X.get(j) ^ block.get(j));
-				}
-				X = gmult(X, H);
-				pos += 16;
-				remaining -= 16;
-				blockNum++;
-			}
+		if (ciphertext.length > 0) {
+			X = ghashUpdate(H, X, ciphertext);
 		}
-
 		var lenBlock = Bytes.alloc(16);
-		var aadBitLen = aadLen << 3;
-		var cipherBitLen = cipherLen << 3;
-
-		lenBlock.set(4, aadBitLen >>> 24);
+		var aadBitLen = aad.length * 8;
+		var cipherBitLen = ciphertext.length * 8;
+		lenBlock.set(4, (aadBitLen >>> 24) & 0xFF);
 		lenBlock.set(5, (aadBitLen >>> 16) & 0xFF);
 		lenBlock.set(6, (aadBitLen >>> 8) & 0xFF);
 		lenBlock.set(7, aadBitLen & 0xFF);
-
-		lenBlock.set(12, cipherBitLen >>> 24);
+		lenBlock.set(12, (cipherBitLen >>> 24) & 0xFF);
 		lenBlock.set(13, (cipherBitLen >>> 16) & 0xFF);
 		lenBlock.set(14, (cipherBitLen >>> 8) & 0xFF);
 		lenBlock.set(15, cipherBitLen & 0xFF);
@@ -188,6 +145,28 @@ class GCM {
 			X.set(j, X.get(j) ^ lenBlock.get(j));
 		}
 		X = gmult(X, H);
+		
+		return X;
+	}
+
+	static function ghashUpdate(H:Bytes, state:Bytes, data:Bytes):Bytes {
+		var X = state.sub(0, 16); // Copy current state
+		var pos = 0;
+		var remaining = data.length;
+		
+		while (remaining > 0) {
+			var block = Bytes.alloc(16);
+			var bytesToCopy = remaining < 16 ? remaining : 16;
+			block.blit(0, data, pos, bytesToCopy);
+			for (j in 0...16) {
+				X.set(j, X.get(j) ^ block.get(j));
+			}
+			X = gmult(X, H);
+			
+			pos += 16;
+			remaining -= 16;
+		}
+		
 		return X;
 	}
 

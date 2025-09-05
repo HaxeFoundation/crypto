@@ -5,7 +5,12 @@ import haxe.io.Bytes;
 class GCMSIV {
 	public static final AES_BLOCK_SIZE = 16;
 	public static final NONCE_SIZE = 12;
-	static final FIELD_MASK:Int64 = Int64.make(0xe1000000, 0);
+	static final E:Int64 = Int64.make(0xe1000000, 0);
+
+	static var h0:Int64;
+	static var h1:Int64;
+	static var s0:Int64;
+	static var s1:Int64;
 
 	/**
 	 * Encrypts plaintext using AES-GCM-SIV authenticated encryption mode
@@ -22,27 +27,24 @@ class GCMSIV {
 		if (key.length != 16 && key.length != 32) {
 			throw "Invalid key length";
 		}
+
 		if (nonce.length != NONCE_SIZE) {
 			throw "Invalid nonce length";
 		}
-
-		var isShortKey = key.length == 16;
-		var authenticationKey = deriveKey(0, 1, nonce, encryptBlock);
-		var encryptionKey = deriveKey(2, (isShortKey ? 3 : 5), nonce, encryptBlock);
-		var authTag = computeTag(encryptionKey, authenticationKey, nonce, plaintext, aad, encryptBlock, initKey);
-		var result = Bytes.alloc(plaintext.length + AES_BLOCK_SIZE);
-
+		var aes128 = key.length == 16;
+		var authKey = subKey(0, 1, nonce, encryptBlock);
+		var encKey = subKey(2, (aes128 ? 3 : 5), nonce, encryptBlock);
+		initKey(encKey);
+		var tag = hash(encKey, authKey, nonce, plaintext, aad, encryptBlock);
+		var output = Bytes.alloc(plaintext.length + AES_BLOCK_SIZE);
 		if (plaintext.length > 0) {
-			initKey(encryptionKey,nonce);
-			var tempCtr:Bytes = plaintext.sub(0, plaintext.length);
-			CTR.encrypt(tempCtr, authTag, AES_BLOCK_SIZE, encryptBlock);
-			result.blit(0, tempCtr, 0, tempCtr.length);
+			output.blit(0, plaintext, 0, plaintext.length);
+			aesCTR(encKey, tag, plaintext, output, encryptBlock);
 		}
 
 		initKey(key, nonce);
-
-		result.blit(plaintext.length, authTag, 0, AES_BLOCK_SIZE);
-		return result;
+		output.blit(plaintext.length, tag, 0, AES_BLOCK_SIZE);
+		return output;
 	}
 
 	/**
@@ -60,254 +62,262 @@ class GCMSIV {
 		if (key.length != 16 && key.length != 32) {
 			throw "Invalid key length";
 		}
+
 		if (nonce.length != NONCE_SIZE) {
 			throw "Invalid nonce length";
 		}
+
 		if (ciphertext.length < AES_BLOCK_SIZE) {
 			throw "Invalid ciphertext length";
 		}
+		var aes128 = key.length == 16;
+		var ctLen = ciphertext.length - AES_BLOCK_SIZE;
 
-		var isShortKey = key.length == 16;
-		var ciphertextLength = ciphertext.length - AES_BLOCK_SIZE;
+		var c = ciphertext.sub(0, ctLen);
+		var tag = ciphertext.sub(ctLen, AES_BLOCK_SIZE);
 
-		var encryptedData = ciphertext.sub(0, ciphertextLength);
-		var providedTag = ciphertext.sub(ciphertextLength, AES_BLOCK_SIZE);
-
-		var authenticationKey = deriveKey(0, 1, nonce, encryptBlock);
-		var encryptionKey = deriveKey(2, (isShortKey ? 3 : 5), nonce, encryptBlock);
-		var plaintext = Bytes.alloc(ciphertextLength);
-
-		if (ciphertextLength > 0) {
-			plaintext.blit(0, encryptedData, 0, ciphertextLength);
-			initKey(encryptionKey,nonce);
-			CTR.encrypt(plaintext, providedTag, AES_BLOCK_SIZE, encryptBlock);
+		var authKey = subKey(0, 1, nonce, encryptBlock);
+		var encKey = subKey(2, (aes128 ? 3 : 5), nonce, encryptBlock);
+		initKey(encKey);
+		var plaintext = Bytes.alloc(ctLen);
+		if (ctLen > 0) {
+			plaintext.blit(0, c, 0, ctLen);
+			aesCTR(encKey, tag, c, plaintext, encryptBlock);
 		}
-		var expectedTag = computeTag(encryptionKey, authenticationKey, nonce, plaintext, aad, encryptBlock, initKey);
+
+		var actualTag = hash(encKey, authKey, nonce, plaintext, aad, encryptBlock);
 		initKey(key, nonce);
-		if (!secureCompare(providedTag, expectedTag)) {
+		if (!constantTimeCompare(tag, actualTag)) {
 			return null;
 		}
-
 		return plaintext;
 	}
 
-	static function deriveKey(startCounter:Int, endCounter:Int, nonce:Bytes, encryptBlock:Bytes->Int->Bytes->Int->Void):Bytes {
-		var counterBlock = Bytes.alloc(AES_BLOCK_SIZE);
-		counterBlock.blit(counterBlock.length - nonce.length, nonce, 0, nonce.length);
+	static function subKey(ctrStart:Int, ctrEnd:Int, nonce:Bytes, encryptBlock:Bytes->Int->Bytes->Int->Void):Bytes {
+		var counter = Bytes.alloc(AES_BLOCK_SIZE);
+		counter.blit(counter.length - nonce.length, nonce, 0, nonce.length);
 
-		var derivedKeyLength = (endCounter - startCounter + 1) << 3;
-		var derivedKey = Bytes.alloc(derivedKeyLength);
-		var tempBlock = Bytes.alloc(AES_BLOCK_SIZE);
+		var keyLen = (ctrEnd - ctrStart + 1) << 3;
+		var key = Bytes.alloc(keyLen);
+		var block = Bytes.alloc(AES_BLOCK_SIZE);
 
-		for (idx in startCounter...(endCounter + 1)) {
-			writeInt(idx, counterBlock, 0);
-			encryptBlock(counterBlock, 0, tempBlock, 0);
-			var keyPosition = (idx - startCounter) << 3;
-			derivedKey.blit(keyPosition, tempBlock, 0, 8);
+		for (i in ctrStart...(ctrEnd + 1)) {
+			putInt(i, counter, 0);
+			encryptBlock(counter, 0, block, 0);
+			var keyOffset = (i - ctrStart) << 3;
+			key.blit(keyOffset, block, 0, 8);
 		}
-		return derivedKey;
+		return key;
 	}
 
-	static function computeTag(encryptionKey:Bytes, authenticationKey:Bytes, nonce:Bytes, plaintext:Bytes, aad:Bytes,
-			encryptBlock:Bytes->Int->Bytes->Int->Void, initKey:Bytes->?Bytes->Void):Bytes {
-		var fieldElement0:Int64;
-		var fieldElement1:Int64;
-		var accumulator0 = Int64.make(0, 0);
-		var accumulator1 = Int64.make(0, 0);
+	static function hash(encKey:Bytes, authKey:Bytes, nonce:Bytes, plaintext:Bytes, aad:Bytes, encryptBlock:Bytes->Int->Bytes->Int->Void):Bytes {
+		initPolyval(authKey);
+		updatePolyval(aad);
+		updatePolyval(plaintext);
+		var block = Bytes.alloc(AES_BLOCK_SIZE);
+		putLong(aad.length << 3, block, 0);
+		putLong(plaintext.length << 3, block, 8);
+		updateBlockPolyval(block, 0);
+		digestPolyval(block);
 
-		var word3 = readInt(authenticationKey, 0);
-		var word2 = readInt(authenticationKey, 4);
-		var word1 = readInt(authenticationKey, 8);
-		var word0 = readInt(authenticationKey, 12);
-		var temp = word0;
-		word0 = temp >>> 1;
-		var carry = temp << 31;
-		temp = word1;
-		word1 = (temp >>> 1) | carry;
-		carry = temp << 31;
-		temp = word2;
-		word2 = (temp >>> 1) | carry;
-		carry = temp << 31;
-		temp = word3;
-		word3 = (temp >>> 1) | carry;
-
-		var fieldReduction = (temp << 31 >> 8) & 0xe1000000;
-		word0 ^= fieldReduction;
-		fieldElement0 = Int64.make(word0, word1);
-		fieldElement1 = Int64.make(word2, word3);
-
-		var stateResult = processBytes(aad, fieldElement0, fieldElement1, accumulator0, accumulator1);
-		accumulator0 = stateResult.accumulator0;
-		accumulator1 = stateResult.accumulator1;
-
-		stateResult = processBytes(plaintext, fieldElement0, fieldElement1, accumulator0, accumulator1);
-		accumulator0 = stateResult.accumulator0;
-		accumulator1 = stateResult.accumulator1;
-
-		var lengthBlock = Bytes.alloc(AES_BLOCK_SIZE);
-		writeLong(aad.length << 3, lengthBlock, 0);
-		writeLong(plaintext.length << 3, lengthBlock, 8);
-		stateResult = processBlock(lengthBlock, 0, fieldElement0, fieldElement1, accumulator0, accumulator1);
-		accumulator0 = stateResult.accumulator0;
-		accumulator1 = stateResult.accumulator1;
-
-		var digest = Bytes.alloc(AES_BLOCK_SIZE);
-		writeLong64(accumulator1, digest, 0);
-		writeLong64(accumulator0, digest, 8);
-
-		for (idx in 0...nonce.length) {
-			digest.set(idx, digest.get(idx) ^ nonce.get(idx));
+		for (i in 0...nonce.length) {
+			block.set(i, block.get(i) ^ nonce.get(i));
 		}
-		digest.set(AES_BLOCK_SIZE - 1, digest.get(AES_BLOCK_SIZE - 1) & 0x7F);
-		var finalTag = Bytes.alloc(AES_BLOCK_SIZE);
-		initKey(encryptionKey, nonce);
-		encryptBlock(digest, 0, finalTag, 0);
-		return finalTag;
-	}
-
-	static function processBytes(data:Bytes, fieldElement0:Int64, fieldElement1:Int64, accumulator0:Int64,
-			accumulator1:Int64):{accumulator0:Int64, accumulator1:Int64} {
-		var remainder = data.length & 15;
-		var completeBlocks = data.length - remainder;
-
-		var position = 0;
-		while (position < completeBlocks) {
-			var stateResult = processBlock(data, position, fieldElement0, fieldElement1, accumulator0, accumulator1);
-			accumulator0 = stateResult.accumulator0;
-			accumulator1 = stateResult.accumulator1;
-			position += AES_BLOCK_SIZE;
-		}
-
-		if (remainder != 0) {
-			var paddedBlock = Bytes.alloc(AES_BLOCK_SIZE);
-			paddedBlock.blit(0, data, completeBlocks, remainder);
-			var stateResult = processBlock(paddedBlock, 0, fieldElement0, fieldElement1, accumulator0, accumulator1);
-			accumulator0 = stateResult.accumulator0;
-			accumulator1 = stateResult.accumulator1;
-		}
-
-		return {accumulator0: accumulator0, accumulator1: accumulator1};
-	}
-
-	static function processBlock(data:Bytes, position:Int, fieldElement0:Int64, fieldElement1:Int64, accumulator0:Int64,
-			accumulator1:Int64):{accumulator0:Int64, accumulator1:Int64} {
-		var dataLow = readLong(data, position);
-		var dataHigh = readLong(data, position + 8);
-		var operand0 = Int64.xor(accumulator1, dataLow);
-		var operand1 = Int64.xor(accumulator0, dataHigh);
-		var multiplier0 = Int64.make(fieldElement0.high, fieldElement0.low);
-		var multiplier1 = Int64.make(fieldElement1.high, fieldElement1.low);
-		var product0 = Int64.make(0, 0);
-		var product1 = Int64.make(0, 0);
-
-		for (iteration in 0...64) {
-			var selector = Int64.shr(operand1, 63);
-			if (selector != 0) {
-				product0 = Int64.xor(product0, multiplier0);
-				product1 = Int64.xor(product1, multiplier1);
-			}
-			var lowBit = Int64.and(multiplier1, 1);
-			var carryBit = Int64.and(multiplier0, 1);
-
-			multiplier0 = Int64.make(multiplier0.high >>> 1, (multiplier0.low >>> 1) | ((multiplier0.high & 1) << 31));
-			multiplier1 = Int64.make(multiplier1.high >>> 1, (multiplier1.low >>> 1) | ((multiplier1.high & 1) << 31));
-			multiplier1 = Int64.xor(multiplier1, (Int64.shl(carryBit, 63)));
-			if (lowBit != 0) {
-				multiplier0 = Int64.xor(multiplier0, FIELD_MASK);
-			}
-			operand1 = Int64.shl(operand1, 1);
-		}
-
-		for (iteration in 64...127) {
-			var selector = Int64.shr(operand0, 63);
-			if (selector != 0) {
-				product0 = Int64.xor(product0, multiplier0);
-				product1 = Int64.xor(product1, multiplier1);
-			}
-			var lowBit = Int64.and(multiplier1, 1);
-			var carryBit = Int64.and(multiplier0, 1);
-
-			multiplier0 = Int64.make(multiplier0.high >>> 1, (multiplier0.low >>> 1) | ((multiplier0.high & 1) << 31));
-			multiplier1 = Int64.make(multiplier1.high >>> 1, (multiplier1.low >>> 1) | ((multiplier1.high & 1) << 31));
-			multiplier1 = Int64.xor(multiplier1, (Int64.shl(carryBit, 63)));
-
-			if (lowBit != 0) {
-				multiplier0 = Int64.xor(multiplier0, FIELD_MASK);
-			}
-			operand0 = Int64.shl(operand0, 1);
-		}
-		var lastSelector = Int64.shr(operand0, 63);
-		if (lastSelector != 0) {
-			return {accumulator0: Int64.xor(product0,
-				Int64.and(multiplier0, lastSelector)), accumulator1: Int64.xor(product1, Int64.and(multiplier1, lastSelector))};
-		} else {
-			return {accumulator0: product0, accumulator1: product1};
-		}
-	}
-
-	static inline function writeInt(value:Int, buffer:Bytes, offset:Int = 0) {
-		buffer.set(offset, value & 0xFF);
-		buffer.set(offset + 1, (value >> 8) & 0xFF);
-		buffer.set(offset + 2, (value >> 16) & 0xFF);
-		buffer.set(offset + 3, (value >> 24) & 0xFF);
-	}
-
-	static inline function writeLong(value:Int, buffer:Bytes, offset:Int) {
-		var upperBits = value & 0xFFFFFFFF;
-		var lowerBits = 0;
-
-		buffer.set(offset, upperBits & 0xFF);
-		buffer.set(offset + 1, (upperBits >> 8) & 0xFF);
-		buffer.set(offset + 2, (upperBits >> 16) & 0xFF);
-		buffer.set(offset + 3, (upperBits >> 24) & 0xFF);
-		buffer.set(offset + 4, 0);
-		buffer.set(offset + 5, 0);
-		buffer.set(offset + 6, 0);
-		buffer.set(offset + 7, 0);
-	}
-
-	static inline function writeLong64(value:Int64, buffer:Bytes, offset:Int) {
-		var upperWord:Int32 = value.high;
-		var lowerWord:Int32 = value.low;
-		buffer.set(offset, lowerWord);
-		buffer.set(offset + 1, (lowerWord >> 8) & 0xFF);
-		buffer.set(offset + 2, (lowerWord >> 16) & 0xFF);
-		buffer.set(offset + 3, (lowerWord >> 24) & 0xFF);
-		buffer.set(offset + 4, upperWord);
-		buffer.set(offset + 5, (upperWord >> 8) & 0xFF);
-		buffer.set(offset + 6, (upperWord >> 16) & 0xFF);
-		buffer.set(offset + 7, (upperWord >> 24) & 0xFF);
-	}
-
-	static inline function readInt(buffer:Bytes, offset:Int):Int {
-		return (buffer.get(offset) & 0xFF) | ((buffer.get(offset + 1) & 0xFF) << 8) | ((buffer.get(offset + 2) & 0xFF) << 16) | (buffer.get(offset + 3) << 24);
-	}
-
-	static inline function readLong(buffer:Bytes, offset:Int):Int64 {
-		var lowerWord = buffer.get(offset) & 0xFF;
-		lowerWord |= (buffer.get(offset + 1) & 0xFF) << 8;
-		lowerWord |= (buffer.get(offset + 2) & 0xFF) << 16;
-		lowerWord |= buffer.get(offset + 3) << 24;
-
-		var upperWord = buffer.get(offset + 4) & 0xFF;
-		upperWord |= (buffer.get(offset + 5) & 0xFF) << 8;
-		upperWord |= (buffer.get(offset + 6) & 0xFF) << 16;
-		upperWord |= buffer.get(offset + 7) << 24;
-
-		var result = Int64.make(upperWord, lowerWord);
+		block.set(AES_BLOCK_SIZE - 1, block.get(AES_BLOCK_SIZE - 1) & 0x7F);
+		var result = Bytes.alloc(AES_BLOCK_SIZE);
+		encryptBlock(block, 0, result, 0);
 		return result;
 	}
 
-	/**
-	 * Performs constant-time comparison of two byte arrays to prevent timing attacks
-	 */
-	static inline function secureCompare(first:Bytes, second:Bytes):Bool {
-		if (first.length != second.length)
-			return false;
-		var difference = 0;
-		for (idx in 0...first.length) {
-			difference |= first.get(idx) ^ second.get(idx);
+	static function initPolyval(authKey:Bytes):Void {
+		var v3 = getInt(authKey, 0);
+		var v2 = getInt(authKey, 4);
+		var v1 = getInt(authKey, 8);
+		var v0 = getInt(authKey, 12);
+		var b = v0;
+		v0 = b >>> 1;
+		var c = b << 31;
+		b = v1;
+		v1 = (b >>> 1) | c;
+		c = b << 31;
+		b = v2;
+		v2 = (b >>> 1) | c;
+		c = b << 31;
+		b = v3;
+		v3 = (b >>> 1) | c;
+
+		var reduction = (b << 31 >> 8) & 0xe1000000;
+		v0 ^= reduction;
+		h0 = Int64.make(v0, v1);
+		h1 = Int64.make(v2, v3);
+		s0 = Int64.make(0, 0);
+		s1 = Int64.make(0, 0);
+	}
+
+	public static inline function updatePolyval(b:Bytes) {
+		var extra = b.length & 15; // % 16
+		var fullBlocks = b.length - extra;
+
+		var i = 0;
+		while (i < fullBlocks) {
+			updateBlockPolyval(b, i);
+			i += GCMSIV.AES_BLOCK_SIZE;
 		}
-		return difference == 0;
+
+		if (extra != 0) {
+			var block = Bytes.alloc(GCMSIV.AES_BLOCK_SIZE);
+			block.blit(0, b, fullBlocks, extra);
+			updateBlockPolyval(block, 0);
+		}
+	}
+
+	public static function updateBlockPolyval(b:Bytes, offset:Int) {
+		var block1 = getLong(b, offset);
+		var block2 = getLong(b, offset + 8);
+		var x0 = Int64.xor(s1, block1);
+		var x1 = Int64.xor(s0, block2);
+		var v0 = Int64.make(h0.high, h0.low);
+		var v1 = Int64.make(h1.high, h1.low);
+		var z0 = Int64.make(0, 0);
+		var z1 = Int64.make(0, 0);
+
+		for (i in 0...64) {
+			var m = Int64.shr(x1, 63);
+			if (m != 0) {
+				z0 = Int64.xor(z0, v0);
+				z1 = Int64.xor(z1, v1);
+			}
+			var v1SignBit = Int64.and(v1, 1); // ==0?0:-1
+			var c = Int64.and(v0, 1);
+
+			v0 = Int64.make(v0.high >>> 1, (v0.low >>> 1) | ((v0.high & 1) << 31));
+			v1 = Int64.make(v1.high >>> 1, (v1.low >>> 1) | ((v1.high & 1) << 31));
+			v1 = Int64.xor(v1, (Int64.shl(c, 63)));
+			if (v1SignBit != 0) {
+				v0 = Int64.xor(v0, E);
+			}
+			x1 = Int64.shl(x1, 1);
+		}
+
+		for (i in 64...127) {
+			var m = Int64.shr(x0, 63);
+			if (m != 0) {
+				z0 = Int64.xor(z0, v0);
+				z1 = Int64.xor(z1, v1);
+			}
+			var v1SignBit = Int64.and(v1, 1);
+			var c = Int64.and(v0, 1);
+
+			v0 = Int64.make(v0.high >>> 1, (v0.low >>> 1) | ((v0.high & 1) << 31));
+			v1 = Int64.make(v1.high >>> 1, (v1.low >>> 1) | ((v1.high & 1) << 31));
+			v1 = Int64.xor(v1, (Int64.shl(c, 63)));
+
+			if (v1SignBit != 0) {
+				v0 = Int64.xor(v0, E);
+			}
+			x0 = Int64.shl(x0, 1);
+		}
+		var finalM = Int64.shr(x0, 63);
+		if (finalM != 0) {
+			s0 = Int64.xor(z0, Int64.and(v0, finalM));
+			s1 = Int64.xor(z1, Int64.and(v1, finalM));
+		} else {
+			s0 = z0;
+			s1 = z1;
+		}
+	}
+
+	public static inline function digestPolyval(d:Bytes) {
+		putLong64(s1, d, 0);
+		putLong64(s0, d, 8);
+	}
+
+	static inline function putLong64(n:Int64, b:Bytes, offset:Int) {
+		var hi:Int32 = n.high;
+		var lo:Int32 = n.low;
+		b.set(offset, lo);
+		b.set(offset + 1, (lo >> 8) & 0xFF);
+		b.set(offset + 2, (lo >> 16) & 0xFF);
+		b.set(offset + 3, (lo >> 24) & 0xFF);
+		b.set(offset + 4, hi);
+		b.set(offset + 5, (hi >> 8) & 0xFF);
+		b.set(offset + 6, (hi >> 16) & 0xFF);
+		b.set(offset + 7, (hi >> 24) & 0xFF);
+	}
+
+	static function aesCTR(key:Bytes, tag:Bytes, input:Bytes, output:Bytes, encryptBlock:Bytes->Int->Bytes->Int->Void) {
+		var counter = Bytes.alloc(tag.length);
+		counter.blit(0, tag, 0, tag.length);
+		counter.set(counter.length - 1, counter.get(counter.length - 1) | 0x80);
+
+		var k = Bytes.alloc(AES_BLOCK_SIZE);
+		var i = 0;
+		while (i < input.length) {
+			encryptBlock(counter, 0, k, 0);
+			var len = Std.int(Math.min(AES_BLOCK_SIZE, input.length - i));
+			for (j in 0...len) {
+				output.set(i + j, input.get(i + j) ^ k.get(j));
+			}
+
+			var carry = 1;
+			for (j in 0...4) {
+				var val = counter.get(j) + carry;
+				counter.set(j, val & 0xFF);
+				carry = val >>> 8;
+				if (carry == 0)
+					break;
+			}
+			i += AES_BLOCK_SIZE;
+		}
+	}
+
+	public static inline function putInt(n:Int, b:Bytes, offset:Int = 0) {
+		b.set(offset, n & 0xFF);
+		b.set(offset + 1, (n >> 8) & 0xFF);
+		b.set(offset + 2, (n >> 16) & 0xFF);
+		b.set(offset + 3, (n >> 24) & 0xFF);
+	}
+
+	public static inline function putLong(n:Int, b:Bytes, offset:Int) {
+		var hi = n & 0xFFFFFFFF;
+		var lo = 0;
+
+		b.set(offset, hi & 0xFF);
+		b.set(offset + 1, (hi >> 8) & 0xFF);
+		b.set(offset + 2, (hi >> 16) & 0xFF);
+		b.set(offset + 3, (hi >> 24) & 0xFF);
+		b.set(offset + 4, 0);
+		b.set(offset + 5, 0);
+		b.set(offset + 6, 0);
+		b.set(offset + 7, 0);
+	}
+
+	public static inline function getInt(b:Bytes, offset:Int):Int {
+		return (b.get(offset) & 0xFF) | ((b.get(offset + 1) & 0xFF) << 8) | ((b.get(offset + 2) & 0xFF) << 16) | (b.get(offset + 3) << 24);
+	}
+
+	public static inline function getLong(b:Bytes, offset:Int):Int64 {
+		var lo = b.get(offset) & 0xFF;
+		lo |= (b.get(offset + 1) & 0xFF) << 8;
+		lo |= (b.get(offset + 2) & 0xFF) << 16;
+		lo |= b.get(offset + 3) << 24;
+
+		var hi = b.get(offset + 4) & 0xFF;
+		hi |= (b.get(offset + 5) & 0xFF) << 8;
+		hi |= (b.get(offset + 6) & 0xFF) << 16;
+		hi |= b.get(offset + 7) << 24;
+
+		var result = Int64.make(hi, lo);
+		return result;
+	}
+
+	public static inline function constantTimeCompare(a:Bytes, b:Bytes):Bool {
+		if (a.length != b.length)
+			return false;
+		var result = 0;
+		for (i in 0...a.length) {
+			result |= a.get(i) ^ b.get(i);
+		}
+		return result == 0;
 	}
 }

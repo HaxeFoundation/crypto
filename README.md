@@ -47,6 +47,11 @@ Using this library on Haxe 3 with `-lib crypto` will overload the `haxe.crypto` 
   * CFB
   * OFB
   * CTR
+  * CMAC
+  * CCM
+  * GCM
+  * SIV
+  * GCMSIV
   
 ### Padding
   * AnsiX923
@@ -109,6 +114,59 @@ Questions
    // Decrypt
    data = aes.decrypt(Mode.CTR,data,Padding.NoPadding);
    trace("Decrypted text: "+ data);
+   
+   // CMAC
+   var cmacKey = Bytes.ofHex("2b7e151628aed2a6abf7158809cf4f3c");
+   var cplaintext = Bytes.ofHex("6bc1bee22e409f96e93d7e117393172a");
+   var cresult = Bytes.ofHex("070a16b46b4d4144f79bdd9dd04a287c");
+   trace("CMAC: " + CMAC.calculate(cplaintext, cmacKey).toHex());
+   trace("Valid: " + CMAC.verify(cplaintext, cresult, cmacKey));
+  
+   // CCM
+   var key = Bytes.ofHex("c0c1c2c3c4c5c6c7c8c9cacbcccdcecf");
+   var nonce = Bytes.ofHex("00000003020100a0a1a2a3a4a5");
+   var aad = Bytes.ofHex("0001020304050607");
+   var plaintext = Bytes.ofHex("08090a0b0c0d0e0f101112131415161718191a1b1c1d1e");
+   var aes = new Aes(key, nonce);
+   var result = aes.encrypt(Mode.CCM, plaintext, aad, 8);
+   trace("CCM Ciphertext: " + result.toHex());
+   var decrypted = aes.decrypt(Mode.CCM, result, aad, 8);
+   trace("CCM Decrypted: " + decrypted.toHex());
+
+   // GCM
+   var key = Bytes.ofHex("feffe9928665731c6d6a8f9467308308");
+   var iv = Bytes.ofHex("cafebabefacedbaddecaf888");
+   var aad = Bytes.alloc(0);
+   var plaintext = Bytes.ofHex("d9313225f88406e5a55909c5aff5269a86a7a9531534f7da2e4c303d8a318a721c3c0c95956809532fcf0e2449a6b525b16aedf5aa0de657ba637b391aafd255");
+   var expected = "42831EC2217774244B7221B784D0D49CE3AA212F2C02A4E035C17E2329ACA12E21D514B25466931C7D8F6A5AAC84AA051BA30B396A0AAC973D58E091473F59854D5C2AF327CD64A62CF35ABD2BA6FAB4";
+   var aes = new Aes(key, iv);
+   var result = aes.encrypt(Mode.GCM, plaintext, aad, 16);
+   var actual = result.toHex().toUpperCase();
+   trace("GCM Ciphertext: " + result.toHex()+" --> Match: " + (expected == actual));
+   var decryptedText = aes.decrypt(Mode.GCM, result, aad, 16);
+   trace("GCM Decrypted: " + decryptedText.toHex()+" --> Match: " + (decryptedText.toHex().toUpperCase() == plaintext.toHex().toUpperCase()));
+  
+   //SIV
+   var plaintext = Bytes.ofHex("112233445566778899aabbccddee");
+   var key = Bytes.ofHex("fffefdfcfbfaf9f8f7f6f5f4f3f2f1f0f0f1f2f3f4f5f6f7f8f9fafbfcfdfeff");
+   var nonce = null;
+   var associatedData = [Bytes.ofHex("101112131415161718191a1b1c1d1e1f2021222324252627")];
+   var aes = new Aes(key,nonce);
+   var res  =  aes.encrypt(Mode.SIV, plaintext, associatedData);
+   trace("SIV Result: "+res.toHex());
+   var dcr = aes.decrypt(Mode.SIV, res, associatedData);
+   trace("Decrypted SIV: " + dcr.toHex()+" --> Match: "+(dcr.toHex()==plaintext.toHex()));
+  
+   // GCM-SIV
+   var key = Bytes.ofHex("ee8e1ed9ff2540ae8f2ba9f50bc2f27c");
+   var nonce = Bytes.ofHex("752abad3e0afb5f434dc4310");
+   var plaintext = Bytes.ofHex("48656c6c6f20776f726c64");
+   var aad = Bytes.ofHex("6578616d706c65");
+   var aes = new Aes(key, nonce);
+   var gcmSivResult = aes.encrypt(Mode.GCMSIV, plaintext, aad);
+   trace("GCM-SIV Ciphertext: " + gcmSivResult.toHex());
+   var result:Bytes = aes.decrypt(Mode.GCMSIV, gcmSivResult, aad);
+   trace("GCM-SIV Decrypted : " + result.toHex());
 ```
 
 #### Blowfish
