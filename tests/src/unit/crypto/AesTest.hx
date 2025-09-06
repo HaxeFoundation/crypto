@@ -6,6 +6,7 @@ import haxe.io.Bytes;
 import haxe.crypto.Aes;
 import haxe.crypto.mode.Mode;
 import haxe.crypto.padding.*;
+import haxe.crypto.mode.CMAC;
 
 class AesTest extends Test {
 	var keys = [

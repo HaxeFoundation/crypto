@@ -29,6 +29,8 @@ class Aes {
 	private var keyRows:Int;
 	private var state:Vector<Int>;
 
+	public var key:Bytes;
+
 	public var iv(default, set):Bytes;
 
 	function set_iv(vector) {
@@ -43,6 +45,7 @@ class Aes {
 	}
 
 	public function init(key:Bytes, ?iv:Bytes):Void {
+		this.key = key;
 		Nk = key.length >> 2;
 		Nr = Nk + 6;
 		keyRows = (Nr + 1) * 4;
@@ -250,7 +253,7 @@ class Aes {
 		return out;
 	}
 
-	private function encryptBlock(src:Bytes, srcIndex:Int, dst:Bytes, dstIndex:Int):Void {
+	public function encryptBlock(src:Bytes, srcIndex:Int, dst:Bytes, dstIndex:Int):Void {
 		for (i in 0...4) {
 			state[i] = bytesToInt32(src, srcIndex + (i << 2));
 		}
