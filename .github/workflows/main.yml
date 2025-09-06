@@ -185,7 +185,6 @@ jobs:
         working-directory: ${{github.workspace}}/tests
 
   mac-test:
-    needs: mac-build-universal
     runs-on: ${{ matrix.os }}
     env:
       PLATFORM: mac${{ matrix.os == 'macos-latest' && '-arm64' || '' }}
@@ -205,10 +204,6 @@ jobs:
       - uses: actions/checkout@main
         with:
           submodules: recursive
-      - uses: actions/download-artifact@v4
-        with:
-          name: macBinaries
-          path: macBinaries
 
       - name: Install Neko from S3
         run: |
@@ -228,12 +223,13 @@ jobs:
       - name: Setup Haxe
         run: |
           set -ex
-          tar -xf macBinaries/*_bin.tar.gz -C macBinaries --strip-components=1
-          sudo mkdir -p /usr/local/bin/
-          sudo mkdir -p /usr/local/share/haxe/
-          sudo ln -s `pwd`/macBinaries/haxe /usr/local/bin/haxe
-          sudo ln -s `pwd`/macBinaries/haxelib /usr/local/bin/haxelib
-          sudo ln -s `pwd`/macBinaries/std /usr/local/share/haxe/std
+          download_url="https://build.haxe.org/builds/haxe/mac/haxe_latest.tar.gz"
+          echo "Downloading [$download_url]..."
+          mkdir /tmp/haxe
+          curl -fsSL --retry 3 --retry-delay 5 "$download_url" -o /tmp/haxe.tar.gz
+          tar xzvf /tmp/haxe.tar.gz -C /tmp/haxe --strip-components=1
+          echo "/tmp/haxe/" >> $GITHUB_PATH
+          echo "HAXE_STD_PATH=/tmp/haxe/std" >> $GITHUB_ENV
       - name: Print Haxe version
         run: haxe -version
 
