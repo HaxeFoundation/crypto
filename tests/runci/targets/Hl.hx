@@ -46,7 +46,7 @@ class Hl {
 					"ninja-build"
 				]);
 			case "Mac":
-				runNetworkCommand("brew", ["update", '--preinstall']);
+				runNetworkCommand("brew", ["update", '--auto-update']);
 				runNetworkCommand("brew", ["bundle", '--file=${hlSrc}/Brewfile']);
 			case "Windows":
 				// pass
