@@ -154,7 +154,7 @@ class Aes {
 		return BLOCK_SIZE;
 	}
 
-	public function encrypt(cipherMode:Mode, data:Bytes, ?padding:Padding = Padding.PKCS7):Bytes {
+	public function encrypt(cipherMode:Mode, data:Bytes, ?padding:Padding = Padding.NoPadding, ?aad:Bytes, ?tagLen:Int = 16, ?sivAad:Array<Bytes>):Bytes {
 		var out:Bytes;
 
 		switch (padding) {
@@ -203,7 +203,7 @@ class Aes {
 		return out;
 	}
 
-	public function decrypt(cipherMode:Mode, data:Bytes, ?padding:Padding = Padding.PKCS7):Bytes {
+	public function decrypt(cipherMode:Mode, data:Bytes, ?padding:Padding = Padding.NoPadding,?aad:Bytes,?tagLen:Int = 16,?sivAad:Array<Bytes>):Bytes {
 		var out:Bytes = data.sub(0, data.length);
 
 		switch (cipherMode) {
