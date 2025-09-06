@@ -292,7 +292,7 @@ class GCMSIV {
 		b.set(offset + 7, 0);
 	}
 
-	public static inline function getInt(b:Bytes, offset:Int):Int {
+	public static inline function getInt(b:Bytes, offset:Int):Int32 {
 		return (b.get(offset) & 0xFF) | ((b.get(offset + 1) & 0xFF) << 8) | ((b.get(offset + 2) & 0xFF) << 16) | (b.get(offset + 3) << 24);
 	}
 
