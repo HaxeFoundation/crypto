@@ -91,7 +91,6 @@ class Lua {
 
 			installLib("https://raw.githubusercontent.com/HaxeFoundation/hx-lua-simdjson/master/hx-lua-simdjson-scm-1.rockspec", "");
 
-			changeDirectory(unitDir);
 			final luaDefine = if (lv.startsWith("-l")) {
 				lv.replace("-l", "lua").replace(".", "_");
 			} else lv.replace("-j", "luajit").replace(".", "_");
