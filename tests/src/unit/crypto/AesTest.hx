@@ -1619,7 +1619,7 @@ class AesTest extends Test {
 		#end
 	}
 	
-	private static function aesCtrDrbgBlock(variant:AesVariant,entr:String,pers:String,resd:String,aadDrbg:String,aad1Drbg:String,aad2Drbg:String,exp:String,derv:Int):Void {
+	private function aesCtrDrbgBlock(variant:AesVariant,entr:String,pers:String,resd:String,aadDrbg:String,aad1Drbg:String,aad2Drbg:String,exp:String,derv:Int):Void {
 		var entropy = Bytes.ofHex(entr);
 		var personalization = Bytes.ofHex(pers);
 		var reseedEntropy = Bytes.ofHex(resd);
@@ -1636,7 +1636,7 @@ class AesTest extends Test {
 		eq(output.toHex().toUpperCase(), expected.toUpperCase());
 	}
 
-	public static function test_aesctrdrbg():Void {
+	public function test_aesctrdrbg():Void {
 		trace("AesCtrDrbg tests");
 		var time = Timer.stamp();
 		for (i in 0...aesctrdrbg_entropy128.length) {
