@@ -157,7 +157,7 @@ class Aes {
 		return BLOCK_SIZE;
 	}
 
-	public function encrypt(cipherMode:Mode, data:Bytes, ?padding:Padding = Padding.NoPadding, ?aad:Bytes, ?tagLen:Int = 16, ?sivAad:Array<Bytes>):Bytes {
+	public function encrypt(cipherMode:Mode, data:Bytes, ?padding:Padding = Padding.NoPadding, ?aad:Bytes, ?tagLen:Int = 16, ?aadCollection:Array<Bytes>):Bytes {
 		var out:Bytes;
 
 		switch (padding) {
@@ -198,15 +198,17 @@ class Aes {
 			case Mode.GCM:
 				return GCM.encrypt(out, iv, aad, tagLen, BLOCK_SIZE, encryptBlock);
 			case Mode.SIV:
-				return SIV.encrypt(key, out, iv, sivAad, encryptBlock, init);
+				return SIV.encrypt(key, out, iv, aadCollection, encryptBlock, init);
 			case Mode.GCMSIV:
 				return GCMSIV.encrypt(key, iv, out, aad, encryptBlock, init);
+			case Mode.EAX:
+				return EAX.encrypt(out, key, iv, encryptBlock, aadCollection);
 		}
 
 		return out;
 	}
 
-	public function decrypt(cipherMode:Mode, data:Bytes, ?padding:Padding = Padding.NoPadding,?aad:Bytes,?tagLen:Int = 16,?sivAad:Array<Bytes>):Bytes {
+	public function decrypt(cipherMode:Mode, data:Bytes, ?padding:Padding = Padding.NoPadding,?aad:Bytes,?tagLen:Int = 16,?aadCollection:Array<Bytes>):Bytes {
 		var out:Bytes = data.sub(0, data.length);
 
 		switch (cipherMode) {
@@ -227,9 +229,11 @@ class Aes {
 			case Mode.GCM:
 				return GCM.decrypt(out,iv,aad,tagLen,BLOCK_SIZE, encryptBlock);
 			case Mode.SIV:
-				return SIV.decrypt(key, out, iv, sivAad, encryptBlock, init);
+				return SIV.decrypt(key, out, iv, aadCollection, encryptBlock, init);
 			case Mode.GCMSIV:
 				return GCMSIV.decrypt(key, iv, out, aad, encryptBlock, init);
+			case Mode.EAX:
+				return EAX.decrypt(out, key, iv, encryptBlock, aadCollection);
 		}
 
 		switch (padding) {

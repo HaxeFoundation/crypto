@@ -185,7 +185,7 @@ class BlowFish {
 				CFB.encrypt(out, iv, BLOCK_SIZE, encryptBlock);
 			case Mode.OFB:
 				OFB.encrypt(out, iv, BLOCK_SIZE, encryptBlock);
-			case Mode.CCM | Mode.GCM | Mode.SIV | Mode.GCMSIV: 
+			case Mode.CCM | Mode.GCM | Mode.SIV | Mode.GCMSIV | Mode.EAX: 
 				throw "Unsupported mode";
 		}
 
@@ -208,7 +208,7 @@ class BlowFish {
 				CFB.decrypt(out, iv, BLOCK_SIZE, encryptBlock);
 			case Mode.OFB:
 				OFB.decrypt(out, iv, BLOCK_SIZE, encryptBlock);
-			case Mode.CCM | Mode.GCM | Mode.SIV | Mode.GCMSIV: 
+			case Mode.CCM | Mode.GCM | Mode.SIV | Mode.GCMSIV | Mode.EAX: 
 				throw "Unsupported mode";
 		}
 

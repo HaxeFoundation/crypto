@@ -7,8 +7,9 @@ enum abstract Mode(String) {
 	var ECB = "ecb";
 	var OFB = "ofb";
 	var PCBC = "pcbc";
-    var CCM = "ccm";
-    var GCM = "gcm";
-    var SIV = "siv";
-    var GCMSIV = "gcmsiv";
+	var CCM = "ccm";
+	var GCM = "gcm";
+	var SIV = "siv";
+	var GCMSIV = "gcmsiv";
+	var EAX = "eax";
 }
