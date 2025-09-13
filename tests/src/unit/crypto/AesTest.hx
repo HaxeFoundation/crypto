@@ -7,6 +7,10 @@ import haxe.crypto.Aes;
 import haxe.crypto.mode.Mode;
 import haxe.crypto.padding.*;
 import haxe.crypto.mode.CMAC;
+import haxe.crypto.mode.KW;
+import haxe.crypto.mode.KWP;
+import haxe.crypto.mode.XTS;
+import haxe.crypto.mode.FF1;
 
 class AesTest extends Test {
 	var keys = [
