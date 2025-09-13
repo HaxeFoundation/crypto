@@ -991,7 +991,7 @@ class AesTest extends Test {
 		trace("Finished XTS: " + time + " seconds");
 	}
 	
-	public static function test_ff1():Void {
+	public function test_ff1():Void {
 		#if (haxe_ver >= 5)
 		trace("FF1 tests for " + ff1_keys.length + " test vectors");
 		var time = Timer.stamp();
