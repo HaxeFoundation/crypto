@@ -11,6 +11,7 @@ import haxe.crypto.mode.KW;
 import haxe.crypto.mode.KWP;
 import haxe.crypto.mode.XTS;
 import haxe.crypto.mode.FF1;
+import haxe.Int64;
 
 class AesTest extends Test {
 	var keys = [
