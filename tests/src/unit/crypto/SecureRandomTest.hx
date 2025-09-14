@@ -13,14 +13,17 @@ class SecureRandomTest extends Test {
 		var randomInt = SecureRandom.int();
 		if ( randomInt < -2147483648 || randomInt > 2147483647) {
 			testFailed = true;
+			trace("Secure random Int test failed "+randomInt);
 		}
 		var randomBytes = SecureRandom.bytes(16);
 		if (randomBytes == null || randomBytes.length != 16) {
 			testFailed = true;
+			trace("Secure random Bytes test failed ");
 		}
 		var randomFloat = SecureRandom.float();
 		if (randomFloat < 0.0 || randomFloat >= 1.0) {
 			testFailed = true;
+			trace("Secure random Float test failed with "+randomFloat);
 		}
 		f(testFailed);
 		time = Timer.stamp() - time;
