@@ -6,7 +6,7 @@ import haxe.io.Bytes;
 import haxe.crypto.random.SecureRandom;
 
 class SecureRandomTest extends Test {
-	public static function test_securerandom():Void {
+	public function test_securerandom():Void {
 		trace("SecureRandom tests");
 		var time = Timer.stamp();
 		var randomInt = SecureRandom.int();
