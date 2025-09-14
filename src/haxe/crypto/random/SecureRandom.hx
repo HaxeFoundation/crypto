@@ -48,8 +48,7 @@ class SecureRandom {
         #elseif php
         return php.Syntax.code("random_int(-2147483648, 2147483647)");
         #elseif flash
-        var buf:Dynamic = untyped __global__["flash.crypto.generateRandomBytes"](4);
-        return (buf[0] << 24) | (buf[1] << 16) | (buf[2] << 8) | buf[3];
+        return  Bytes.ofData(untyped __global__["flash.crypto.generateRandomBytes"](4));
         #elseif (sys || interp || macro)
         return sysInt();
         #end
@@ -88,10 +87,7 @@ class SecureRandom {
         #elseif php
         return Bytes.ofString(php.Syntax.code("random_bytes({0})", length));
         #elseif flash
-        var buf = untyped __global__["flash.crypto.generateRandomBytes"](length);
-        var result = Bytes.alloc(length);
-        for (i in 0...length) result.set(i, buf[i]);
-        return result;
+        return Bytes.ofData(untyped __global__["flash.crypto.generateRandomBytes"](length));
         #elseif (sys || interp || macro)
         return sysBytes(length);
         #end
