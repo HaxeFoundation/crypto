@@ -8,19 +8,21 @@ import haxe.crypto.random.SecureRandom;
 class SecureRandomTest extends Test {
 	public function test_securerandom():Void {
 		trace("SecureRandom tests");
+		var testFailed:Bool = false;
 		var time = Timer.stamp();
 		var randomInt = SecureRandom.int();
 		if ( randomInt < -2147483648 || randomInt > 2147483647) {
-			throw "Secure random Int test failed";
+			testFailed = true;
 		}
 		var randomBytes = SecureRandom.bytes(16);
 		if (randomBytes == null || randomBytes.length != 16) {
-			throw "Secure random Bytes test failed";
+			testFailed = true;
 		}
 		var randomFloat = SecureRandom.float();
 		if (randomFloat < 0.0 || randomFloat >= 1.0) {
-			throw "Secure random Float test failed";
+			testFailed = true;
 		}
+		f(testFailed);
 		time = Timer.stamp() - time;
 		trace("Finished SecureRandom: " + time + " seconds");
 	}
