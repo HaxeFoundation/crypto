@@ -35,11 +35,17 @@ Using this library on Haxe 3 with `-lib crypto` will overload the `haxe.crypto` 
   * [`SCrypt`](#scrypt)
   * [`Poly1305`](#poly1305)
   * [`Md5`](#md5)
+  * [`Chacha20Poly1305`](#chacha20poly1305)
+  * [`XChacha20Poly1305`](#xchacha20poly1305)
+  * [`XSalsa20Poly1305`](#xsalsa20poly1305)
    
 ### Other algorithms
   * [`Adler32`](#adler32)
   * [`Crc32`](#crc32)
 
+### Random algorithms
+  * [`AesCtrDrbg`](#aesCtrDrbg)
+  
 ### Block cipher mode of operation
   * ECB
   * CBC
@@ -52,6 +58,11 @@ Using this library on Haxe 3 with `-lib crypto` will overload the `haxe.crypto` 
   * GCM
   * SIV
   * GCMSIV
+  * EAX
+  * KW
+  * KWP
+  * XTS
+  * FF1
   
 ### Padding
   * AnsiX923
@@ -167,6 +178,59 @@ Questions
    trace("GCM-SIV Ciphertext: " + gcmSivResult.toHex());
    var result:Bytes = aes.decrypt(Mode.GCMSIV, gcmSivResult, aad);
    trace("GCM-SIV Decrypted : " + result.toHex());
+   
+   // EAX
+   var key = Bytes.ofHex("91945D3F4DCBEE0BF45EF52255F095A4");
+   var nonce = Bytes.ofHex("BECAF043B0A23D843194BA972C66DEBD");
+   var aad = [Bytes.ofHex("FA3BFD4806EB53FA")];
+   var plaintext = Bytes.ofHex("F7FB");
+   var expected = "19DD5C4C9331049D0BDAB0277408F67967E5";
+   var aes = new Aes(key, nonce);
+   var result = aes.encrypt(Mode.EAX, plaintext, aad);
+   trace("EAX Ciphertext: " + result.toHex());
+   var result:Bytes = aes.decrypt(Mode.EAX, result, aad);
+   trace("EAX Decrypted : " + result.toHex());
+   
+   // KW
+   var key = Bytes.ofHex("000102030405060708090A0B0C0D0E0F");
+   var plaintext = Bytes.ofHex("00112233445566778899AABBCCDDEEFF");
+   var expected = "1FA68B0A8112B447AEF34BD8FB5A7B829D3E862371D2CFE5";
+   var result = KW.encrypt(plaintext, key, nonce);
+   trace("KW Ciphertext: " + result.toHex());
+   var decrypted = KW.decrypt(result, key, nonce);
+   trace("KW Decrypted : " + decrypted.toHex());
+   
+   // KWP
+   var key = Bytes.ofHex("5840df6e29b02af1ab493b705bf16ea1ae8338f4dcc176a8");
+   var plaintext = Bytes.ofHex("C37B7E6492584340BED12207808941155068F738");
+   var expected = "138BDEAA9B8FA7FC61F97742E72248EE5AE6AE5360D1AE6A5F54F373FA543B6A";
+   var result = KWP.encrypt(plaintext, key, nonce);
+   trace("KWP Ciphertext: " + result.toHex());
+   var decrypted = KWP.decrypt(result, key, nonce);
+   trace("KWP Decrypted : " + decrypted.toHex());
+   
+   // XTS
+   var key1 = Bytes.ofHex("11111111111111111111111111111111");
+   var key2 = Bytes.ofHex("22222222222222222222222222222222");
+   var sector:Int64 = Int64.parseString("219902325555");
+   var plaintext = Bytes.ofHex("4444444444444444444444444444444444444444444444444444444444444444");
+   var expected = "c454185e6a16936e39334038acef838bfb186fff7480adc4289382ecd6d394f0";
+   var result = XTS.encrypt(plaintext, key1, key2, sector);
+   trace("XTS Ciphertext: " + result.toHex());
+   var decrypted = XTS.decrypt(result, key1, key2, sector);
+   trace("XTS Decrypted : " + decrypted.toHex());
+   
+   // FF1
+   var key = Bytes.ofHex("2B7E151628AED2A6ABF7158809CF4F3C");
+   var plaintext = "0123456789";
+   var tweak = Bytes.alloc(0);
+   var radix = 10;
+   var alphabet = "0123456789";
+   var expected = "2433477484";
+   var result = FF1.encrypt(plaintext, key, tweak, radix, alphabet);
+   trace("FF1 Ciphertext: " + result.toHex());
+   var decrypted = FF1.decrypt(result, key, tweak, radix, alphabet);
+   trace("FF1 Decrypted : " + decrypted.toHex());
 ```
 
 #### Blowfish
@@ -487,6 +551,83 @@ Questions
    poly1305.update(msg, 0, msg.length);
    var data = poly1305.finish();
    trace("Poly1305 encrypt: "+ data.toHex());
+```
+
+#### Chacha20Poly1305
+
+```haxe
+   var key = Bytes.ofHex("808182838485868788898a8b8c8d8e8f909192939495969798999a9b9c9d9e9f");
+   var iv = Bytes.ofHex("070000004041424344454647");
+   var aad = Bytes.ofHex("50515253c0c1c2c3c4c5c6c7");
+   var plaintext = Bytes.ofHex("4c616469657320616e642047656e746c656d656e206f662074686520636c617373206f66202739393a204966204920636f756c64206f6666657220796f75206f6e6c79206f6e652074697020666f7220746865206675747572652c2073756e73637265656e20776f756c642062652069742e");
+   var expected = Bytes.ofHex("d31a8d34648e60db7b86afbc53ef7ec2a4aded51296e08fea9e2b5a736ee62d63dbea45e8ca9671282fafb69da92728b1a71de0a9e060b2905d6a5b67ecd3b3692ddbd7f2d778b8c9803aee328091b58fab324e4fad675945585808b4831d7bc3ff4def08e4b7a9de576d26586cec64b61161ae10b594f09e26a7e902ecbd0600691");
+   var cipher = new Chacha20Poly1305();
+   var result = cipher.encrypt(key, iv, plaintext, aad);
+   trace("Chacha20Poly1305 encrypt: " + result.toHex());
+   var decrypted = cipher.decrypt(key, iv, result, aad);
+   trace("Chacha20Poly1305 text: " + decryptedText.toHex());
+```
+   
+#### XChacha20Poly1305
+
+```haxe
+   var key = Bytes.ofHex("0000000000000000000000000000000000000000000000000000000000000000");
+   var iv = Bytes.ofHex("000000000000000000000000000000000000000000000000");
+   var aad = Bytes.alloc(0);
+   var plaintext = Bytes.ofHex("000000000000000000000000000000");
+   var expected = Bytes.ofHex("789e9689e5208d7fd9e1f3c5b5341fb2f7033812ac9ebd3745e2c99c7bbfeb");
+   var cipher = new XChaCha20Poly1305();
+   var result = cipher.encrypt(key, iv, plaintext, aad);
+   trace("XChaCha20Poly1305 encrypt: " + result.toHex());
+   var decrypted = cipher.decrypt(key, iv, result, aad);
+   trace("XChaCha20Poly1305 text: " + decryptedText.toHex());
+```
+
+#### XSalsa20Poly1305
+
+```haxe
+   var key = Bytes.ofHex("822bca3c7e05fde0dc204519730b35f81216a9c9f1df9525e2a900ec89718f57");
+   var iv = Bytes.ofHex("72b90208d2800e36ad16c730941a038d7c3ad9d87030d329");
+   var plaintext = Bytes.alloc(0);
+   var expected = Bytes.ofHex("79b34551ed224fa17cb6460ccb90a0d9");
+   var cipher = new XSalsa20Poly1305();
+   var result = cipher.encrypt(key, iv, plaintext);
+   trace("XSalsa20Poly1305 encrypt: " + result.toHex());
+   var decrypted = cipher.decrypt(key, iv, result);
+   trace("XSalsa20Poly1305 text: " + decryptedText.toHex());
+```
+
+#### AesCtrDrbg
+
+```haxe
+   // AES128
+   var entropy = Bytes.ofHex("6b098f314b9f95c3a7bb2597182b30483f2194fa4d2142b11d3f46cd94a0fed4");
+   var personalization = Bytes.ofHex("5536b0e31db780144ab7f5e6c2255884a84b6df99477039939e26c77bf28470d");
+   var drbg = new AesCtrDrbg(AES128, false);
+   drbg.init(entropy, personalization);
+   var output = drbg.generate(32);
+   
+   // AES192 with derivation
+   var entropy = Bytes.ofHex("c4f088cc369b2c227667e82978f34d2678d1a53de1f056556195e02670bae3bedb2ff0ca0f7a0549");
+   var reseedEntropy = Bytes.ofHex("1f37e780fb27d743c52de9bb71d4ddca743900154a8d4622");
+   var aad = Bytes.ofHex("5f059ab2c47e54f7735d850d49230696d52238c6ab28f2b11994545389350f78");
+   var drbg = new AesCtrDrbg(AES192, true);
+   drbg.init(entropy);
+   drbg.reseed(reseedEntropy, aad);
+   var output = drbg.generate(16);
+   
+   // AES256
+   var entropy = Bytes.ofHex("7bc5d970186b9e1b0052b7564dbabf61c89cb3d64ff42f9a62d625112aca0486cdf0336c3612254b40cbfba83ab65b42");
+   var personalization = Bytes.ofHex("a25326fef30f9c94423d99759a1ee575536a9715df9526de9a0b8dbcc3a2234cd835615f5dfe7823927355f569ec6f02");
+   var reseedEntropy = Bytes.ofHex("ef8a0137013be212402e42b28c03ed6420881aa38b3a3e6e90a861116516df1ef732a19e8935ffcd9be7a2fc236783b7");
+   var aad = Bytes.ofHex("6afcdc760fe62b080f141886b516623971f8014ede86e50d62d307a90cf3512da5fefd37b3932d3d9d86ad0c03447be4");
+   var aad1 = Bytes.ofHex("72105702fbf1da4c10ff087b02db764804963fd986de933b757b8fe5a6016e0f2700573925aced85c09e2ad9f9f7b2c2");
+   var aad2 = Bytes.ofHex("65f9a3fe4e1953b7d538f6d6ca3c0a73bda2276fe8f80860c07b7ed139d748c3c45db5d96598f77ff863a43977ba390c");
+   var drbg = new AesCtrDrbg(AES256, false);
+   drbg.init(entropy, personalization);
+   drbg.reseed(reseedEntropy, aad);
+   var output = drbg.generate(64, aad1);
+   var output2 = drbg.generate(48, aad2);
 ```
 
 #### Md5
