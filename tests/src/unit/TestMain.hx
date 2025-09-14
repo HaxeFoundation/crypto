@@ -61,6 +61,11 @@ function main() {
 		new ChaChaTest(),
 		new RC4Test(),
 		new XChaCha20Test(),
+		new XChaCha20Poly1305Test(),
+		new ChaCha20Poly1305Test(),
+		new XSalsa20Poly1305Test(),
+		new AesCtrDrbgTest(),
+		new SecureRandomTest(),
 		#if (!eval)
 		new SCryptTest(),
 		#end
