@@ -1763,7 +1763,7 @@ class AesTest extends Test {
 			var expected = Bytes.ofHex(xsalsa20_poly1305_ciphers[i]);
 			var cipher = new XSalsa20Poly1305();
 			var result = cipher.encrypt(key, iv, plaintext);
-			eq(result.toHex().toUpperCase(), expected.toHex());
+			eq(result.toHex().toUpperCase(), expected.toHex().toUpperCase());
 			var decrypted = cipher.decrypt(key, iv, result);
 			eq(decrypted.toHex().toUpperCase(), plaintext.toHex().toUpperCase());
 		}
@@ -1782,7 +1782,7 @@ class AesTest extends Test {
 			var expected = Bytes.ofHex(xchacha20_poly1305_ciphers[i]);
 			var cipher = new XChaCha20Poly1305();
 			var result = cipher.encrypt(key, iv, plaintext, aad);
-			eq(result.toHex().toUpperCase(), expected.toHex());
+			eq(result.toHex().toUpperCase(), expected.toHex().toUpperCase());
 			var decrypted = cipher.decrypt(key, iv, result, aad);
 			eq(decrypted.toHex().toUpperCase(), plaintext.toHex().toUpperCase());
 		}
@@ -1801,7 +1801,7 @@ class AesTest extends Test {
 			var expected = Bytes.ofHex(chacha20_poly1305_ciphers[i]);
 			var cipher = new ChaCha20Poly1305();
 			var result = cipher.encrypt(key, iv, plaintext, aad);
-			eq(result.toHex().toUpperCase(), expected.toHex());
+			eq(result.toHex().toUpperCase(), expected.toHex().toUpperCase());
 			var decrypted = cipher.decrypt(key, iv, result, aad);
 			eq(decrypted.toHex().toUpperCase(), plaintext.toHex().toUpperCase());
 		}
