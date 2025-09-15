@@ -1,5 +1,13 @@
 # Changelog
 
+### 1.2.1 - September 15, 2025
+- Add SecureRandom
+
+### 1.2.0 - September 14, 2025
+- Add EAX,KW,KWP,XTS and FF1 AES modes
+- Add ChaCha20-Poly1305,XChaCha20-Poly1305,XSalsa20-Poly1305 ciphers
+- Add AesCtrDrbg algorithm
+
 ### 1.1.0 - September 3, 2025
 - Add CMAC,CCM,GCM,SIV and GCM-SIV AES modes
 

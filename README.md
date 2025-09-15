@@ -45,6 +45,7 @@ Using this library on Haxe 3 with `-lib crypto` will overload the `haxe.crypto` 
 
 ### Random algorithms
   * [`AesCtrDrbg`](#aesCtrDrbg)
+  * [`SecureRandom`](#securerandom)
   
 ### Block cipher mode of operation
   * ECB
@@ -628,6 +629,16 @@ Questions
    drbg.reseed(reseedEntropy, aad);
    var output = drbg.generate(64, aad1);
    var output2 = drbg.generate(48, aad2);
+```
+
+#### SecureRandom
+
+```haxe
+   var randomInt = SecureRandom.int();
+   var randomBytes = SecureRandom.bytes(16);
+   var randomFloat = SecureRandom.float();
+   var range = SecureRandom.range(0,100);
+   var gBool = SecureRandom.bool();
 ```
 
 #### Md5
