@@ -122,6 +122,49 @@ class SecureRandom {
 		return (int() & 1) == 1;
 	}
 
+	/**
+	 * Fill an existing Bytes object with secure random data
+	 * @param dest The Bytes to fill
+	 * @param offset Starting offset
+	 * @param length Number of bytes to fill (default: entire length)
+	 */
+	public static function fillBytes(dest:Bytes, offset:Int = 0, length:Int = -1):Void {
+		if (length == -1) {
+			length = dest.length - offset;
+		}
+		if (offset < 0 || length < 0 || offset + length > dest.length) {
+			throw "Invalid offset or length";
+		}
+		dest.blit(offset, bytes(length), 0, length);
+	}
+
+	/**
+	 * Secure random string of specified length with given character set
+	 * @param length Length of the string
+	 * @param charset Character set to use (default: alphanumeric)
+	 * @return Secure random string
+	 */
+	public static function string(length:Int, charset:String = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"):String {
+		var result = new StringBuf();
+		var charsetLength = charset.length;
+		var randomBytes = bytes(length);
+		var rnd:Float = 0;
+		for (i in 0...randomBytes.length) {
+			var index = Std.int(randomBytes.get(i) * charsetLength / 256);
+			result.add(charset.charAt(index));
+		}
+		return result.toString();
+	}
+
+	/**
+	 * Secure random hexadecimal string
+	 * @param length Number of hex characters to generate
+	 * @return Random hex string
+	 */
+	public static function hex(length:Int):String {
+		return string(length, "0123456789ABCDEF");
+	}
+
 	#if js
 	static function jsInt():Int {
 		if (js.Syntax.typeof(js.Browser.window) != "undefined") {
