@@ -71,12 +71,7 @@ class SecureRandom {
 		return result;
 		#elseif (java || jvm)
 		var result = Bytes.alloc(length);
-		var r = 0;
-		for (i in 0...length) {
-			if (i % 4 == 0)
-				r = srng.nextInt();
-			result.set(i, (r >> (8 * (i % 4))) & 255);
-		}
+		srng.nextBytes(cast result.getData());
 		return result;
 		#elseif js
 		return jsBytes(length);
