@@ -72,7 +72,7 @@ class Sha512 {
 
 	public function digest():Bytes {
 		#if php
-		return Bytes.ofData(untyped __php__("hash_final({0}, true)", hashContext));
+		return Bytes.ofString(untyped __php__("hash_final({0}, true)", hashContext));
 		#else
 		var block = Bytes.alloc(BLOCK_LEN);
 		block.blit(0, buffer, 0, bufferPos);

@@ -115,7 +115,7 @@ class Sha224 {
 
 	public function digest():Bytes {
 		#if php
-		return Bytes.ofData(untyped __php__("hash_final({0}, true)", hashContext));
+		return Bytes.ofString(untyped __php__("hash_final({0}, true)", hashContext));
 		#else
 		var finalBuffer = Bytes.alloc(64);
 		finalBuffer.blit(0, buffer, 0, bufferPos);

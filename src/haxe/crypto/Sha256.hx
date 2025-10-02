@@ -52,7 +52,7 @@ class Sha256 {
 	
 	public function digest():Bytes {
 		#if php
-		return Bytes.ofData(untyped __php__("hash_final({0}, true)", hashContext));
+		return Bytes.ofString(untyped __php__("hash_final({0}, true)", hashContext));
 		#elseif java
 		return Bytes.ofData(messageDigest.digest());
 		#else
