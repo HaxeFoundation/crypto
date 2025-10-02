@@ -1,5 +1,10 @@
 # Changelog
 
+### 1.2.2 - October 02, 2025
+- Add incremental hashing for Sha224,Sha256,Sha384 and Sha512
+- Use nextBytes() for Java SecureRandom
+- Add random functions for fillBytes(),string(),hex()
+
 ### 1.2.1 - September 15, 2025
 - Add SecureRandom
 

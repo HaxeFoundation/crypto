@@ -379,6 +379,12 @@ Questions
    
    var dataBytes = Sha224.make(text);
    trace("Sha224: "+dataBytes.toHex());
+   
+   var sha = new Sha224();
+   sha.update(Bytes.ofString("Haxe - "));
+   sha.update(Bytes.ofString("The Cross-platform Toolkit"));
+   var result = sha.digest();
+   trace("Sha224: "+result.toHex());
 ```
 
 #### SHA256
@@ -415,6 +421,12 @@ Questions
    
    var dataBytes = Sha512.make(text);
    trace("Sha512: "+dataBytes.toHex());
+   
+   var sha = new Sha512();
+   sha.update(Bytes.ofString("Haxe - "));
+   sha.update(Bytes.ofString("The Cross-platform Toolkit"));
+   var result = sha.digest();
+   trace("Sha512: "+result.toHex());
 ```
 
 #### Ripemd-160
