@@ -8,7 +8,28 @@ import haxe.io.Bytes;
 class Sha512 {
 	inline static var BLOCK_LEN:Int = 128;
 
-	public function new() {}
+	#if php
+	var hashContext:Dynamic;
+	#else
+	var state:Vector<Int64>;
+	var buffer:Bytes;
+	var bufferPos:Int;
+	var totalLength:Int;
+	#end
+	
+	public function new() {
+		#if php
+		hashContext = php.Global.hash_init('sha512');
+		#else
+		state = Vector.fromArrayCopy([
+			Int64.make(0x6A09E667, 0xF3BCC908), Int64.make(0xBB67AE85, 0x84CAA73B), Int64.make(0x3C6EF372, 0xFE94F82B), Int64.make(0xA54FF53A, 0x5F1D36F1),
+			Int64.make(0x510E527F, 0xADE682D1), Int64.make(0x9B05688C, 0x2B3E6C1F), Int64.make(0x1F83D9AB, 0xFB41BD6B), Int64.make(0x5BE0CD19, 0x137E2179)
+		]);
+		buffer = Bytes.alloc(BLOCK_LEN);
+		bufferPos = 0;
+		totalLength = 0;
+		#end
+	}
 
 	public static function encode(s:String #if haxe4, ?encoding:haxe.io.Encoding #end):String {
 		#if php
@@ -21,6 +42,72 @@ class Sha512 {
 		var data = haxe.io.Bytes.ofString(s #if haxe4, encoding #end);
 		var out = new Sha512().doEncode(data);
 		return out.toHex();
+		#end
+	}
+	
+	public function update(data:Bytes):Void {
+		#if php
+		php.Global.hash_update(hashContext, data.getData());
+		#else
+		var pos = 0;
+		var len = data.length;
+		totalLength += len;
+
+		while (len > 0) {
+			var toCopy = BLOCK_LEN - bufferPos;
+			if (toCopy > len) toCopy = len;
+
+			buffer.blit(bufferPos, data, pos, toCopy);
+			bufferPos += toCopy;
+			pos += toCopy;
+			len -= toCopy;
+
+			if (bufferPos == BLOCK_LEN) {
+				compress(state, buffer, BLOCK_LEN);
+				bufferPos = 0;
+			}
+		}
+		#end
+	}
+
+	public function digest():Bytes {
+		#if php
+		return Bytes.ofData(php.Global.hash_final(hashContext, true));
+		#else
+		var block = Bytes.alloc(BLOCK_LEN);
+		block.blit(0, buffer, 0, bufferPos);
+		var off = bufferPos;
+		
+		block.set(off, 0x80);
+		off++;
+		
+		if (off + 16 > block.length) {
+			for (i in off...block.length) {
+				block.set(i, 0);
+			}
+			compress(state, block, block.length);
+			block.fill(0, block.length, 0);
+			off = 0;
+		} else {
+			for (i in off...block.length - 16) {
+				block.set(i, 0);
+			}
+		}
+
+		var len = totalLength << 3;
+		for (i in 0...8) {
+			if (i > 3) {
+				block.set(block.length - 1 - i, 0);
+			} else {
+				block.set(block.length - 1 - i, (len >>> (i * 8)));
+			}
+		}
+		compress(state, block, block.length);
+
+		var result = Bytes.alloc(state.length * 8);
+		for (i in 0...result.length)
+			result.set(i, (state[i >>> 3] >>> ((7 - i % 8) * 8)).low);
+		return result;
 		#end
 	}
 

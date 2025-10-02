@@ -8,7 +8,94 @@ import haxe.io.Bytes;
 class Sha384 {
 	inline static var BLOCK_LEN:Int = 128;
 
-	public function new() {}
+	#if php
+	var hashContext:Dynamic;
+	#else
+	var state:Vector<Int64>;
+	var buffer:Bytes;
+	var bufferPos:Int;
+	var totalLength:Int;
+	#end
+
+	public function new() {
+		#if php
+		hashContext = php.Global.hash_init('sha384');
+		#else
+		state = Vector.fromArrayCopy([
+			Int64.make(0xcbbb9d5d, 0xc1059ed8), Int64.make(0x629a292a, 0x367cd507), Int64.make(0x9159015a, 0x3070dd17), Int64.make(0x152fecd8, 0xf70e5939),
+			Int64.make(0x67332667, 0xffc00b31), Int64.make(0x8eb44a87, 0x68581511), Int64.make(0xdb0c2e0d, 0x64f98fa7), Int64.make(0x47b5481d, 0xbefa4fa4)
+		]);
+		buffer = Bytes.alloc(BLOCK_LEN);
+		bufferPos = 0;
+		totalLength = 0;
+		#end
+	}
+	
+	public function update(data:Bytes):Void {
+		#if php
+		php.Global.hash_update(hashContext, data.getData());
+		#else
+		var pos = 0;
+		var len = data.length;
+		totalLength += len;
+
+		while (len > 0) {
+			var toCopy = BLOCK_LEN - bufferPos;
+			if (toCopy > len) toCopy = len;
+
+			buffer.blit(bufferPos, data, pos, toCopy);
+			bufferPos += toCopy;
+			pos += toCopy;
+			len -= toCopy;
+
+			if (bufferPos == BLOCK_LEN) {
+				compress(state, buffer, BLOCK_LEN);
+				bufferPos = 0;
+			}
+		}
+		#end
+	}
+	
+	public function digest():Bytes {
+		#if php
+		return Bytes.ofData(php.Global.hash_final(hashContext, true));
+		#else
+		var block = Bytes.alloc(BLOCK_LEN);
+		block.blit(0, buffer, 0, bufferPos);
+		var off = bufferPos;
+		
+		block.set(off, 0x80);
+		off++;
+		
+		if (off + 16 > block.length) {
+			for (i in off...block.length) {
+				block.set(i, 0);
+			}
+			compress(state, block, block.length);
+			block.fill(0, block.length, 0);
+			off = 0;
+		} else {
+			for (i in off...block.length - 16) {
+				block.set(i, 0);
+			}
+		}
+
+		var len = totalLength << 3;
+		for (i in 0...8) {
+			if (i > 3) {
+				block.set(block.length - 1 - i, 0);
+			} else {
+				block.set(block.length - 1 - i, (len >>> (i * 8)));
+			}
+		}
+		compress(state, block, block.length);
+
+		var result = Bytes.alloc(state.length * 6);
+		for (i in 0...result.length)
+			result.set(i, (state[i >>> 3] >>> ((7 - i % 8) * 8)).low);
+		return result;
+		#end
+	}
 
 	public static function encode(s:String #if haxe4, ?encoding:haxe.io.Encoding #end):String {
 		#if php
