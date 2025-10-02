@@ -47,7 +47,7 @@ class Sha512 {
 	
 	public function update(data:Bytes):Void {
 		#if php
-		untyped __php__("hash_update({0}, {1})", hashContext, data.getData());
+		untyped __php__("hash_update({0}, {1})", hashContext, data.toString());
 		#else
 		var pos = 0;
 		var len = data.length;
