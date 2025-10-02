@@ -2,6 +2,7 @@ package unit.crypto;
 
 import unit.Test;
 import haxe.Timer;
+import haxe.io.Bytes;
 import haxe.crypto.Sha384;
 
 class Sha384Test extends Test {
