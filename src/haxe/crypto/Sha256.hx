@@ -35,6 +35,8 @@ import java.nio.charset.StandardCharsets;
 class Sha256 {
 	#if php
 	var hashContext:Dynamic;
+	#elseif java
+	var messageDigest:MessageDigest;
 	#else
 	var HASH:Vector<Int>;
 	var buffer:Bytes;
@@ -43,94 +45,16 @@ class Sha256 {
 	#end
 	
 	#if java
-	inline static function digest(b:haxe.io.BytesData):haxe.io.BytesData {
+	inline static function digestJava(b:haxe.io.BytesData):haxe.io.BytesData {
 		return MessageDigest.getInstance("SHA-256").digest(b);
 	}
 	#end
-
-	public static function encode(s:String #if haxe4, ?encoding:haxe.io.Encoding #end):String {
-		#if php
-		#if haxe4
-		return php.Global.hash('sha256', s);
-		#else
-		return untyped __php__("hash('sha256', {0})", s);
-		#end
-		#elseif java
-		return Bytes.ofData(digest((cast s : java.NativeString).getBytes(StandardCharsets.UTF_8))).toHex();
-		#else
-		var sh = new Sha256();
-		var data = haxe.io.Bytes.ofString(s #if haxe4, encoding #end);
-		var nblk = data.length * 8;
-		var h = sh.doEncode(str2blks(data), nblk);
-		return sh.hex(h);
-		#end
-	}
-
-	public static function make(b:haxe.io.Bytes):haxe.io.Bytes {
-		#if php
-		#if haxe4
-		return haxe.io.Bytes.ofData(php.Global.hash('sha256', b.getData(), true));
-		#else
-		return haxe.io.Bytes.ofData(untyped __php__("hash('sha256', {0}, true)", b.getData()));
-		#end
-		#elseif java
-		return Bytes.ofData(digest(b.getData()));
-		#else
-		var h = new Sha256().doEncode(bytes2blks(b), b.length * 8);
-		var out = haxe.io.Bytes.alloc(32);
-		var p = 0;
-		for (i in 0...8) {
-			out.set(p++, h[i] >>> 24);
-			out.set(p++, (h[i] >> 16) & 0xFF);
-			out.set(p++, (h[i] >> 8) & 0xFF);
-			out.set(p++, h[i] & 0xFF);
-		}
-		return out;
-		#end
-	}
-
-	public function new() {
-		#if php
-		hashContext = php.Global.hash_init('sha256');
-		#else
-		HASH = Vector.fromArrayCopy([
-			0x6A09E667, 0xBB67AE85, 0x3C6EF372, 0xA54FF53A,
-			0x510E527F, 0x9B05688C, 0x1F83D9AB, 0x5BE0CD19
-		]);
-		buffer = Bytes.alloc(64);
-		bufferPos = 0;
-		totalLength = 0;
-		#end
-	}
 	
-	public function update(data:Bytes):Void {
-		#if php
-		php.Global.hash_update(hashContext, data.getData());
-		#else
-		var pos = 0;
-		var len = data.length;
-		totalLength += len;
-
-		while (len > 0) {
-			var toCopy = 64 - bufferPos;
-			if (toCopy > len) toCopy = len;
-
-			buffer.blit(bufferPos, data, pos, toCopy);
-			bufferPos += toCopy;
-			pos += toCopy;
-			len -= toCopy;
-
-			if (bufferPos == 64) {
-				processBlock(buffer, 0);
-				bufferPos = 0;
-			}
-		}
-		#end
-	}
-
 	public function digest():Bytes {
 		#if php
-		return Bytes.ofData(php.Global.hash_final(hashContext, true));
+		return Bytes.ofData(untyped __php__("hash_final({0}, true)", hashContext));
+		#elseif java
+		return Bytes.ofData(messageDigest.digest());
 		#else
 		var finalBuffer = Bytes.alloc(64);
 		finalBuffer.blit(0, buffer, 0, bufferPos);
@@ -178,6 +102,91 @@ class Sha256 {
 		}
 
 		return out;
+		#end
+	}
+
+
+	public static function encode(s:String #if haxe4, ?encoding:haxe.io.Encoding #end):String {
+		#if php
+		#if haxe4
+		return php.Global.hash('sha256', s);
+		#else
+		return untyped __php__("hash('sha256', {0})", s);
+		#end
+		#elseif java
+		return Bytes.ofData(digestJava((cast s : java.NativeString).getBytes(StandardCharsets.UTF_8))).toHex();
+		#else
+		var sh = new Sha256();
+		var data = haxe.io.Bytes.ofString(s #if haxe4, encoding #end);
+		var nblk = data.length * 8;
+		var h = sh.doEncode(str2blks(data), nblk);
+		return sh.hex(h);
+		#end
+	}
+
+	public static function make(b:haxe.io.Bytes):haxe.io.Bytes {
+		#if php
+		#if haxe4
+		return haxe.io.Bytes.ofData(php.Global.hash('sha256', b.getData(), true));
+		#else
+		return haxe.io.Bytes.ofData(untyped __php__("hash('sha256', {0}, true)", b.getData()));
+		#end
+		#elseif java
+		return Bytes.ofData(digestJava(b.getData()));
+		#else
+		var h = new Sha256().doEncode(bytes2blks(b), b.length * 8);
+		var out = haxe.io.Bytes.alloc(32);
+		var p = 0;
+		for (i in 0...8) {
+			out.set(p++, h[i] >>> 24);
+			out.set(p++, (h[i] >> 16) & 0xFF);
+			out.set(p++, (h[i] >> 8) & 0xFF);
+			out.set(p++, h[i] & 0xFF);
+		}
+		return out;
+		#end
+	}
+
+	public function new() {
+		#if php
+		hashContext = untyped __php__("hash_init('sha256')");
+		#elseif java
+		messageDigest = MessageDigest.getInstance("SHA-256");
+		#else
+		HASH = Vector.fromArrayCopy([
+			0x6A09E667, 0xBB67AE85, 0x3C6EF372, 0xA54FF53A,
+			0x510E527F, 0x9B05688C, 0x1F83D9AB, 0x5BE0CD19
+		]);
+		buffer = Bytes.alloc(64);
+		bufferPos = 0;
+		totalLength = 0;
+		#end
+	}
+	
+	public function update(data:Bytes):Void {
+		#if php
+		untyped __php__("hash_update({0}, {1})", hashContext, data.getData());
+		#elseif java
+		messageDigest.update(data.getData());
+		#else
+		var pos = 0;
+		var len = data.length;
+		totalLength += len;
+
+		while (len > 0) {
+			var toCopy = 64 - bufferPos;
+			if (toCopy > len) toCopy = len;
+
+			buffer.blit(bufferPos, data, pos, toCopy);
+			bufferPos += toCopy;
+			pos += toCopy;
+			len -= toCopy;
+
+			if (bufferPos == 64) {
+				processBlock(buffer, 0);
+				bufferPos = 0;
+			}
+		}
 		#end
 	}
 

@@ -19,7 +19,7 @@ class Sha384 {
 
 	public function new() {
 		#if php
-		hashContext = php.Global.hash_init('sha384');
+		hashContext = untyped __php__("hash_init('sha384')");
 		#else
 		state = Vector.fromArrayCopy([
 			Int64.make(0xcbbb9d5d, 0xc1059ed8), Int64.make(0x629a292a, 0x367cd507), Int64.make(0x9159015a, 0x3070dd17), Int64.make(0x152fecd8, 0xf70e5939),
@@ -33,7 +33,7 @@ class Sha384 {
 	
 	public function update(data:Bytes):Void {
 		#if php
-		php.Global.hash_update(hashContext, data.getData());
+		untyped __php__("hash_update({0}, {1})", hashContext, data.getData());
 		#else
 		var pos = 0;
 		var len = data.length;
@@ -58,7 +58,7 @@ class Sha384 {
 	
 	public function digest():Bytes {
 		#if php
-		return Bytes.ofData(php.Global.hash_final(hashContext, true));
+		return Bytes.ofData(untyped __php__("hash_final({0}, true)", hashContext));
 		#else
 		var block = Bytes.alloc(BLOCK_LEN);
 		block.blit(0, buffer, 0, bufferPos);

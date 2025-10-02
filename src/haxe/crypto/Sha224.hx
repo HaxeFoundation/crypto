@@ -76,7 +76,7 @@ class Sha224 {
 
 	public function new() {
 		#if php
-		hashContext = php.Global.hash_init('sha224');
+		hashContext = untyped __php__("hash_init('sha224')");
 		#else
 		HASH = Vector.fromArrayCopy([
 			0xc1059ed8, 0x367cd507, 0x3070dd17, 0xf70e5939,
@@ -90,7 +90,7 @@ class Sha224 {
 	
 	public function update(data:Bytes):Void {
 		#if php
-		php.Global.hash_update(hashContext, data.getData());
+		untyped __php__("hash_update({0}, {1})", hashContext, data.getData());
 		#else
 		var pos = 0;
 		var len = data.length;
@@ -115,7 +115,7 @@ class Sha224 {
 
 	public function digest():Bytes {
 		#if php
-		return Bytes.ofData(php.Global.hash_final(hashContext, true));
+		return Bytes.ofData(untyped __php__("hash_final({0}, true)", hashContext));
 		#else
 		var finalBuffer = Bytes.alloc(64);
 		finalBuffer.blit(0, buffer, 0, bufferPos);

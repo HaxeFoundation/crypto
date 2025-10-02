@@ -19,7 +19,7 @@ class Sha512 {
 	
 	public function new() {
 		#if php
-		hashContext = php.Global.hash_init('sha512');
+		hashContext = untyped __php__("hash_init('sha512')");
 		#else
 		state = Vector.fromArrayCopy([
 			Int64.make(0x6A09E667, 0xF3BCC908), Int64.make(0xBB67AE85, 0x84CAA73B), Int64.make(0x3C6EF372, 0xFE94F82B), Int64.make(0xA54FF53A, 0x5F1D36F1),
@@ -47,7 +47,7 @@ class Sha512 {
 	
 	public function update(data:Bytes):Void {
 		#if php
-		php.Global.hash_update(hashContext, data.getData());
+		untyped __php__("hash_update({0}, {1})", hashContext, data.getData());
 		#else
 		var pos = 0;
 		var len = data.length;
@@ -72,7 +72,7 @@ class Sha512 {
 
 	public function digest():Bytes {
 		#if php
-		return Bytes.ofData(php.Global.hash_final(hashContext, true));
+		return Bytes.ofData(untyped __php__("hash_final({0}, true)", hashContext));
 		#else
 		var block = Bytes.alloc(BLOCK_LEN);
 		block.blit(0, buffer, 0, bufferPos);
