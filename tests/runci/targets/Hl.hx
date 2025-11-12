@@ -58,7 +58,7 @@ class Hl {
 		}
 		runCommand("cmake", args.concat([
 			"-DBUILD_TESTING=OFF", "-DWITH_DIRECTX=OFF", "-DWITH_FMT=ON", "-DWITH_OPENAL=OFF", "-DWITH_SDL=OFF", "-DWITH_SQLITE=ON", "-DWITH_SSL=OFF",
-			"-DWITH_UI=OFF", "-DWITH_UV=OFF", "-DWITH_VIDEO=OFF", "-B" + hlBuild, "-H" + hlSrc
+			"-DWITH_UI=OFF", "-DWITH_UV=ON", "-DWITH_VIDEO=OFF", "-B" + hlBuild, "-H" + hlSrc
 		]));
 		runCommand("cmake", ["--build", hlBuild]);
 
