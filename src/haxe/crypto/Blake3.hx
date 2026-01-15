@@ -2,6 +2,7 @@ package haxe.crypto;
 
 import haxe.io.Bytes;
 import haxe.ds.Vector;
+import haxe.Int64;
 
 class Blake3 {
 	static inline var CHUNK_SIZE = 1024;
@@ -26,36 +27,62 @@ class Blake3 {
 	static inline var CHUNK_END = 1 << 1;
 	static inline var PARENT = 1 << 2;
 	static inline var ROOT = 1 << 3;
+	static inline var KEYED_HASH = 1 << 4;
+	static inline var DERIVE_KEY_CONTEXT = 1 << 5;
+	static inline var DERIVE_KEY_MATERIAL = 1 << 6;
 
 	var key:Vector<Int>;
 	var cvStack:Array<Vector<Int>>;
+	var cvStackLen:Int;
 	var outlen:Int;
+	var flags:Int;
 
 	var chunkCV:Vector<Int>;
 	var chunkBlock:Vector<Int>;
 	var chunkBlockLen:Int;
 	var chunkBlocksCompressed:Int;
-	var chunkCounter:Int;
-	var chunkFlags:Int;
-
-	public function new(outlen:Int = 32, keyBytes:Bytes = null) {
+	var chunkCounter:Int64;
+	
+	public function new(outlen:Int = 32, keyBytes:Bytes = null, context:String = null) {
 		this.outlen = outlen;
+		this.flags = 0;
 
 		if (keyBytes != null && keyBytes.length == 32) {
+			// Keyed hash mode
 			this.key = new Vector<Int>(8);
 			for (i in 0...8) {
 				var off = i << 2;
-				this.key[i] = keyBytes.get(off) | (keyBytes.get(off + 1) << 8) | (keyBytes.get(off + 2) << 16) | (keyBytes.get(off + 3) << 24);
+				this.key[i] = keyBytes.get(off) | (keyBytes.get(off + 1) << 8) | 
+					(keyBytes.get(off + 2) << 16) | (keyBytes.get(off + 3) << 24);
 			}
+			this.flags = KEYED_HASH;
+		} else if (context != null) {
+			// Key derivation mode
+			var contextBytes = Bytes.ofString(context);
+			var contextHasher = new Blake3(32, null, null);
+			contextHasher.flags = DERIVE_KEY_CONTEXT;
+			contextHasher.update(contextBytes);
+			var contextKey = contextHasher.digest();
+			
+			this.key = new Vector<Int>(8);
+			for (i in 0...8) {
+				var off = i << 2;
+				this.key[i] = contextKey.get(off) | (contextKey.get(off + 1) << 8) | 
+					(contextKey.get(off + 2) << 16) | (contextKey.get(off + 3) << 24);
+			}
+			this.flags = DERIVE_KEY_MATERIAL;
 		} else {
+			// Regular hash mode
 			this.key = IV;
 		}
 
 		cvStack = [];
-		initChunk(0, 0);
+		cvStackLen = 0;
+		chunkCounter = Int64.make(0, 0);
+		initChunk();
 	}
 
-	inline function initChunk(counter:Int, flags:Int) {
+	inline function initChunk() {
 		chunkCV = new Vector<Int>(8);
 		for (i in 0...8)
 			chunkCV[i] = key[i];
@@ -64,12 +91,10 @@ class Blake3 {
 			chunkBlock[i] = 0;
 		chunkBlockLen = 0;
 		chunkBlocksCompressed = 0;
-		chunkCounter = counter;
-		chunkFlags = flags;
 	}
 
 	inline function chunkComplete():Bool {
-		return chunkBlocksCompressed == 16;
+		return chunkBlocksCompressed == 16 || (chunkBlocksCompressed == 15 && chunkBlockLen == 64);
 	}
 
 	function updateChunk(data:Bytes):Int {
@@ -78,25 +103,29 @@ class Blake3 {
 
 		while (len > 0 && !chunkComplete()) {
 			if (chunkBlockLen == 64) {
-				var blockFlags = chunkFlags;
+				var blockFlags = flags;
 				if (chunkBlocksCompressed == 0)
 					blockFlags |= CHUNK_START;
-				chunkCV = compress(chunkCV, chunkBlock, 64, chunkCounter, blockFlags);
+				var full = compress(chunkCV, chunkBlock, 64, chunkCounter, blockFlags);
+				for (i in 0...8)
+					chunkCV[i] = full[i];
 				chunkBlocksCompressed++;
+				// Clear the block
 				for (i in 0...16)
 					chunkBlock[i] = 0;
 				chunkBlockLen = 0;
 			}
 
-			var take = 64 - chunkBlockLen;
-			if (take > len)
-				take = len;
+			var want = 64 - chunkBlockLen;
+			var take = len < want ? len : want;
 
+			// Pack bytes (little-endian)
 			for (i in 0...take) {
-				var wordIdx = (chunkBlockLen + i) >> 2;
-				var byteIdx = (chunkBlockLen + i) & 3;
+				var bytePos = chunkBlockLen + i;
+				var wordIdx = bytePos >> 2;
+				var byteInWord = bytePos & 3;  // mod 4
 				var byte = data.get(pos + i);
-				chunkBlock[wordIdx] = chunkBlock[wordIdx] | (byte << (byteIdx << 3));
+				chunkBlock[wordIdx] |= (byte << (byteInWord * 8));
 			}
 
 			chunkBlockLen += take;
@@ -108,27 +137,53 @@ class Blake3 {
 	}
 
 	function outputChunkCV():Vector<Int> {
-		var blockFlags = chunkFlags | CHUNK_END;
+		var blockFlags = flags | CHUNK_END;
 		if (chunkBlocksCompressed == 0)
 			blockFlags |= CHUNK_START;
-		return compress(chunkCV, chunkBlock, chunkBlockLen, chunkCounter, blockFlags);
+		
+		var full = compress(chunkCV, chunkBlock, chunkBlockLen, chunkCounter, blockFlags);
+		var result = new Vector<Int>(8);
+		for (i in 0...8)
+			result[i] = full[i];
+		return result;
 	}
 
-	function addChunkCV(cv:Vector<Int>, totalChunks:Int) {
-		while (totalChunks > 0 && (totalChunks & 1) == 0) {
-			cv = parentOutput(cvStack.pop(), cv);
-			totalChunks >>= 1;
+	function addChunkCV(cv:Vector<Int>, totalChunks:Int64) {
+		while ((totalChunks.low & 1) == 0 && cvStackLen > 0) {
+			cvStackLen--;
+			cv = parentCV(cvStack[cvStackLen], cv);
+			totalChunks = Int64.shr(totalChunks, 1);
 		}
-		cvStack.push(cv);
+		
+		if (cvStackLen >= cvStack.length) {
+			cvStack.push(cv);
+		} else {
+			cvStack[cvStackLen] = cv;
+		}
+		cvStackLen++;
 	}
 
-	function parentOutput(left:Vector<Int>, right:Vector<Int>):Vector<Int> {
+	function parentCV(leftCV:Vector<Int>, rightCV:Vector<Int>):Vector<Int> {
 		var block = new Vector<Int>(16);
 		for (i in 0...8)
-			block[i] = left[i];
+			block[i] = leftCV[i];
 		for (i in 0...8)
-			block[i + 8] = right[i];
-		return compress(key, block, 64, 0, PARENT);
+			block[i + 8] = rightCV[i];
+		
+		var full = compress(key, block, 64, Int64.make(0, 0), PARENT | flags);
+		var result = new Vector<Int>(8);
+		for (i in 0...8)
+			result[i] = full[i];
+		return result;
+	}
+	
+	function parentOutput(leftCV:Vector<Int>, rightCV:Vector<Int>):Vector<Int> {
+		var block = new Vector<Int>(16);
+		for (i in 0...8)
+			block[i] = leftCV[i];
+		for (i in 0...8)
+			block[i + 8] = rightCV[i];
+		return block;
 	}
 
 	public function update(data:Bytes) {
@@ -138,8 +193,10 @@ class Blake3 {
 		while (len > 0) {
 			if (chunkComplete()) {
 				var cv = outputChunkCV();
-				addChunkCV(cv, chunkCounter);
-				initChunk(chunkCounter + 1, 0);
+				var totalChunks = Int64.add(chunkCounter, Int64.make(0, 1));
+				addChunkCV(cv, totalChunks);
+				chunkCounter = totalChunks;
+				initChunk();
 			}
 
 			var n = updateChunk(data.sub(pos, len));
@@ -152,58 +209,61 @@ class Blake3 {
 		var out = Bytes.alloc(outlen);
 		var outPos = 0;
 
-		if (cvStack.length == 0) {
-			var blockFlags = chunkFlags | CHUNK_END | ROOT;
+		var node:Vector<Int>;
+		var nodeCV:Vector<Int>;
+		var nodeLen:Int;
+		var nodeCounter:Int64;
+		var nodeFlags:Int;
+		
+		if (cvStackLen == 0) {
+			// Single chunk
+			nodeFlags = flags | CHUNK_END | ROOT;
 			if (chunkBlocksCompressed == 0)
-				blockFlags |= CHUNK_START;
-
-			var outputBlockCounter = 0;
-			while (outPos < outlen) {
-				var words = compress(chunkCV, chunkBlock, chunkBlockLen, outputBlockCounter, blockFlags);
-
-				for (i in 0...8) {
-					if (outPos >= outlen)
-						break;
-					var word = words[i];
-					for (j in 0...4) {
-						if (outPos >= outlen)
-							break;
-						out.set(outPos++, (word >> (j << 3)) & 0xff);
-					}
-				}
-				outputBlockCounter++;
-			}
+				nodeFlags |= CHUNK_START;
+			node = chunkBlock;
+			nodeCV = chunkCV;
+			nodeLen = chunkBlockLen;
+			nodeCounter = Int64.make(0, 0);
 		} else {
+			// Multiple chunks
 			var cv = outputChunkCV();
-			while (cvStack.length > 0)
-				cv = parentOutput(cvStack.pop(), cv);
-
-			var block = new Vector<Int>(16);
-			for (i in 0...8)
-				block[i] = cv[i];
-
-			var outputBlockCounter = 0;
-			while (outPos < outlen) {
-				var words = compress(key, block, 64, outputBlockCounter, ROOT | PARENT);
-
-				for (i in 0...8) {
-					if (outPos >= outlen)
-						break;
-					var word = words[i];
-					for (j in 0...4) {
-						if (outPos >= outlen)
-							break;
-						out.set(outPos++, (word >> (j << 3)) & 0xff);
-					}
-				}
-				outputBlockCounter++;
+			var blockWords:Vector<Int> = null;
+			var i = cvStackLen;
+			while (i > 0) {
+				i--;
+				var leftCV = cvStack[i];
+				blockWords = parentOutput(leftCV, cv);
+				var full = compress(key, blockWords, 64, Int64.make(0, 0), PARENT | flags);
+				cv = new Vector<Int>(8);
+				for (k in 0...8)
+					cv[k] = full[k];
 			}
+			
+			node = blockWords;
+			nodeCV = key;
+			nodeLen = 64;
+			nodeCounter = Int64.make(0, 0);
+			nodeFlags = ROOT | PARENT | flags;
+		}
+		
+		var outputBlockCounter = 0;
+		while (outPos < outlen) {
+			var words = compress(nodeCV, node, nodeLen, Int64.make(0, outputBlockCounter), nodeFlags);
+			for (i in 0...16) {
+				if (outPos >= outlen) break;
+				var word = words[i];
+				for (j in 0...4) {
+					if (outPos >= outlen) break;
+					out.set(outPos++, (word >> (j << 3)) & 0xff);
+				}
+			}
+			outputBlockCounter++;
 		}
 
 		return out;
 	}
 
-	static function compress(cv:Vector<Int>, block:Vector<Int>, blockLen:Int, counter:Int, flags:Int):Vector<Int> {
+	static function compress(cv:Vector<Int>, block:Vector<Int>, blockLen:Int, counter:Int64, flags:Int):Vector<Int> {
 		var state = new Vector<Int>(16);
 		for (i in 0...8)
 			state[i] = cv[i];
@@ -211,8 +271,8 @@ class Blake3 {
 		state[9] = IV[1];
 		state[10] = IV[2];
 		state[11] = IV[3];
-		state[12] = counter;
-		state[13] = 0;
+		state[12] = counter.low;
+		state[13] = counter.high;
 		state[14] = blockLen;
 		state[15] = flags;
 
@@ -230,9 +290,11 @@ class Blake3 {
 			g(state, 3, 4, 9, 14, block[s[14]], block[s[15]]);
 		}
 
-		var result = new Vector<Int>(8);
-		for (i in 0...8)
+		var result = new Vector<Int>(16);
+		for (i in 0...8) {
 			result[i] = state[i] ^ state[i + 8];
+			result[i + 8] = state[i + 8] ^ cv[i];
+		}
 		return result;
 	}
 
@@ -254,6 +316,18 @@ class Blake3 {
 	public static function hash(data:Bytes, outlen:Int = 32):Bytes {
 		var ctx = new Blake3(outlen);
 		ctx.update(data);
+		return ctx.digest();
+	}
+
+	public static function keyedHash(key:Bytes, data:Bytes, outlen:Int = 32):Bytes {
+		var ctx = new Blake3(outlen, key);
+		ctx.update(data);
+		return ctx.digest();
+	}
+
+	public static function deriveKey(context:String, material:Bytes, outlen:Int = 32):Bytes {
+		var ctx = new Blake3(outlen, null, context);
+		ctx.update(material);
 		return ctx.digest();
 	}
 }

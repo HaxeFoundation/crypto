@@ -63,6 +63,12 @@ function main() {
 		new XChaCha20Test(),
 		new AesCtrDrbgTest(),
 		new SecureRandomTest(),
+		new Blake2bTest(),
+		new Blake2sTest(),
+		new Blake3Test(),
+		new Argon2dTest(),
+		new Argon2iTest(),
+		new Argon2idTest(),
 		#if (!eval)
 		new SCryptTest(),
 		#end
