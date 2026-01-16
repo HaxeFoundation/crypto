@@ -58,7 +58,7 @@ class Blake2s {
 		return (x >>> n) | (x << (32 - n));
 	}
 
-	inline function g(v:Vector<Int>, a:Int, b:Int, c:Int, d:Int, x:Int, y:Int) {
+	inline function g(v:Vector<Int32>, a:Int, b:Int, c:Int, d:Int, x:Int, y:Int) {
 		v[a] = (v[a] + v[b] + x) | 0;
 		v[d] = rotr32(v[d] ^ v[a], 16);
 		v[c] = (v[c] + v[d]) | 0;

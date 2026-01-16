@@ -298,7 +298,7 @@ class Blake3 {
 		return result;
 	}
 
-	static inline function g(state:Vector<Int>, a:Int, b:Int, c:Int, d:Int, mx:Int, my:Int) {
+	static inline function g(state:Vector<Int32>, a:Int, b:Int, c:Int, d:Int, mx:Int, my:Int) {
 		state[a] = (state[a] + state[b] + mx) | 0;
 		state[d] = rotr32(state[d] ^ state[a], 16);
 		state[c] = (state[c] + state[d]) | 0;
