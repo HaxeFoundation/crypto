@@ -38,12 +38,12 @@ Using this library on Haxe 3 with `-lib crypto` will overload the `haxe.crypto` 
   * [`Chacha20Poly1305`](#chacha20poly1305)
   * [`XChacha20Poly1305`](#xchacha20poly1305)
   * [`XSalsa20Poly1305`](#xsalsa20poly1305)
-  * [`Blake2b`] (#blake2b)
-  * [`Blake2s`] (#blake2s)
-  * [`Blake3`] (#blake3)
-  * [`Argon2i`] (#argon2i)
-  * [`Argon2d`] (#argon2d)
-  * [`Argon2id`] (#argon2id)
+  * [`Blake2b`](#blake2b)
+  * [`Blake2s`](#blake2s)
+  * [`Blake3`](#blake3)
+  * [`Argon2i`](#argon2i)
+  * [`Argon2d`](#argon2d)
+  * [`Argon2id`](#argon2id)
    
 ### Other algorithms
   * [`Adler32`](#adler32)
