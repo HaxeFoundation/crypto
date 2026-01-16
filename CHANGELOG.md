@@ -1,6 +1,6 @@
 # Changelog
 
-### 1.3.0 - January 15, 2026
+### 1.3.0 - January 16, 2026
 - Add Blake2b, Blake2s, Blake3, Argon2d, Argon2i and Argon2id
 
 ### 1.2.2 - October 02, 2025

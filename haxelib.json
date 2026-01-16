@@ -2,7 +2,7 @@
   "name": "crypto",
   "description": "Cross-platform crypto library with support of : Aes, BCrypt, BlowFish, Des, TripleDes, TwoFish, Hmac, Pbkdf2, Ripemd160, Sha224, Sha256, Sha384, Sha512, Salsa20, XSalsa, ChaCha, SCrypt, RC4, ChaCha20-Poly1305, XChaCha20-Poly1305, XSalsa20-Poly1305, Blake2b, Blake2s, Blake3, Argon2d, Argon2i, Argon2id, AesCtrDrbg, SecureRandom. Block cipher mode of operation:  cbc, cfb, ctr, ecb, ofb, pcbc, cmac, ccm, gcm, siv, gcm-siv, eax, kw, kwp, xts, ff1",
   "version": "1.3.0",
-  "releasenote": "Add incremental hashing for Blake2b, Blake2s, Blake3, Argon2d, Argon2i and Argon2id.",
+  "releasenote": "Add Blake2b, Blake2s, Blake3, Argon2d, Argon2i and Argon2id.",
   "url": "https://github.com/HaxeFoundation/crypto",
   "classPath": "src",
   "license": "MIT",
