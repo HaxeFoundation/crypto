@@ -1,11 +1,11 @@
 {
   "name": "crypto",
-  "description": "Cross-platform crypto library with support of : Aes, BCrypt, BlowFish, Des, TripleDes, TwoFish, Hmac, Pbkdf2, Ripemd160, Sha224, Sha256, Sha384, Sha512, Salsa20, XSalsa, ChaCha, SCrypt, RC4, ChaCha20-Poly1305, XChaCha20-Poly1305, XSalsa20-Poly1305, AesCtrDrbg, SecureRandom. Block cipher mode of operation:  cbc, cfb, ctr, ecb, ofb, pcbc, cmac, ccm, gcm, siv, gcm-siv, eax, kw, kwp, xts, ff1",
-  "version": "1.2.2",
+  "description": "Cross-platform crypto library with support of : Aes, BCrypt, BlowFish, Des, TripleDes, TwoFish, Hmac, Pbkdf2, Ripemd160, Sha224, Sha256, Sha384, Sha512, Salsa20, XSalsa, ChaCha, SCrypt, RC4, ChaCha20-Poly1305, XChaCha20-Poly1305, XSalsa20-Poly1305, Blake2b, Blake2s, Blake3, Argon2d, Argon2i, Argon2id, AesCtrDrbg, SecureRandom. Block cipher mode of operation:  cbc, cfb, ctr, ecb, ofb, pcbc, cmac, ccm, gcm, siv, gcm-siv, eax, kw, kwp, xts, ff1",
+  "version": "1.3.0",
   "releasenote": "Add incremental hashing for Sha224,Sha256,Sha384 and Sha512. SecureRandom fixes.",
   "url": "https://github.com/HaxeFoundation/crypto",
   "classPath": "src",
   "license": "MIT",
-  "tags":["crypto","utility","hash","auth","cross","web","aes","blowfish","twofish","tripledes","des","bcrypt","hmac","sha224","sha256","sha384","sha512","ripemd-160","pbkdf2","salsa20","xsalsa","chacha","ecb","cbc","pcbc","cfb","ofb","ctr","cmac","ccm","gcm","siv","gcm-siv","eax","kw","kwp","xts","ff1","ansix923","bitpadding","iso10126","nullpadding","pkcs7","spacepadding","tbc","poly1305","chacha20-poly1305", "xchacha20-poly1305", "xsalsa20-poly1305","aesctrdrbg","securerandom"],
+  "tags":["crypto","utility","hash","auth","cross","web","aes","blowfish","twofish","tripledes","des","bcrypt","hmac","sha224","sha256","sha384","sha512","ripemd-160","pbkdf2","salsa20","xsalsa","chacha","ecb","cbc","pcbc","cfb","ofb","ctr","cmac","ccm","gcm","siv","gcm-siv","eax","kw","kwp","xts","ff1","ansix923","bitpadding","iso10126","nullpadding","pkcs7","spacepadding","tbc","poly1305","chacha20-poly1305", "xchacha20-poly1305", "xsalsa20-poly1305","aesctrdrbg","securerandom","blake2b","blake2s","blake3","argon2d","argon2i","argon2id"],
   "contributors":["flashultra"]
 }

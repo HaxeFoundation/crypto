@@ -1,5 +1,8 @@
 # Changelog
 
+### 1.3.0 - January 15, 2026
+- Add Blake2b, Blake2s, Blake3, Argon2d, Argon2i and Argon2id
+
 ### 1.2.2 - October 02, 2025
 - Add incremental hashing for Sha224,Sha256,Sha384 and Sha512
 - Use nextBytes() for Java SecureRandom

@@ -38,6 +38,12 @@ Using this library on Haxe 3 with `-lib crypto` will overload the `haxe.crypto` 
   * [`Chacha20Poly1305`](#chacha20poly1305)
   * [`XChacha20Poly1305`](#xchacha20poly1305)
   * [`XSalsa20Poly1305`](#xsalsa20poly1305)
+  * [`Blake2b`] (#blake2b)
+  * [`Blake2s`] (#blake2s)
+  * [`Blake3`] (#blake3)
+  * [`Argon2i`] (#argon2i)
+  * [`Argon2d`] (#argon2d)
+  * [`Argon2id`] (#argon2id)
    
 ### Other algorithms
   * [`Adler32`](#adler32)
@@ -608,6 +614,67 @@ Questions
    trace("XSalsa20Poly1305 encrypt: " + result.toHex());
    var decrypted = cipher.decrypt(key, iv, result);
    trace("XSalsa20Poly1305 text: " + decryptedText.toHex());
+```
+
+#### Blake2b
+
+```haxe
+   var input = Bytes.ofString("Haxe - The Cross-platform Toolkit");
+   var hash = Blake2b.hash(input);
+   trace("Blake2b hash: "+hash.toHex());
+```
+
+#### Blake2s
+
+```haxe
+   var input = Bytes.ofString("Haxe - The Cross-platform Toolkit");
+   var hash = Blake2s.hash(input);
+   trace("Blake2s hash: "+hash.toHex());
+```
+
+#### Blake3
+
+```haxe
+   var input = Bytes.ofString("Haxe - The Cross-platform Toolkit");
+   var key = "whats the Elvish word for friend";
+   var keyHash = Bytes.ofString(key);
+   
+   var hash = Blake3.hash(input);
+   trace("Blake3 hash: "+hash.toHex());
+   
+   var hash = Blake3.keyedHash(keyHash,input);
+   trace("Blake3 keyd hash: "+hash.toHex());
+   
+   var hash = Blake3.deriveKey(key,input);
+   trace("Blake3 derive key hash: "+hash.toHex());
+   
+```
+
+#### Argon2i
+
+```haxe
+   var password:Bytes = Bytes.ofString("Haxe - The Cross-platform Toolkit");
+   var salt = Bytes.ofString("somesalt");
+   var hash = Argon2i.hash(password, salt, 3, 32, 4, 32);
+   trace("Argon2i hash: "+hash.toHex());
+```
+
+#### Argon2d
+
+```haxe
+   var password:Bytes = Bytes.ofString("Haxe - The Cross-platform Toolkit");
+   var salt = Bytes.ofString("somesalt");
+   var hash = Argon2d.hash(password, salt, 3, 32, 4, 32);
+   trace("Argon2i hash: "+hash.toHex());
+```
+
+#### Argon2id
+
+```haxe
+   var password:Bytes = Bytes.ofString("Haxe - The Cross-platform Toolkit");
+   var salt = Bytes.ofString("somesalt");
+   var hash = Argon2id.hash(password, salt, 3, 32, 4, 32);
+   trace("Argon2id hash: "+hash.toHex());
 ```
 
 #### AesCtrDrbg
