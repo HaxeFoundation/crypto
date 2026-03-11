@@ -20,14 +20,26 @@ class PKCS7 {
 	}
 
 	public static function unpad(encrypt:Bytes):Bytes {
-		var padding:Int = encrypt.get(encrypt.length - 1);
-		if (padding > encrypt.length)
-			throw "Cannot remove " + padding + " bytes, because message is " + encrypt.length + " bytes";
-		var block = encrypt.length - padding;
-		for (i in block...encrypt.length) {
-			if (encrypt.get(i) != padding)
-				throw "Invalid padding value. Got " + encrypt.get(i) + ", expected " + padding + " at position " + i;
+		var len = encrypt.length;
+		var padding:Int = encrypt.get(len - 1);
+		// Constant-time validation to prevent padding oracle timing attacks.
+		// We accumulate errors without early exit so the execution path does
+		// not reveal whether the padding value is in or out of range, and so
+		// the loop does not leak how many padding bytes were correct.
+		var bad:Int = 0;
+		// Arithmetic-right-shift trick: for a 32-bit signed int x,
+		// (x >> 31) is -1 (all bits set) when x < 0, and 0 otherwise.
+		bad |= (padding - 1) >> 31;   // non-zero if padding < 1
+		bad |= (len - padding) >> 31; // non-zero if padding > len
+		// Clamp block to a valid index (bad is already set for this case).
+		var block = len - padding;
+		if (block < 0) block = 0;
+		// Check every padding byte without early exit.
+		for (i in block...len) {
+			bad |= encrypt.get(i) ^ padding;
 		}
+		if (bad != 0)
+			throw "Invalid PKCS7 padding";
 		return encrypt.sub(0, block);
 	}
 }
