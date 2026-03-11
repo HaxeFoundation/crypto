@@ -126,17 +126,10 @@ class PaddingTest extends Test {
 		// padding byte value exceeds the message length (4 bytes, value 8)
 		exc(() -> PKCS7.unpad(Bytes.ofHex("04040408")));
 
-		// one corrupted byte in the middle of an otherwise valid padding region
-		// "0001040404040404": last byte = 4, bytes at positions 4-7 are 00,04,04,04
-		exc(() -> PKCS7.unpad(Bytes.ofHex("0001040404040404")));
-
-		// only the first padding byte is wrong — catches a non-constant-time loop
-		// "0808080808080801": last byte = 1, byte at position 7 = 0x01 — that's fine,
-		// but the declared padding value is 1, so only position 7 is checked and it
-		// equals 1 → actually valid.  Use a case where the first mismatch is early:
-		// "0102030404040404": last byte = 4, bytes at positions 4-7: 04,04,04,04 → valid
-		// "0102030400040404": last byte = 4, byte at position 4 = 0x00 ≠ 4 → invalid
-		exc(() -> PKCS7.unpad(Bytes.ofHex("0102030400040404")));
+		// one corrupted byte at the start of an otherwise valid padding region:
+		// "AAAAAA00040404": last byte = 4, padding positions 3-6 = 00,04,04,04;
+		// position 3 is 0x00 ≠ 4, so the whole padding is invalid.
+		exc(() -> PKCS7.unpad(Bytes.ofHex("AAAAAA00040404")));
 
 		trace("PKCS7 security: valid inputs must still be accepted ...");
 

@@ -27,10 +27,10 @@ class PKCS7 {
 		// not reveal whether the padding value is in or out of range, and so
 		// the loop does not leak how many padding bytes were correct.
 		var bad:Int = 0;
-		// Arithmetic-right-shift trick: for a 32-bit signed int x,
-		// (x >> 31) is -1 (all bits set) when x < 0, and 0 otherwise.
-		bad |= (padding - 1) >> 31;   // non-zero if padding < 1
-		bad |= (len - padding) >> 31; // non-zero if padding > len
+		// Use explicit boolean-to-int to avoid platform-specific bit-width
+		// assumptions (e.g. Python arbitrary-precision ints, JS float64).
+		bad |= (padding < 1) ? 1 : 0;  // non-zero if padding < 1
+		bad |= (padding > len) ? 1 : 0; // non-zero if padding > len
 		// Clamp block to a valid index (bad is already set for this case).
 		var block = len - padding;
 		if (block < 0) block = 0;

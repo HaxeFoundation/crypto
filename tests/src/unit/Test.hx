@@ -37,7 +37,7 @@ class Test implements utest.ITest {
 	}
 
 	function exc(f:() -> Void, ?pos:haxe.PosInfos) {
-		Assert.raises(f, pos);
+		Assert.raises(f, null, null, null, pos);
 	}
 
 	function unspec(f:() -> Void, ?pos) {
