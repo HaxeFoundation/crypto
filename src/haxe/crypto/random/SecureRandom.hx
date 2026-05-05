@@ -162,31 +162,18 @@ class SecureRandom {
 
 	#if js
 	static function jsInt():Int {
-		if (js.Syntax.typeof(js.Browser.window) != "undefined") {
+		if (js.Syntax.typeof(js.Syntax.code("globalThis.crypto")) != "undefined") {
 			var buf = new js.lib.Int32Array(1);
-			js.Browser.window.crypto.getRandomValues(buf);
+			js.Syntax.code("globalThis.crypto").getRandomValues(buf);
 			return buf[0];
-		}
-		if (js.Syntax.typeof(js.Syntax.code("require")) != "undefined") {
-			var crypto = js.Syntax.code("require('crypto')");
-			var buf = crypto.randomBytes(4);
-			return (buf[0] << 24) | (buf[1] << 16) | (buf[2] << 8) | buf[3];
 		}
 		throw "No secure random source available";
 	}
 
 	static function jsBytes(length:Int):Bytes {
-		if (js.Syntax.typeof(js.Browser.window) != "undefined") {
+		if (js.Syntax.typeof(js.Syntax.code("globalThis.crypto")) != "undefined") {
 			var buf = new js.lib.Uint8Array(length);
-			js.Browser.window.crypto.getRandomValues(buf);
-			var result = Bytes.alloc(length);
-			for (i in 0...length)
-				result.set(i, buf[i]);
-			return result;
-		}
-		if (js.Syntax.typeof(js.Syntax.code("require")) != "undefined") {
-			var crypto = js.Syntax.code("require('crypto')");
-			var buf = crypto.randomBytes(length);
+			js.Syntax.code("globalThis.crypto").getRandomValues(buf);
 			var result = Bytes.alloc(length);
 			for (i in 0...length)
 				result.set(i, buf[i]);
