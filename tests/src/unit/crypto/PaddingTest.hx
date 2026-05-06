@@ -103,4 +103,87 @@ class PaddingTest extends Test {
 			eq(plainText[i], padTbc.toHex().toUpperCase());
 		}
 	}
+
+	// -----------------------------------------------------------------------
+	// Security regression tests
+	// -----------------------------------------------------------------------
+
+	/**
+	 * PKCS7.unpad must reject all invalid inputs with a single uniform
+	 * exception, regardless of *why* validation fails.  Using different
+	 * code paths for "out of range" vs "wrong byte value" leaks the
+	 * padding length to an attacker (padding oracle / timing side-channel).
+	 */
+	public function test_pkcs7_unpad_security():Void {
+		trace("PKCS7 security: all invalid inputs must throw ...");
+
+		// padding = 0 is never produced by pad() and must be rejected
+		exc(() -> PKCS7.unpad(Bytes.ofHex("0000000000000000")));
+
+		// padding byte value (0xFF = 255) exceeds the message length (1 byte)
+		exc(() -> PKCS7.unpad(Bytes.ofHex("FF")));
+
+		// padding byte value exceeds the message length (4 bytes, value 8)
+		exc(() -> PKCS7.unpad(Bytes.ofHex("04040408")));
+
+		// one corrupted byte at the start of an otherwise valid padding region:
+		// "AAAAAA00040404": last byte = 4, padding positions 3-6 = 00,04,04,04;
+		// position 3 is 0x00 ≠ 4, so the whole padding is invalid.
+		exc(() -> PKCS7.unpad(Bytes.ofHex("AAAAAA00040404")));
+
+		trace("PKCS7 security: valid inputs must still be accepted ...");
+
+		// full block of padding (blockSize = 8, padding = 8)
+		var result = PKCS7.unpad(Bytes.ofHex("0808080808080808"));
+		eq(0, result.length);
+
+		// single padding byte
+		eq("01", PKCS7.unpad(Bytes.ofHex("0101")).toHex().toUpperCase());
+
+		// round-trip: pad then unpad must yield the original plaintext
+		for (i in 0...plainText.length) {
+			var original = Bytes.ofHex(plainText[i]);
+			var padded   = PKCS7.pad(original, BLOCK_SIZE);
+			var restored = PKCS7.unpad(padded);
+			eq(plainText[i], restored.toHex().toUpperCase());
+		}
+	}
+
+	/**
+	 * ISO10126.unpad must validate the padding length field before using it.
+	 * Without this check an attacker can supply a crafted last byte that
+	 * causes an out-of-bounds access, crashing the program.
+	 *
+	 * ISO 10126 pad() always writes a length-byte ≥ 1, so 0 is never a
+	 * legitimate value and must also be rejected.
+	 */
+	public function test_iso10126_unpad_security():Void {
+		trace("ISO10126 security: padding = 0 must be rejected ...");
+		// Last byte 0x00: never produced by pad(), must be rejected
+		exc(() -> ISO10126.unpad(Bytes.ofHex("0100")));
+
+		trace("ISO10126 security: padding > length must not crash ...");
+		// 1-byte input, last byte = 0xFF (255) — would read sub(0, -254)
+		exc(() -> ISO10126.unpad(Bytes.ofHex("FF")));
+
+		// 4-byte input, last byte = 0x10 (16 > 4) — padding larger than message
+		exc(() -> ISO10126.unpad(Bytes.ofHex("AABBCC10")));
+
+		trace("ISO10126 security: valid inputs must still be accepted ...");
+
+		// Entire buffer is padding: 5 bytes, last byte = 5, result is empty
+		var result = ISO10126.unpad(Bytes.ofHex("AABBCCDD05"));
+		eq(0, result.length);
+
+		// Single padding byte: last byte = 1
+		eq("01", ISO10126.unpad(Bytes.ofHex("0101")).toHex().toUpperCase());
+
+		// Round-trip: pad then unpad must yield the original plaintext
+		for (i in 0...plainText.length) {
+			var original = Bytes.ofHex(plainText[i]);
+			var padded   = ISO10126.pad(original, BLOCK_SIZE);
+			var restored = ISO10126.unpad(padded);
+			eq(plainText[i], restored.toHex().toUpperCase());
+		}
+	}
 }

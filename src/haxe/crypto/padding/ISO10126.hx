@@ -18,6 +18,8 @@ class ISO10126 {
 
 	public static function unpad(encrypt:Bytes):Bytes {
 		var padding:Int = encrypt.get(encrypt.length - 1);
+		if (padding < 1 || padding > encrypt.length)
+			throw "Invalid ISO10126 padding";
 		return encrypt.sub(0, encrypt.length - padding);
 	}
 }
