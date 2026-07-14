@@ -29,7 +29,7 @@ import java.nio.charset.StandardCharsets;
 #end
 
 /**
-	Creates a Sha1 of a String.
+	Creates a Sha1 of a String or Bytes.
 **/
 class Sha1 {
 	#if hl
@@ -64,108 +64,163 @@ class Sha1 {
 	public static inline function make(b:haxe.io.Bytes):haxe.io.Bytes {
 		return Bytes.ofData(php.Global.sha1(b.getData(), true));
 	}
+
 	#else
 	public static function encode(s:String):String {
 		var sh = new Sha1();
-		var h = sh.doEncode(str2blks(s));
-		return sh.hex(h);
+		#if target.unicode
+		sh.update(haxe.io.Bytes.ofString(s));
+		#else
+		var b = haxe.io.Bytes.alloc(s.length);
+		for (i in 0...s.length) b.set(i, StringTools.fastCodeAt(s, i) & 0xFF);
+		sh.update(b);
+		#end
+		return sh.digest().toHex();
 	}
 
 	public static function make(b:haxe.io.Bytes):haxe.io.Bytes {
-		var h = new Sha1().doEncode(bytes2blks(b));
+		var sh = new Sha1();
+		sh.update(b);
+		return sh.digest();
+	}
+	#end
+
+	#if java
+	var digest:java.security.MessageDigest;
+
+	public function new() {
+		digest = java.security.MessageDigest.getInstance("SHA-1");
+	}
+
+	public function update(b:haxe.io.Bytes):Void {
+		digest.update(b.getData());
+	}
+
+	public function digest():haxe.io.Bytes {
+		return Bytes.ofData(digest.digest());
+	}
+
+	#elseif php
+	var context:Dynamic;
+
+	public function new() {
+		context = php.Global.hash_init("sha1");
+	}
+
+	public function update(b:haxe.io.Bytes):Void {
+		php.Global.hash_update(context, b.getData());
+	}
+
+	public function digest():haxe.io.Bytes {
+		return Bytes.ofData(php.Global.hash_final(context, true));
+	}
+
+	#else
+	var h:Array<Int>;
+	var buffer:haxe.io.Bytes;
+	var bufferLen:Int;
+	var totalLen:haxe.Int64;
+
+	public function new() {
+		h = [0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476, 0xC3D2E1F0];
+		buffer = haxe.io.Bytes.alloc(64);
+		bufferLen = 0;
+		totalLen = 0;
+	}
+
+	public function update(b:haxe.io.Bytes):Void {
+		if (b.length == 0) return;
+
+		totalLen = totalLen + b.length;
+
+		var pos = 0;
+		var len = b.length;
+		while (len > 0) {
+			var copyLen = len < (64 - bufferLen) ? len : (64 - bufferLen);
+			buffer.blit(bufferLen, b, pos, copyLen);
+			bufferLen += copyLen;
+			pos += copyLen;
+			len -= copyLen;
+
+			if (bufferLen == 64) {
+				processBlock();
+				bufferLen = 0;
+			}
+		}
+	}
+
+	public function digest():haxe.io.Bytes {
+		buffer.set(bufferLen, 0x80);
+		bufferLen++;
+
+		if (bufferLen > 56) {
+			while (bufferLen < 64) {
+				buffer.set(bufferLen, 0);
+				bufferLen++;
+			}
+			processBlock();
+			bufferLen = 0;
+		}
+
+		while (bufferLen < 56) {
+			buffer.set(bufferLen, 0);
+			bufferLen++;
+		}
+
+		final bitLen = totalLen * 8;
+		buffer.set(56, haxe.Int64.toInt((bitLen >>> 56) & 0xFF));
+		buffer.set(57, haxe.Int64.toInt((bitLen >>> 48)) & 0xFF);
+		buffer.set(58, haxe.Int64.toInt((bitLen >>> 40)) & 0xFF);
+		buffer.set(59, haxe.Int64.toInt((bitLen >>> 32)) & 0xFF);
+		buffer.set(60, haxe.Int64.toInt((bitLen >>> 24)) & 0xFF);
+		buffer.set(61, haxe.Int64.toInt((bitLen >>> 16)) & 0xFF);
+		buffer.set(62, haxe.Int64.toInt((bitLen >>> 8)) & 0xFF);
+		buffer.set(63, haxe.Int64.toInt(bitLen) & 0xFF);
+
+		processBlock();
+
 		var out = haxe.io.Bytes.alloc(20);
-		var p = 0;
 		for (i in 0...5) {
-			out.set(p++, h[i] >>> 24);
-			out.set(p++, (h[i] >> 16) & 0xFF);
-			out.set(p++, (h[i] >> 8) & 0xFF);
-			out.set(p++, h[i] & 0xFF);
+			out.set(i * 4, h[i] >>> 24);
+			out.set(i * 4 + 1, (h[i] >> 16) & 0xFF);
+			out.set(i * 4 + 2, (h[i] >> 8) & 0xFF);
+			out.set(i * 4 + 3, h[i] & 0xFF);
 		}
 		return out;
 	}
 
-	function new() {}
-
-	function doEncode(x:Array<Int>):Array<Int> {
+	function processBlock():Void {
 		var w = new Array<Int>();
+		for (j in 0...16) {
+			w[j] = (buffer.get(j * 4) << 24) |
+			           ((buffer.get(j * 4 + 1) & 0xFF) << 16) |
+			           ((buffer.get(j * 4 + 2) & 0xFF) << 8) |
+			           (buffer.get(j * 4 + 3) & 0xFF);
+		}
 
-		var a = 0x67452301;
-		var b = 0xEFCDAB89;
-		var c = 0x98BADCFE;
-		var d = 0x10325476;
-		var e = 0xC3D2E1F0;
+		var a = h[0];
+		var b = h[1];
+		var c = h[2];
+		var d = h[3];
+		var e = h[4];
 
-		var i = 0;
-		while (i < x.length) {
-			var olda = a;
-			var oldb = b;
-			var oldc = c;
-			var oldd = d;
-			var olde = e;
-
-			var j = 0;
-			while (j < 80) {
-				if (j < 16)
-					w[j] = x[i + j];
-				else
-					w[j] = rol(w[j - 3] ^ w[j - 8] ^ w[j - 14] ^ w[j - 16], 1);
-				var t = rol(a, 5) + ft(j, b, c, d) + e + w[j] + kt(j);
-				e = d;
-				d = c;
-				c = rol(b, 30);
-				b = a;
-				a = t;
-				j++;
+		for (j in 0...80) {
+			if (j >= 16) {
+				w[j] = rol(w[j - 3] ^ w[j - 8] ^ w[j - 14] ^ w[j - 16], 1);
 			}
-			a += olda;
-			b += oldb;
-			c += oldc;
-			d += oldd;
-			e += olde;
-			i += 16;
+			var t = rol(a, 5) + ft(j, b, c, d) + e + w[j] + kt(j);
+			e = d;
+			d = c;
+			c = rol(b, 30);
+			b = a;
+			a = t;
 		}
-		return [a, b, c, d, e];
-	}
 
-	/**
-		Convert a string to a sequence of 16-word blocks, stored as an array.
-		Append padding bits and the length, as described in the SHA1 standard.
-	**/
-	static function str2blks(s:String):Array<Int> {
-		#if target.unicode
-		var s = haxe.io.Bytes.ofString(s);
-		#end
-		var nblk = ((s.length + 8) >> 6) + 1;
-		var blks = new Array<Int>();
-
-		for (i in 0...nblk * 16)
-			blks[i] = 0;
-		for (i in 0...s.length) {
-			var p = i >> 2;
-			blks[p] |= #if target.unicode s.get(i) #else StringTools.fastCodeAt(s, i) #end << (24 - ((i & 3) << 3));
-		}
-		var i = s.length;
-		var p = i >> 2;
-		blks[p] |= 0x80 << (24 - ((i & 3) << 3));
-		blks[nblk * 16 - 1] = s.length * 8;
-		return blks;
-	}
-
-	static function bytes2blks(b:haxe.io.Bytes):Array<Int> {
-		var nblk = ((b.length + 8) >> 6) + 1;
-		var blks = new Array<Int>();
-
-		for (i in 0...nblk * 16)
-			blks[i] = 0;
-		for (i in 0...b.length) {
-			var p = i >> 2;
-			blks[p] |= b.get(i) << (24 - ((i & 3) << 3));
-		}
-		var i = b.length;
-		var p = i >> 2;
-		blks[p] |= 0x80 << (24 - ((i & 3) << 3));
-		blks[nblk * 16 - 1] = b.length * 8;
-		return blks;
+		h[0] += a;
+		h[1] += b;
+		h[2] += c;
+		h[3] += d;
+		h[4] += e;
 	}
 
 	/**
@@ -199,14 +254,6 @@ class Sha1 {
 		if (t < 60)
 			return 0x8F1BBCDC;
 		return 0xCA62C1D6;
-	}
-
-	function hex(a:Array<Int>) {
-		var str = "";
-		for (num in a) {
-			str += StringTools.hex(num, 8);
-		}
-		return str.toLowerCase();
 	}
 	#end
 }
